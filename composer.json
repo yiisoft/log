@@ -75,5 +75,11 @@
         "psr-4": {
             "yii\\log\\": "src"
         }
+    },
+    "extra": {
+        "config-plugin": {
+            "params": "config/params.php",
+            "common": "config/common.php"
+        }
     }
 }

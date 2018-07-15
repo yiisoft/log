@@ -1,9 +1,11 @@
 {
     "name": "yiisoft/log",
-    "description": "Yii Log",
+    "description": "Yii Framework 3.0 cache components",
     "keywords": [
-        "yii2",
-        "framework"
+        "yii",
+        "framework",
+        "log",
+        "logger"
     ],
     "homepage": "http://www.yiiframework.com/",
     "type": "library",

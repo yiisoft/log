@@ -7,8 +7,7 @@
 
 namespace yii\log;
 
-use Yii;
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 use yii\helpers\FileHelper;
 
 /**
@@ -29,7 +28,7 @@ class FileTarget extends Target
      * @var string log file path or [path alias](guide:concept-aliases). If not set, it will use the "@runtime/logs/app.log" file.
      * The directory containing the log files will be automatically created if not existing.
      */
-    public $logFile;
+    protected $_logFile;
     /**
      * @var bool whether log files should be rotated when they reach a certain [[maxFileSize|maximum size]].
      * Log rotation is enabled by default. This property allows you to disable it, when you have configured
@@ -40,11 +39,11 @@ class FileTarget extends Target
     /**
      * @var int maximum log file size, in kilo-bytes. Defaults to 10240, meaning 10MB.
      */
-    public $maxFileSize = 10240; // in KB
+    protected $_maxFileSize = 10240; // in KB
     /**
      * @var int number of log files used for rotation. Defaults to 5.
      */
-    public $maxLogFiles = 5;
+    protected $_maxLogFiles = 5;
     /**
      * @var int the permission to be set for newly created log files.
      * This value will be used by PHP chmod() function. No umask will be applied.
@@ -72,25 +71,64 @@ class FileTarget extends Target
      */
     public $rotateByCopy = true;
 
+    public function getLogFile()
+    {
+        if ($this->_logFile == null) {
+            $this->_logFile = $this->app->getAlias('@runtime/logs/app.log');
+        }
+
+        return $this->_logFile;
+    }
+
+    public function setLogFile($path)
+    {
+        $this->_logFile = $this->app->getAlias($path);
+    }
 
     /**
-     * Initializes the route.
-     * This method is invoked after the route is created by the route manager.
+     * Sets the value of maxLogFiles.
+     * @param int $maxLogFiles
      */
-    public function init()
+    public function setMaxLogFiles($maxLogFiles): self
     {
-        parent::init();
-        if ($this->logFile === null) {
-            $this->logFile = Yii::$app->getRuntimePath() . '/logs/app.log';
-        } else {
-            $this->logFile = Yii::getAlias($this->logFile);
+        $this->_maxLogFiles = (int)$maxLogFiles;
+        if ($this->_maxLogFiles < 1) {
+            $this->_maxLogFiles = 1;
         }
-        if ($this->maxLogFiles < 1) {
-            $this->maxLogFiles = 1;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of maxLogFiles.
+     * @return int
+     */
+    public function getMaxLogFiles(): int
+    {
+        return $this->_maxLogFiles;
+    }
+
+    /**
+     * Sets the value of maxFileSize.
+     * @param int $maxFileSize
+     */
+    public function setMaxFileSize($maxFileSize): self
+    {
+        $this->_maxFileSize = $maxFileSize;
+        if ($this->_maxFileSize < 1) {
+            $this->_maxFileSize = 1;
         }
-        if ($this->maxFileSize < 1) {
-            $this->maxFileSize = 1;
-        }
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of maxFileSize.
+     * @return int
+     */
+    public function getMaxFileSize(): int
+    {
+        return $this->_maxFileSize;
     }
 
     /**

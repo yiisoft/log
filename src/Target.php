@@ -8,7 +8,7 @@
 namespace yii\log;
 
 use Psr\Log\LogLevel;
-use Yii;
+use yii\base\Application;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
@@ -124,6 +124,16 @@ abstract class Target extends Component
      * Child classes must implement this method.
      */
     abstract public function export();
+
+    /**
+     * @var Application
+     */
+    protected $app;
+
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
 
     /**
      * Processes the given log messages.
@@ -248,15 +258,15 @@ abstract class Target extends Component
             return call_user_func($this->prefix, $message);
         }
 
-        if (Yii::$app === null) {
+        if ($this->app === null) {
             return '';
         }
 
-        $request = Yii::$app->getRequest();
+        $request = $this->app->getRequest();
         $ip = $request instanceof Request ? $request->getUserIP() : '-';
 
         /* @var $user \yii\web\User */
-        $user = Yii::$app->has('user', true) ? Yii::$app->get('user') : null;
+        $user = $this->app->has('user') ? $this->app->user : null;
         if ($user && ($identity = $user->getIdentity(false))) {
             $userID = $identity->getId();
         } else {
@@ -264,7 +274,7 @@ abstract class Target extends Component
         }
 
         /* @var $session \yii\web\Session */
-        $session = Yii::$app->has('session', true) ? Yii::$app->get('session') : null;
+        $session = $this->app->has('session') ? $this->app->session : null;
         $sessionID = $session && $session->getIsActive() ? $session->getId() : '-';
 
         return "[$ip][$userID][$sessionID]";

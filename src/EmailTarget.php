@@ -8,7 +8,7 @@
 namespace yii\log;
 
 use Yii;
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 use yii\di\Instance;
 use yii\mail\MailerInterface;
 

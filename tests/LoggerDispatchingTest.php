@@ -20,7 +20,7 @@ namespace yiiunit\framework\log {
 
     use Psr\Log\LogLevel;
     use Yii;
-    use yii\base\UserException;
+    use yii\exceptions\UserException;
     use yii\log\Logger;
     use yiiunit\TestCase;
 

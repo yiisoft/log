@@ -43,7 +43,7 @@ class EmailTargetTest extends TestCase
 
     /**
      * @covers \yii\log\EmailTarget::init()
-     * @expectedException \yii\base\InvalidConfigException
+     * @expectedException \yii\exceptions\InvalidConfigException
      * @expectedExceptionMessage The "to" option must be set for EmailTarget::message.
      */
     public function testInitWithoutOptionTo()

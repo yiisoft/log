@@ -8,7 +8,7 @@
 namespace yii\log;
 
 use Psr\Log\LoggerInterface;
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 use yii\di\Instance;
 
 /**

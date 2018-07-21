@@ -7,7 +7,7 @@
 
 namespace yiiunit\framework\log;
 
-use yii\base\Exception;
+use yii\exceptions\Exception;
 use yii\log\Target;
 
 /**

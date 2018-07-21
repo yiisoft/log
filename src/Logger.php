@@ -11,9 +11,9 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerTrait;
-use Yii;
 use yii\base\Component;
 use yii\base\ErrorHandler;
+use yii\helpers\Yii;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to [[targets]].

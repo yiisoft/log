@@ -13,7 +13,7 @@ namespace yii\log;
  * @author Bizley <pawel@positive.codes>
  * @since 2.0.14
  */
-class LogRuntimeException extends \yii\base\Exception
+class LogRuntimeException extends \yii\exceptions\Exception
 {
     /**
      * @return string the user-friendly name of this exception

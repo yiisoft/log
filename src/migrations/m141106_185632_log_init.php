@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-use yii\base\InvalidConfigException;
+use yii\exceptions\InvalidConfigException;
 use yii\db\Migration;
 use yii\log\DbTarget;
 

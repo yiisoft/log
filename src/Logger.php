@@ -201,7 +201,7 @@ class Logger extends Component implements LoggerInterface
                 $ts = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                 array_pop($ts); // remove the last trace since it would be the entry script, not very useful
                 foreach ($ts as $trace) {
-                    if (isset($trace['file'], $trace['line']) && strpos($trace['file'], YII2_PATH) !== 0) {
+                    if (isset($trace['file'], $trace['line']) && strpos($trace['file'], YII_PATH) !== 0) {
                         unset($trace['object'], $trace['args']);
                         $traces[] = $trace;
                         if (++$count >= $this->traceLevel) {

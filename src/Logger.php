@@ -14,6 +14,7 @@ use Psr\Log\LoggerTrait;
 use yii\base\Component;
 use yii\base\ErrorHandler;
 use yii\helpers\Yii;
+use yii\helpers\VarDumper;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to [[targets]].
@@ -155,9 +156,9 @@ class Logger extends Component implements LoggerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Prepares message for logging.
      */
-    public function log($level, $message, array $context = array())
+    public static function prepareMessage($message)
     {
         if (!is_string($message)) {
             if (is_scalar($message)) {
@@ -165,18 +166,30 @@ class Logger extends Component implements LoggerInterface
             } elseif (is_object($message)) {
                 if ($message instanceof \Throwable) {
                     if (!isset($context['exception'])) {
+                        // exceptions are string-convertable, thus should be passed as it is to the logger
+                        // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
                         $context['exception'] = $message;
                     }
                     $message = $message->__toString();
                 } elseif (method_exists($message, '__toString')) {
                     $message = $message->__toString();
-                } else {
-                    throw new InvalidArgumentException('The log message MUST be a string or object implementing __toString()');
+                } elseif (class_exists(VarDumper::class)) {
+                    $message = VarDumper::export($message);
                 }
-            } else {
-                throw new InvalidArgumentException('The log message MUST be a string or object implementing __toString()');
             }
         }
+
+        if (!is_string($message)) {
+            throw new InvalidArgumentException('The log message MUST be a string or object implementing __toString()');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function log($level, $message, array $context = [])
+    {
+        $message = static::prepareMessage($message);
 
         if (!isset($context['time'])) {
             $context['time'] = microtime(true);

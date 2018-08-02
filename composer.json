@@ -1,6 +1,6 @@
 {
     "name": "yiisoft/log",
-    "description": "Yii Framework 3.0 cache components",
+    "description": "Yii Logging Library",
     "keywords": [
         "yii",
         "framework",

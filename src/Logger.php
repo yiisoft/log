@@ -42,7 +42,7 @@ use yii\helpers\VarDumper;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class Logger extends Component implements LoggerInterface
+class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
@@ -182,6 +182,8 @@ class Logger extends Component implements LoggerInterface
         if (!is_string($message)) {
             throw new InvalidArgumentException('The log message MUST be a string or object implementing __toString()');
         }
+
+        return $message;
     }
 
     /**

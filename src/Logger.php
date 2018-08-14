@@ -160,30 +160,19 @@ class Logger implements LoggerInterface
      */
     public static function prepareMessage($message)
     {
-        if (!is_string($message)) {
-            if (is_scalar($message)) {
-                $message = (string)$message;
-            } elseif (is_object($message)) {
-                if ($message instanceof \Throwable) {
-                    if (!isset($context['exception'])) {
-                        // exceptions are string-convertable, thus should be passed as it is to the logger
-                        // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
-                        $context['exception'] = $message;
-                    }
-                    $message = $message->__toString();
-                } elseif (method_exists($message, '__toString')) {
-                    $message = $message->__toString();
-                } elseif (class_exists(VarDumper::class)) {
-                    $message = VarDumper::export($message);
-                }
-            }
+        if (method_exists($message, '__toString')) {
+            return $message->__toString();
         }
 
-        if (!is_string($message)) {
-            throw new InvalidArgumentException('The log message MUST be a string or object implementing __toString()');
+        if (is_scalar($message)) {
+            return (string)$message;
         }
 
-        return $message;
+        if (class_exists(VarDumper::class)) {
+            return VarDumper::export($message);
+        }
+
+        throw new InvalidArgumentException('The log message MUST be a string or object implementing __toString()');
     }
 
     /**
@@ -191,6 +180,13 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
+        if ($message instanceof \Throwable) {
+            if (!isset($context['exception'])) {
+                // exceptions are string-convertable, thus should be passed as it is to the logger
+                // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
+                $context['exception'] = $message;
+            }
+        }
         $message = static::prepareMessage($message);
 
         if (!isset($context['time'])) {

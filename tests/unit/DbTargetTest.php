@@ -37,7 +37,7 @@ abstract class DbTargetTest extends TestCase
         if (Yii::getApp() === null) {
             new \yii\console\Application([
                 'id' => 'Migrator',
-                'basePath' => '@yiiunit',
+                'basePath' => '@yii/tests',
                 'controllerMap' => [
                     'migrate' => EchoMigrateController::class,
                 ],

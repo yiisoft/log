@@ -30,7 +30,7 @@ namespace yiiunit\framework\log {
     use yii\helpers\VarDumper;
     use yii\log\Logger;
     use yii\log\SyslogTarget;
-    use yiiunit\TestCase;
+    use yii\tests\TestCase;
 
     /**
      * Class SyslogTargetTest.

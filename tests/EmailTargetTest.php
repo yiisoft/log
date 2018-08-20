@@ -8,7 +8,7 @@
 namespace yiiunit\framework\log;
 
 use yii\log\EmailTarget;
-use yiiunit\TestCase;
+use yii\tests\TestCase;
 
 /**
  * Class EmailTargetTest.

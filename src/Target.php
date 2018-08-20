@@ -291,7 +291,7 @@ abstract class Target extends Component
      *
      * ```php
      * 'enabled' => function() {
-     *     return !Yii::$app->user->isGuest;
+     *     return !Yii::getApp()->user->isGuest;
      * }
      * ```
      */

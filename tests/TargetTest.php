@@ -10,7 +10,7 @@ namespace yiiunit\framework\log;
 use Psr\Log\LogLevel;
 use yii\log\Logger;
 use yii\log\Target;
-use yiiunit\TestCase;
+use yii\tests\TestCase;
 
 /**
  * @group log

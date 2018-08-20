@@ -13,6 +13,7 @@ use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
 use yii\helpers\VarDumper;
+use yii\helpers\Yii;
 use yii\web\Request;
 
 /**
@@ -124,16 +125,6 @@ abstract class Target extends Component
      * Child classes must implement this method.
      */
     abstract public function export();
-
-    /**
-     * @var Application
-     */
-    protected $app;
-
-    public function __construct(Application $app)
-    {
-        $this->app = $app;
-    }
 
     /**
      * Processes the given log messages.
@@ -258,15 +249,17 @@ abstract class Target extends Component
             return call_user_func($this->prefix, $message);
         }
 
-        if ($this->app === null) {
+        $app = $this->getApp();
+
+        if ($app === null) {
             return '';
         }
 
-        $request = $this->app->getRequest();
+        $request = $app->getRequest();
         $ip = $request instanceof Request ? $request->getUserIP() : '-';
 
         /* @var $user \yii\web\User */
-        $user = $this->app->has('user') ? $this->app->user : null;
+        $user = $app->has('user') ? $app->user : null;
         if ($user && ($identity = $user->getIdentity(false))) {
             $userID = $identity->getId();
         } else {
@@ -274,10 +267,19 @@ abstract class Target extends Component
         }
 
         /* @var $session \yii\web\Session */
-        $session = $this->app->has('session') ? $this->app->session : null;
+        $session = $app->has('session') ? $app->session : null;
         $sessionID = $session && $session->getIsActive() ? $session->getId() : '-';
 
         return "[$ip][$userID][$sessionID]";
+    }
+
+    /**
+     * To be redefined in other targets
+     * @return Application
+     */
+    protected function getApp(): Application
+    {
+        return Yii::getApp();
     }
 
     /**

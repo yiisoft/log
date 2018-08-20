@@ -39,11 +39,9 @@ class FileTargetTest extends TestCase
      */
     public function testInit()
     {
-        $logFile = Yii::getAlias('@yiiunit/runtime/log/filetargettest.log');
+        $logFile = Yii::getAlias('@yii/tests/runtime/log/filetargettest.log');
         FileHelper::removeDirectory(dirname($logFile));
-        new FileTarget([
-            'logFile' => Yii::getAlias('@yiiunit/runtime/log/filetargettest.log'),
-        ]);
+        new FileTarget(Yii::getAlias('@yii/tests/runtime/log/filetargettest.log'));
         $this->assertFileNotExists(
             dirname($logFile),
             'Log directory should not be created during init process'
@@ -56,21 +54,20 @@ class FileTargetTest extends TestCase
      */
     public function testRotate($rotateByCopy)
     {
-        $logFile = Yii::getAlias('@yiiunit/runtime/log/filetargettest.log');
+        $logFile = Yii::getAlias('@yii/tests/runtime/log/filetargettest.log');
         FileHelper::removeDirectory(dirname($logFile));
         mkdir(dirname($logFile), 0777, true);
 
-        $logger = new Logger([
-            'targets' => [
-                'file' => [
-                    '__class' => FileTarget::class,
-                    'logFile' => $logFile,
-                    'levels' => [LogLevel::WARNING],
-                    'maxFileSize' => 1024, // 1 MB
-                    'maxLogFiles' => 1, // one file for rotation and one normal log file
-                    'logVars' => [],
-                    'rotateByCopy' => $rotateByCopy,
-                ],
+        $logger = new Logger();
+        $logger->setTargets([
+            'file' => [
+                '__class' => FileTarget::class,
+                'logFile' => $logFile,
+                'levels' => [LogLevel::WARNING],
+                'maxFileSize' => 1024, // 1 MB
+                'maxLogFiles' => 1, // one file for rotation and one normal log file
+                'logVars' => [],
+                'rotateByCopy' => $rotateByCopy,
             ],
         ]);
 

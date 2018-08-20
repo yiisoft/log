@@ -9,6 +9,7 @@ namespace yii\log;
 
 use yii\exceptions\InvalidConfigException;
 use yii\helpers\FileHelper;
+use yii\helpers\Yii;
 
 /**
  * FileTarget records log messages in a file.
@@ -71,18 +72,19 @@ class FileTarget extends Target
      */
     public $rotateByCopy = true;
 
+    public function __construct(string $logFile = '@runtime/logs/app.log')
+    {
+        $this->setLogFile($logFile);
+    }
+
     public function getLogFile()
     {
-        if ($this->_logFile == null) {
-            $this->_logFile = $this->app->getAlias('@runtime/logs/app.log');
-        }
-
         return $this->_logFile;
     }
 
     public function setLogFile($path)
     {
-        $this->_logFile = $this->app->getAlias($path);
+        $this->_logFile = Yii::getAlias($path);
     }
 
     /**

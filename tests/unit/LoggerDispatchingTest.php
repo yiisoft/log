@@ -19,7 +19,7 @@ namespace yii\log {
 namespace yii\log\tests\unit {
 
     use Psr\Log\LogLevel;
-    use Yii;
+    use yii\helpers\Yii;
     use yii\exceptions\UserException;
     use yii\log\Logger;
     use yii\tests\TestCase;

@@ -8,7 +8,7 @@
 namespace yii\log;
 
 use Psr\Log\LogLevel;
-use Yii;
+use yii\helpers\Yii;
 
 /**
  * SyslogTarget writes log to syslog.

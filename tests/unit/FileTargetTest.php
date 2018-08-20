@@ -8,7 +8,7 @@
 namespace yii\log\tests\unit;
 
 use Psr\Log\LogLevel;
-use Yii;
+use yii\helpers\Yii;
 use yii\helpers\FileHelper;
 use yii\log\FileTarget;
 use yii\log\Logger;

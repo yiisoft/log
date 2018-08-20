@@ -8,7 +8,7 @@
 namespace yii\log\tests\unit;
 
 use Psr\Log\LogLevel;
-use Yii;
+use yii\helpers\Yii;
 use yii\console\ExitCode;
 use yii\db\Connection;
 use yii\db\Query;

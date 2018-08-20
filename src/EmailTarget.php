@@ -7,9 +7,8 @@
 
 namespace yii\log;
 
-use Yii;
 use yii\exceptions\InvalidConfigException;
-use yii\di\Instance;
+use yii\di\AbstractContainer;
 use yii\mail\MailerInterface;
 
 /**
@@ -48,26 +47,23 @@ class EmailTarget extends Target
      * @var array the configuration array for creating a [[\yii\mail\MessageInterface|message]] object.
      * Note that the "to" option must be set, which specifies the destination email address(es).
      */
-    public $message = [];
+    protected $message = [];
     /**
      * @var MailerInterface|array|string the mailer object or the application component ID of the mailer object.
      * After the EmailTarget object is created, if you want to change this property, you should only assign it
      * with a mailer object.
      * Starting from version 2.0.2, this can also be a configuration array for creating the object.
      */
-    public $mailer = 'mailer';
+    protected $mailer = 'mailer';
 
 
-    /**
-     * {@inheritdoc}
-     */
-    public function init()
+    public function __construct(MailerInterface $mailer, array $message)
     {
-        parent::init();
+        $this->mailer = $mailer;
+        $this->message = $message;
         if (empty($this->message['to'])) {
             throw new InvalidConfigException('The "to" option must be set for EmailTarget::message.');
         }
-        $this->mailer = Instance::ensure($this->mailer, MailerInterface::class);
     }
 
     /**
@@ -98,7 +94,7 @@ class EmailTarget extends Target
     protected function composeMessage($body)
     {
         $message = $this->mailer->compose();
-        Yii::configure($message, $this->message);
+        AbstractContainer::configure($message, $this->message);
         $message->setTextBody($body);
 
         return $message;

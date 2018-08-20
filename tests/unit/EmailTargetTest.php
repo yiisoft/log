@@ -8,6 +8,7 @@
 namespace yii\log\tests\unit;
 
 use yii\log\EmailTarget;
+use yii\mail\BaseMailer;
 use yii\tests\TestCase;
 
 /**
@@ -27,7 +28,9 @@ class EmailTargetTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->mailer = $this->getMockBuilder('yii\\mail\\BaseMailer')
+        $this->mockApplication();
+        $this->mailer = $this->getMockBuilder(BaseMailer::class)
+            ->setConstructorArgs([$this->app])
             ->setMethods(['compose'])
             ->getMockForAbstractClass();
     }
@@ -37,7 +40,7 @@ class EmailTargetTest extends TestCase
      */
     public function testInitWithOptionTo()
     {
-        $target = new EmailTarget(['mailer' => $this->mailer, 'message' => ['to' => 'developer1@example.com']]);
+        $target = new EmailTarget($this->mailer, ['to' => 'developer1@example.com']);
         $this->assertInternalType('object', $target); // should be no exception during `init()`
     }
 
@@ -48,7 +51,7 @@ class EmailTargetTest extends TestCase
      */
     public function testInitWithoutOptionTo()
     {
-        new EmailTarget(['mailer' => $this->mailer]);
+        new EmailTarget($this->mailer, []);
     }
 
     /**
@@ -76,12 +79,10 @@ class EmailTargetTest extends TestCase
         $mailTarget = $this->getMockBuilder('yii\\log\\EmailTarget')
             ->setMethods(['formatMessage'])
             ->setConstructorArgs([
-                [
-                    'mailer' => $this->mailer,
-                    'message' => [
-                        'to' => 'developer@example.com',
-                        'subject' => 'Hello world',
-                    ],
+                'mailer' => $this->mailer,
+                'message' => [
+                    'to' => 'developer@example.com',
+                    'subject' => 'Hello world',
                 ],
             ])
             ->getMock();
@@ -121,11 +122,9 @@ class EmailTargetTest extends TestCase
         $mailTarget = $this->getMockBuilder('yii\\log\\EmailTarget')
             ->setMethods(['formatMessage'])
             ->setConstructorArgs([
-                [
-                    'mailer' => $this->mailer,
-                    'message' => [
-                        'to' => 'developer@example.com',
-                    ],
+                'mailer' => $this->mailer,
+                'message' => [
+                    'to' => 'developer@example.com',
                 ],
             ])
             ->getMock();
@@ -155,11 +154,9 @@ class EmailTargetTest extends TestCase
         $mailTarget = $this->getMockBuilder('yii\\log\\EmailTarget')
             ->setMethods(['formatMessage'])
             ->setConstructorArgs([
-                [
-                    'mailer' => $this->mailer,
-                    'message' => [
-                        'to' => 'developer@example.com',
-                    ],
+                'mailer' => $this->mailer,
+                'message' => [
+                    'to' => 'developer@example.com',
                 ],
             ])
             ->getMock();

@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\log;
+namespace yii\log\tests\unit;
 
 use yii\log\EmailTarget;
 use yii\tests\TestCase;

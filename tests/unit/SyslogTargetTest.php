@@ -9,21 +9,21 @@ namespace yii\log {
 
     function openlog()
     {
-        return \yiiunit\framework\log\SyslogTargetTest::openlog(func_get_args());
+        return \yii\log\tests\unit\SyslogTargetTest::openlog(func_get_args());
     }
 
     function syslog()
     {
-        return \yiiunit\framework\log\SyslogTargetTest::syslog(func_get_args());
+        return \yii\log\tests\unit\SyslogTargetTest::syslog(func_get_args());
     }
 
     function closelog()
     {
-        return \yiiunit\framework\log\SyslogTargetTest::closelog(func_get_args());
+        return \yii\log\tests\unit\SyslogTargetTest::closelog(func_get_args());
     }
 }
 
-namespace yiiunit\framework\log {
+namespace yii\log\tests\unit {
 
     use PHPUnit_Framework_MockObject_MockObject;
     use Psr\Log\LogLevel;

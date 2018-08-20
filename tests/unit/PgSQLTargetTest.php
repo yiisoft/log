@@ -5,14 +5,14 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yiiunit\framework\log;
+namespace yii\log\tests\unit;
 
 /**
  * @group db
- * @group mysql
+ * @group pgsql
  * @group log
  */
-class MySQLTargetTest extends DbTargetTest
+class PgSQLTargetTest extends DbTargetTest
 {
-    protected static $driverName = 'mysql';
+    protected static $driverName = 'pgsql';
 }

@@ -22,7 +22,7 @@ namespace yiiunit\framework\log {
     use Yii;
     use yii\exceptions\UserException;
     use yii\log\Logger;
-    use yiiunit\TestCase;
+    use yii\tests\TestCase;
 
     /**
      * @group log

@@ -14,7 +14,7 @@ use yii\db\Connection;
 use yii\db\Query;
 use yii\log\DbTarget;
 use yiiunit\framework\console\controllers\EchoMigrateController;
-use yiiunit\TestCase;
+use yii\tests\TestCase;
 
 /**
  * @group db
@@ -34,7 +34,7 @@ abstract class DbTargetTest extends TestCase
 
     protected static function runConsoleAction($route, $params = [])
     {
-        if (Yii::$app === null) {
+        if (Yii::getApp() === null) {
             new \yii\console\Application([
                 'id' => 'Migrator',
                 'basePath' => '@yiiunit',
@@ -57,7 +57,7 @@ abstract class DbTargetTest extends TestCase
         }
 
         ob_start();
-        $result = Yii::$app->runAction($route, $params);
+        $result = Yii::getApp()->runAction($route, $params);
         echo 'Result is ' . $result;
         if ($result !== ExitCode::OK) {
             ob_end_flush();

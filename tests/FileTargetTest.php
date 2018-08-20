@@ -12,7 +12,7 @@ use Yii;
 use yii\helpers\FileHelper;
 use yii\log\FileTarget;
 use yii\log\Logger;
-use yiiunit\TestCase;
+use yii\tests\TestCase;
 
 /**
  * @group log

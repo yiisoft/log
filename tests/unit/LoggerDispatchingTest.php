@@ -22,6 +22,7 @@ namespace yii\log\tests\unit {
     use yii\helpers\Yii;
     use yii\exceptions\UserException;
     use yii\log\Logger;
+    use yii\log\SyslogTarget;
     use yii\tests\TestCase;
 
     /**
@@ -149,13 +150,13 @@ namespace yii\log\tests\unit {
                 [
                     'targets' => [
                         'syslog' => [
-                            '__class' => \yii\log\SyslogTarget::class,
+                            '__class' => SyslogTarget::class,
                         ],
                     ],
                 ]
             );
 
-            $this->assertEquals($logger->targets['syslog'], Yii::createObject('yii\log\SyslogTarget'));
+            $this->assertEquals($logger->getTarget('syslog'), Yii::createObject(SyslogTarget::class));
         }
 
         /**

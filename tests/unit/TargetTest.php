@@ -149,7 +149,7 @@ class TargetTest extends TestCase
     public function testFormatMessage()
     {
         /** @var Target $target */
-        $target = $this->getMockForAbstractClass('yii\\log\\Target');
+        $target = $this->getMockForAbstractClass(Target::class);
 
         $text = 'message';
         $level = LogLevel::INFO;

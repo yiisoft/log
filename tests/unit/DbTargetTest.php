@@ -32,29 +32,27 @@ abstract class DbTargetTest extends TestCase
 
     protected static $logTable = '{{%log}}';
 
-    protected static function runConsoleAction($route, $params = [])
+    protected function runConsoleAction($route, $params = [])
     {
-        if (Yii::getApp() === null) {
-            new \yii\console\Application([
-                'id' => 'Migrator',
-                'basePath' => '@yii/tests',
-                'controllerMap' => [
-                    'migrate' => EchoMigrateController::class,
-                ],
-                'logger' => [
-                    'targets' => [
-                        'db' => [
-                            '__class' => DbTarget::class,
-                            'levels' => [LogLevel::WARNING],
-                            'logTable' => self::$logTable,
-                        ],
+        $this->destroyApplication();
+        $this->mockApplication([
+            'id' => 'Migrator',
+            'basePath' => '@yii/tests',
+            'controllerMap' => [
+                'migrate' => EchoMigrateController::class,
+            ],
+        ], [
+            'logger' => [
+                'targets' => [
+                    'db' => [
+                        '__class' => DbTarget::class,
+                        'levels' => [LogLevel::WARNING],
+                        'logTable' => self::$logTable,
                     ],
                 ],
-                'components' => [
-                    'db' => static::getConnection(),
-                ],
-            ]);
-        }
+            ],
+            'db' => static::getConnection(),
+        ]);
 
         ob_start();
         $result = Yii::getApp()->runAction($route, $params);
@@ -77,13 +75,13 @@ abstract class DbTargetTest extends TestCase
             static::markTestSkipped('pdo and ' . $pdo_database . ' extension are required.');
         }
 
-        static::runConsoleAction('migrate/up', ['migrationPath' => '@yii/log/migrations/', 'interactive' => false]);
+        $this->runConsoleAction('migrate/up', ['migrationPath' => '@yii/log/migrations/', 'interactive' => false]);
     }
 
     public function tearDown()
     {
         self::getConnection()->createCommand()->truncateTable(self::$logTable)->execute();
-        static::runConsoleAction('migrate/down', ['migrationPath' => '@yii/log/migrations/', 'interactive' => false]);
+        $this->runConsoleAction('migrate/down', ['migrationPath' => '@yii/log/migrations/', 'interactive' => false]);
         if (static::$db) {
             static::$db->close();
         }

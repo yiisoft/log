@@ -108,6 +108,17 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * @param int|string $name string name or integer index
+     * @return Target|null
+     */
+    public function getTarget($name): ?Target
+    {
+        $this->getTargets();
+
+        return $this->_targets[$name] ?? null;
+    }
+
+    /**
      * @param array|Target[] $targets the log targets. Each array element represents a single [[Target|log target]] instance
      * or the configuration for creating the log target instance.
      * @since 3.0.0

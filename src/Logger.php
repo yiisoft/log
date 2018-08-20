@@ -35,10 +35,6 @@ use yii\helpers\VarDumper;
  * to send logged messages to different log targets, such as [[FileTarget|file]], [[EmailTarget|email]],
  * or [[DbTarget|database]], according to the [[targets]].
  *
- * @property array|Target[] $targets the log targets. See [[setTargets()]] for details.
- * @property float $elapsedTime The total elapsed time in seconds for current request. This property is
- * read-only.
- *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
@@ -251,7 +247,7 @@ class Logger implements LoggerInterface
     protected function dispatch($messages, $final)
     {
         $targetErrors = [];
-        foreach ($this->targets as $target) {
+        foreach ($this->getTargets() as $target) {
             if ($target->enabled) {
                 try {
                     $target->collect($messages, $final);

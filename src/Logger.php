@@ -38,7 +38,7 @@ use yii\helpers\VarDumper;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class Logger implements LoggerInterface
+class Logger extends Component implements LoggerInterface
 {
     use LoggerTrait;
 

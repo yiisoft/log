@@ -50,7 +50,7 @@ namespace yii\log\tests\unit {
         protected function setUp()
         {
             static::$microtimeIsMocked = false;
-            $this->logger = new Logger();
+            $this->logger = new Logger([]);
         }
 
         /**
@@ -65,7 +65,7 @@ namespace yii\log\tests\unit {
             $target->expects($this->never())->method($this->anything());
             $target->enabled = false;
 
-            $logger = new Logger(['targets' => ['fakeTarget' => $target]]);
+            $logger = new Logger(['fakeTarget' => $target]);
             $logger->messages = 'messages';
             $logger->flush(true);
         }
@@ -86,7 +86,7 @@ namespace yii\log\tests\unit {
                     $this->equalTo(true)
                 );
 
-            $logger = new Logger(['targets' => ['fakeTarget' => $target]]);
+            $logger = new Logger(['fakeTarget' => $target]);
 
             $logger->messages = 'messages';
             $logger->flush(true);
@@ -130,7 +130,10 @@ namespace yii\log\tests\unit {
                     $this->equalTo(true)
                 )->will($this->throwException(new UserException('some error')));
 
-            $logger = new Logger(['targets' => ['fakeTarget1' => $target1, 'fakeTarget2' => $target2]]);
+            $logger = new Logger([
+                'fakeTarget1' => $target1,
+                'fakeTarget2' => $target2,
+            ]);
 
             static::$functions['microtime'] = function ($arguments) {
                 $this->assertEquals([true], $arguments);
@@ -146,15 +149,11 @@ namespace yii\log\tests\unit {
          */
         public function testInitWithCreateTargetObject()
         {
-            $logger = new Logger(
-                [
-                    'targets' => [
-                        'syslog' => [
-                            '__class' => SyslogTarget::class,
-                        ],
-                    ],
-                ]
-            );
+            $logger = new Logger([
+                'syslog' => [
+                    '__class' => SyslogTarget::class,
+                ],
+            ]);
 
             $this->assertEquals($logger->getTarget('syslog'), Yii::createObject(SyslogTarget::class));
         }

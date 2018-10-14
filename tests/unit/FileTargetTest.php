@@ -58,8 +58,7 @@ class FileTargetTest extends TestCase
         FileHelper::removeDirectory(dirname($logFile));
         mkdir(dirname($logFile), 0777, true);
 
-        $logger = new Logger();
-        $logger->setTargets([
+        $logger = new Logger([
             'file' => [
                 '__class' => FileTarget::class,
                 'logFile' => $logFile,

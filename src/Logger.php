@@ -93,7 +93,7 @@ class Logger implements LoggerInterface
     /**
      * Initializes the logger by registering [[flush()]] as a shutdown function.
      */
-    public function __construct(array $targets)
+    public function __construct(array $targets = [])
     {
         $this->setTargets($targets);
         register_shutdown_function(function () {

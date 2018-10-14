@@ -60,10 +60,13 @@ class TargetTest extends TestCase
     {
         static::$messages = [];
 
-        $logger = new Logger([
-            'targets' => [new TestTarget(array_merge($filter, ['logVars' => []]))],
-            'flushInterval' => 1,
-        ]);
+        $filter = array_merge($filter, ['logVars' => []]);
+        $target = new TestTarget();
+        foreach ($filter as $key => $value) {
+            $target->{$key} = $value;
+        }
+        $logger = new Logger(['test' => $target]);
+        $logger->flushInterval = 1;
         $logger->log(LogLevel::INFO, 'testA');
         $logger->log(LogLevel::ERROR, 'testB');
         $logger->log(LogLevel::WARNING, 'testC');
@@ -83,14 +86,12 @@ class TargetTest extends TestCase
 
     public function testGetContextMessage()
     {
-        $target = new TestTarget([
-            'logVars' => [
-                'A', '!A.A_b', 'A.A_d',
-                'B.B_a',
-                'C', 'C.C_a',
-                'D',
-            ],
-        ]);
+        $target = new TestTarget();
+        $target->logVars = [
+            'A', '!A.A_b', 'A.A_d',
+            'B.B_a',
+            'C', 'C.C_a',
+        ];
         $GLOBALS['A'] = [
             'A_a' => 1,
             'A_b' => 1,
@@ -156,19 +157,19 @@ class TargetTest extends TestCase
         $category = 'application';
         $timestamp = 1508160390.6083;
 
-        $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
+        $expectedWithoutMicro = '2017-10-16 13:26:30 [][-][-][info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
 
         $target->microtime = true;
 
-        $expectedWithMicro = '2017-10-16 13:26:30.6083 [info][application] message';
+        $expectedWithMicro = '2017-10-16 13:26:30.6083 [][-][-][info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithMicro, $formatted);
 
         $timestamp = 1508160390;
 
-        $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
+        $expectedWithoutMicro = '2017-10-16 13:26:30 [][-][-][info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
     }

@@ -10,10 +10,10 @@ namespace yii\log\tests\unit;
 use Psr\Log\LogLevel;
 use yii\helpers\Yii;
 use yii\console\ExitCode;
+use yii\console\tests\unit\controllers\EchoMigrateController;
 use yii\db\Connection;
 use yii\db\Query;
 use yii\log\DbTarget;
-use yiiunit\framework\console\controllers\EchoMigrateController;
 use yii\tests\TestCase;
 
 /**
@@ -41,13 +41,16 @@ abstract class DbTargetTest extends TestCase
             'controllerMap' => [
                 'migrate' => EchoMigrateController::class,
             ],
-        ], [
+        ], null, [
             'logger' => [
-                'targets' => [
-                    'db' => [
-                        '__class' => DbTarget::class,
-                        'levels' => [LogLevel::WARNING],
-                        'logTable' => self::$logTable,
+                '__class' => 'yii\\log\\Logger',
+                '__construct()' => [
+                    'targets' => [
+                        'db' => [
+                            '__class' => DbTarget::class,
+                            'levels' => [LogLevel::WARNING],
+                            'logTable' => self::$logTable,
+                        ],
                     ],
                 ],
             ],

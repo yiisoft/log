@@ -107,11 +107,5 @@
             "params": "config/params.php",
             "common": "config/common.php"
         }
-    },
-    "repositories" : [
-        {
-            "type" : "path",
-            "url" : "../yii-core"
-        }
-    ]
+    }
 }

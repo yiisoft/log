@@ -145,7 +145,6 @@ namespace yii\log\tests\unit {
         }
 
         /**
-         * @covers \yii\log\Logger::init()
          */
         public function testInitWithCreateTargetObject()
         {

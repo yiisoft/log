@@ -124,7 +124,7 @@ abstract class DbTargetTest extends TestCase
      */
     public function testTimestamp()
     {
-        $logger = Yii::getLogger();
+        $logger = Yii::getApp()->getLogger();
 
         $time = 1424865393.0105;
 
@@ -150,7 +150,7 @@ abstract class DbTargetTest extends TestCase
     public function testTransactionRollBack()
     {
         $db = self::getConnection();
-        $logger = Yii::getLogger();
+        $logger = Yii::getApp()->getLogger();
 
         $tx = $db->beginTransaction();
 
@@ -170,7 +170,7 @@ abstract class DbTargetTest extends TestCase
         // current db connection should still have a transaction
         $this->assertNotNull($db->transaction);
         // log db connection should not have transaction
-        $this->assertNull(Yii::getLogger()->targets['db']->db->transaction);
+        $this->assertNull(Yii::getApp()->getLogger()->getTargets()['db']->db->transaction);
 
         $tx->rollBack();
 

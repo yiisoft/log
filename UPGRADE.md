@@ -10,4 +10,3 @@ the changes are bearable and require "refactoring", not "rewrite".
 All the "Yes, it is" cool stuff and Yii soul are still in place.
 
 Changes summary:
-*  removed `m180103_040100_log_change_level_to_int` migration;

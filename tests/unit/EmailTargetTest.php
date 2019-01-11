@@ -36,20 +36,20 @@ class EmailTargetTest extends TestCase
     }
 
     /**
-     * @covers \yii\log\EmailTarget::init()
+     * @covers \yii\log\EmailTarget::__construct()
      */
-    public function testInitWithOptionTo()
+    public function testConstructWithOptionTo()
     {
         $target = new EmailTarget($this->mailer, ['to' => 'developer1@example.com']);
-        $this->assertInternalType('object', $target); // should be no exception during `init()`
+        $this->assertInternalType('object', $target);
     }
 
     /**
-     * @covers \yii\log\EmailTarget::init()
+     * @covers \yii\log\EmailTarget::__construct()
      * @expectedException \yii\exceptions\InvalidConfigException
      * @expectedExceptionMessage The "to" option must be set for EmailTarget::message.
      */
-    public function testInitWithoutOptionTo()
+    public function testConstructWithoutOptionTo()
     {
         new EmailTarget($this->mailer, []);
     }

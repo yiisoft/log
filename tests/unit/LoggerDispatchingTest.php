@@ -145,8 +145,9 @@ namespace yii\log\tests\unit {
         }
 
         /**
+         * @covers \yii\log\Logger::__construct()
          */
-        public function testInitWithCreateTargetObject()
+        public function testConstructWithCreateTargetObject()
         {
             $logger = new Logger([
                 'syslog' => [

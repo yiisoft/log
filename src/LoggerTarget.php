@@ -55,15 +55,12 @@ class LoggerTarget extends Target
 
     /**
      * Sets the PSR-3 logger used to save messages of this target.
-     * @param LoggerInterface|\Closure|array $logger logger instance or its DI compatible configuration.
+     * @param LoggerInterface $logger logger instance or its DI compatible configuration.
      * @throws InvalidConfigException
      */
-    public function setLogger($logger)
+    public function setLogger(LoggerInterface $logger)
     {
-        if ($logger instanceof \Closure) {
-            $logger = call_user_func($logger);
-        }
-        $this->_logger = Instance::ensure($logger, LoggerInterface::class);
+        $this->_logger = $logger;
     }
 
     /**
@@ -81,7 +78,7 @@ class LoggerTarget extends Target
     /**
      * {@inheritdoc}
      */
-    public function export()
+    public function export(): void
     {
         foreach ($this->messages as $message) {
             [$level, $text, $context] = $message;

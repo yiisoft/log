@@ -192,7 +192,7 @@ class TestTarget extends Target
     /**
      * {@inheritdoc}
      */
-    public function getContextMessage()
+    public function getContextMessage(): string
     {
         return parent::getContextMessage();
     }

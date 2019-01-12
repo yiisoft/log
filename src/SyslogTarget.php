@@ -65,7 +65,7 @@ class SyslogTarget extends Target
      * Starting from version 2.0.14, this method throws LogRuntimeException in case the log can not be exported.
      * @throws LogRuntimeException
      */
-    public function export()
+    public function export(): void
     {
         openlog($this->identity, $this->options, $this->facility);
         foreach ($this->messages as $message) {
@@ -79,7 +79,7 @@ class SyslogTarget extends Target
     /**
      * {@inheritdoc}
      */
-    public function formatMessage($message)
+    public function formatMessage($message): string
     {
         [$level, $text, $context] = $message;
         $level = Logger::getLevelName($level);

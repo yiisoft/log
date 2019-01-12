@@ -7,12 +7,10 @@
 
 namespace yii\log;
 
-use yii\helpers\Yii;
-use yii\exceptions\InvalidConfigException;
-use yii\db\Connection;
-use yii\db\Exception;
-use yii\helpers\VarDumper;
 use yii\db\ConnectionInterface;
+use yii\db\Exception;
+use yii\exceptions\InvalidConfigException;
+use yii\helpers\VarDumper;
 
 /**
  * DbTarget stores log messages in a database table.
@@ -33,12 +31,12 @@ use yii\db\ConnectionInterface;
 class DbTarget extends Target
 {
     /**
-     * @var Connection|array|string the DB connection object or the application component ID of the DB connection.
+     * @var ConnectionInterface the DB connection object or the application component ID of the DB connection.
      * After the DbTarget object is created, if you want to change this property, you should only assign it
      * with a DB connection object.
      * Starting from version 2.0.2, this can also be a configuration array for creating the object.
      */
-    public $db = 'db';
+    public $db;
     /**
      * @var string name of the DB table to store cache content. Defaults to "log".
      */
@@ -52,7 +50,7 @@ class DbTarget extends Target
      */
     public function __construct(ConnectionInterface $db)
     {
-        $this->db = Yii::ensureObject($db, Connection::class);
+        $this->db = $db;
     }
 
     /**
@@ -61,7 +59,7 @@ class DbTarget extends Target
      * @throws Exception
      * @throws LogRuntimeException
      */
-    public function export()
+    public function export(): void
     {
         if ($this->db->getTransaction()) {
             // create new database connection, if there is an open transaction

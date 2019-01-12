@@ -109,7 +109,7 @@ class Logger implements LoggerInterface
      * @return Target[] the log targets. Each array element represents a single [[Target|log target]] instance.
      * @since 3.0.0
      */
-    public function getTargets()
+    public function getTargets(): array
     {
         if (!$this->_isTargetsInitialized) {
             foreach ($this->_targets as $name => $target) {
@@ -138,7 +138,7 @@ class Logger implements LoggerInterface
      * or the configuration for creating the log target instance.
      * @since 3.0.0
      */
-    public function setTargets($targets)
+    public function setTargets(array $targets): void
     {
         $this->_targets = $targets;
         $this->_isTargetsInitialized = false;
@@ -150,7 +150,7 @@ class Logger implements LoggerInterface
      * @param string|null $name array key to be used to store target, if `null` is given target will be append
      * to the end of the array by natural integer key.
      */
-    public function addTarget($target, $name = null)
+    public function addTarget($target, string $name = null)
     {
         if (!$target instanceof Target) {
             $this->_isTargetsInitialized = false;
@@ -239,7 +239,7 @@ class Logger implements LoggerInterface
      * Flushes log messages from memory to targets.
      * @param bool $final whether this is a final call during a request.
      */
-    public function flush($final = false)
+    public function flush(bool $final = false): void
     {
         $messages = $this->messages;
         // https://github.com/yiisoft/yii2/issues/5619
@@ -255,7 +255,7 @@ class Logger implements LoggerInterface
      * @param bool $final whether this method is called at the end of the current application
      * @since 3.0.0
      */
-    protected function dispatch($messages, $final)
+    protected function dispatch($messages, bool $final): void
     {
         $targetErrors = [];
         foreach ($this->getTargets() as $target) {
@@ -288,7 +288,7 @@ class Logger implements LoggerInterface
      * @return string parsed message.
      * @since 3.0.0
      */
-    protected function parseMessage($message, array $context)
+    protected function parseMessage(string $message, array $context): string
     {
         return preg_replace_callback('/\\{([\\w\\.]+)\\}/is', function ($matches) use ($context) {
             $placeholderName = $matches[1];
@@ -306,7 +306,7 @@ class Logger implements LoggerInterface
      * of [[\yii\BaseYii]] class file.
      * @return float the total elapsed time in seconds for current request.
      */
-    public function getElapsedTime()
+    public function getElapsedTime(): float
     {
         return microtime(true) - YII_BEGIN_TIME;
     }
@@ -316,7 +316,7 @@ class Logger implements LoggerInterface
      * @param mixed $level the message level, e.g. [[LogLevel::ERROR]], [[LogLevel::WARNING]].
      * @return string the text display of the level
      */
-    public static function getLevelName($level)
+    public static function getLevelName($level): string
     {
         if (is_string($level)) {
             return $level;

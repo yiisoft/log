@@ -134,7 +134,7 @@ abstract class Target extends Component
      * of each message.
      * @param bool $final whether this method is called at the end of the current application
      */
-    public function collect($messages, $final)
+    public function collect($messages, bool $final): void
     {
         $this->messages = array_merge($this->messages, static::filterMessages($messages, $this->levels, $this->categories, $this->except));
         $count = count($this->messages);
@@ -157,7 +157,7 @@ abstract class Target extends Component
      * The default implementation will dump user information, system variables, etc.
      * @return string the context information. If an empty string, it means no context information.
      */
-    protected function getContextMessage()
+    protected function getContextMessage(): string
     {
         $context = ArrayHelper::filter($GLOBALS, $this->logVars);
         $result = [];
@@ -177,7 +177,7 @@ abstract class Target extends Component
      * @param array $except the message categories to exclude. If empty, it means all categories are allowed.
      * @return array the filtered messages.
      */
-    public static function filterMessages($messages, $levels = [], $categories = [], $except = [])
+    public static function filterMessages($messages, array $levels = [], array $categories = [], array $except = []): array
     {
         foreach ($messages as $i => $message) {
             if (!empty($levels) && !in_array($message[0], $levels, true)) {
@@ -217,7 +217,7 @@ abstract class Target extends Component
      * The message structure follows that in [[Logger::messages]].
      * @return string the formatted message
      */
-    public function formatMessage($message)
+    public function formatMessage($message): string
     {
         [$level, $text, $context] = $message;
         $category = $context['category'];
@@ -243,7 +243,7 @@ abstract class Target extends Component
      * The message structure follows that in [[Logger::messages]].
      * @return string the prefix string
      */
-    public function getMessagePrefix($message)
+    public function getMessagePrefix($message): string
     {
         if ($this->prefix !== null) {
             return call_user_func($this->prefix, $message);
@@ -307,7 +307,7 @@ abstract class Target extends Component
      * @property bool Indicates whether this log target is enabled. Defaults to true.
      * @return bool A value indicating whether this log target is enabled.
      */
-    public function getEnabled()
+    public function getEnabled(): bool
     {
         if (is_callable($this->_enabled)) {
             return call_user_func($this->_enabled, $this);
@@ -323,7 +323,7 @@ abstract class Target extends Component
      * @return string
      * @since 2.0.13
      */
-    protected function getTime($timestamp)
+    protected function getTime($timestamp): string
     {
         $parts = explode('.', StringHelper::floatToString($timestamp));
 

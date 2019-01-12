@@ -14,6 +14,7 @@ use yii\console\tests\unit\controllers\EchoMigrateController;
 use yii\db\Connection;
 use yii\db\Query;
 use yii\log\DbTarget;
+use yii\log\Logger;
 use yii\tests\TestCase;
 
 /**
@@ -43,7 +44,7 @@ abstract class DbTargetTest extends TestCase
             ],
         ], null, [
             'logger' => [
-                '__class' => 'yii\\log\\Logger',
+                '__class' => Logger::class,
                 '__construct()' => [
                     'targets' => [
                         'db' => [

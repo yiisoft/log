@@ -87,7 +87,7 @@
         "psr/log-implementation": "1.0.0"
     },
     "suggest": {
-        "yiisoft/db": "version ^3.0 for saving logs to data base"
+        "yiisoft/log-target-file": "version ^3.0 for saving logs to filesystem"
     },
     "autoload": {
         "psr-4": {

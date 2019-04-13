@@ -58,16 +58,13 @@ class FileTargetTest extends TestCase
         FileHelper::removeDirectory(dirname($logFile));
         mkdir(dirname($logFile), 0777, true);
 
+
+        $fileTarget = (new FileTarget($logFile))
+        ->setMaxFileSize(1024)
+        ->setMaxLogFiles(1);
+
         $logger = new Logger([
-            'file' => [
-                '__class' => FileTarget::class,
-                'logFile' => $logFile,
-                'levels' => [LogLevel::WARNING],
-                'maxFileSize' => 1024, // 1 MB
-                'maxLogFiles' => 1, // one file for rotation and one normal log file
-                'logVars' => [],
-                'rotateByCopy' => $rotateByCopy,
-            ],
+            'file' => $fileTarget,
         ]);
 
         // one file

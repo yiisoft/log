@@ -143,24 +143,26 @@ class FileTarget extends Target
      */
     public function export(): void
     {
-        $logPath = dirname($this->logFile);
+        $logPath = dirname($this->_logFile);
         FileHelper::createDirectory($logPath, $this->dirMode, true);
 
         $text = implode("\n", array_map([$this, 'formatMessage'], $this->messages)) . "\n";
-        if (($fp = @fopen($this->logFile, 'a')) === false) {
-            throw new InvalidConfigException("Unable to append to log file: {$this->logFile}");
+
+        if (($fp = fopen($this->_logFile, 'a')) === false) {
+            throw new InvalidConfigException("Unable to append to log file: {$this->_logFile}");
         }
+
         @flock($fp, LOCK_EX);
         if ($this->enableRotation) {
             // clear stat cache to ensure getting the real current file size and not a cached one
             // this may result in rotating twice when cached file size is used on subsequent calls
             clearstatcache();
         }
-        if ($this->enableRotation && @filesize($this->logFile) > $this->maxFileSize * 1024) {
+        if ($this->enableRotation && @filesize($this->_logFile) > $this->_maxFileSize * 1024) {
             @flock($fp, LOCK_UN);
             @fclose($fp);
             $this->rotateFiles();
-            $writeResult = @file_put_contents($this->logFile, $text, FILE_APPEND | LOCK_EX);
+            $writeResult = @file_put_contents($this->_logFile, $text, FILE_APPEND | LOCK_EX);
             if ($writeResult === false) {
                 $error = error_get_last();
                 throw new LogRuntimeException("Unable to export log through file!: {$error['message']}");
@@ -183,7 +185,7 @@ class FileTarget extends Target
             @fclose($fp);
         }
         if ($this->fileMode !== null) {
-            @chmod($this->logFile, $this->fileMode);
+            @chmod($this->_logFile, $this->fileMode);
         }
     }
 

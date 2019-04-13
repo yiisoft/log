@@ -5,24 +5,24 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log {
+namespace Yii\Log {
     function microtime($get_as_float)
     {
-        if (\yii\log\tests\unit\LoggerDispatchingTest::$microtimeIsMocked) {
-            return \yii\log\tests\unit\LoggerDispatchingTest::microtime(func_get_args());
+        if (\Yii\Log\Tests\Unit\LoggerDispatchingTest::$microtimeIsMocked) {
+            return \Yii\Log\Tests\Unit\LoggerDispatchingTest::microtime(func_get_args());
         }
 
         return \microtime($get_as_float);
     }
 }
 
-namespace yii\log\tests\unit {
+namespace Yii\Log\Tests\Unit {
 
     use Psr\Log\LogLevel;
     use yii\helpers\Yii;
     use yii\exceptions\UserException;
-    use yii\log\Logger;
-    use yii\log\SyslogTarget;
+    use Yii\Log\Logger;
+    use Yii\Log\SyslogTarget;
     use yii\tests\TestCase;
 
     /**
@@ -54,11 +54,11 @@ namespace yii\log\tests\unit {
         }
 
         /**
-         * @covers \yii\log\Logger::dispatch()
+         * @covers \Yii\Log\Logger::dispatch()
          */
         public function testDispatchWithDisabledTarget()
         {
-            $target = $this->getMockBuilder('yii\\log\\Target')
+            $target = $this->getMockBuilder('Yii\\Log\\Target')
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
@@ -71,11 +71,11 @@ namespace yii\log\tests\unit {
         }
 
         /**
-         * @covers \yii\log\Logger::dispatch()
+         * @covers \Yii\Log\Logger::dispatch()
          */
         public function testDispatchWithSuccessTargetCollect()
         {
-            $target = $this->getMockBuilder('yii\\log\\Target')
+            $target = $this->getMockBuilder('Yii\\Log\\Target')
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
@@ -93,17 +93,17 @@ namespace yii\log\tests\unit {
         }
 
         /**
-         * @covers \yii\log\Logger::dispatch()
+         * @covers \Yii\Log\Logger::dispatch()
          */
         public function testDispatchWithFakeTarget2ThrowExceptionWhenCollect()
         {
             static::$microtimeIsMocked = true;
 
-            $target1 = $this->getMockBuilder('yii\\log\\Target')
+            $target1 = $this->getMockBuilder('Yii\\Log\\Target')
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
-            $target2 = $this->getMockBuilder('yii\\log\\Target')
+            $target2 = $this->getMockBuilder('Yii\\Log\\Target')
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
@@ -115,7 +115,7 @@ namespace yii\log\tests\unit {
                         [[
                             'Unable to send log via ' . get_class($target1) . ': Exception: some error',
                             LogLevel::WARNING,
-                            'yii\log\Logger::dispatch',
+                            'Yii\Log\Logger::dispatch',
                             'time data',
                             [],
                         ]],
@@ -145,7 +145,7 @@ namespace yii\log\tests\unit {
         }
 
         /**
-         * @covers \yii\log\Logger::__construct()
+         * @covers \Yii\Log\Logger::__construct()
          */
         public function testConstructWithCreateTargetObject()
         {

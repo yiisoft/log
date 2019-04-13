@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log;
+namespace Yii\Log;
 
-use yii\exceptions\InvalidConfigException;
 use yii\di\AbstractContainer;
+use yii\exceptions\InvalidConfigException;
 use yii\mail\MailerInterface;
 use yii\mail\MessageInterface;
 
@@ -23,7 +23,7 @@ use yii\mail\MessageInterface;
  *     'log' => [
  *          'targets' => [
  *              [
- *                  '__class' => \yii\log\EmailTarget::class,
+ *                  '__class' => \Yii\Log\EmailTarget::class,
  *                  'mailer' => 'mailer',
  *                  'levels' => ['error', 'warning'],
  *                  'message' => [
@@ -40,7 +40,6 @@ use yii\mail\MessageInterface;
  * In the above `mailer` is ID of the component that sends email and should be already configured.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class EmailTarget extends Target
 {

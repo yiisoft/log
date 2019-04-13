@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log;
+namespace Yii\Log;
 
 use Psr\Log\LogLevel;
 use yii\base\Component;
@@ -29,7 +29,6 @@ use yii\helpers\VarDumper;
  * @property bool $enabled Whether to enable this log target. Defaults to true.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 abstract class Target extends Component
 {
@@ -71,8 +70,7 @@ abstract class Target extends Component
      *
      * Defaults to `['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER']`.
      *
-     * Since version 2.0.9 additional syntax can be used:
-     * Each element could be specified as one of the following:
+     * Each element can also be specified as one of the following:
      *
      * - `var` - `var` will be logged.
      * - `var.key` - only `var[key]` key will be logged.
@@ -107,7 +105,6 @@ abstract class Target extends Component
     /**
      * @var bool whether to log time with microseconds.
      * Defaults to false.
-     * @since 2.0.13
      */
     public $microtime = false;
 
@@ -254,7 +251,6 @@ abstract class Target extends Component
     /**
      * Sets a value indicating whether this log target is enabled.
      * @param bool|callable $value a boolean value or a callable to obtain the value from.
-     * The callable value is available since version 2.0.13.
      *
      * A callable may be used to determine whether the log target should be enabled in a dynamic way.
      * For example, to only enable a log if the current user is logged in you can configure the target
@@ -290,7 +286,6 @@ abstract class Target extends Component
      * If [[microtime]] is configured to true it will return format 'Y-m-d H:i:s.u'.
      * @param float $timestamp
      * @return string
-     * @since 2.0.13
      */
     protected function getTime($timestamp): string
     {

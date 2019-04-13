@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yii\Log\tests\unit;
+namespace Yii\Log\Tests\Unit;
 
 use Psr\Log\LogLevel;
 use Yii\Log\Logger;

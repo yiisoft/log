@@ -1,5 +1,5 @@
 /**
- * Database schema required by \yii\log\DbTarget.
+ * Database schema required by \Yii\Log\DbTarget.
  *
  * The indexes declared are not required. They are mainly used to improve the performance
  * of some queries about message levels and categories. Depending on your actual needs, you may
@@ -9,7 +9,6 @@
  * @link http://www.yiiframework.com/
  * @copyright 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- * @since 2.0.1
  */
 
 drop table if exists `log`;

@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log;
+namespace Yii\Log;
 
 use yii\exceptions\InvalidConfigException;
 use yii\helpers\FileHelper;
@@ -21,7 +21,6 @@ use yii\helpers\Yii;
  * The property [[maxLogFiles]] specifies how many history files to keep.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class FileTarget extends Target
 {
@@ -34,7 +33,6 @@ class FileTarget extends Target
      * @var bool whether log files should be rotated when they reach a certain [[maxFileSize|maximum size]].
      * Log rotation is enabled by default. This property allows you to disable it, when you have configured
      * an external tools for log rotation on your server.
-     * @since 2.0.3
      */
     public $enableRotation = true;
     /**

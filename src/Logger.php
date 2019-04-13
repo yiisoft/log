@@ -5,16 +5,15 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log;
+namespace Yii\Log;
 
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Psr\Log\LoggerTrait;
-use yii\base\Component;
+use Psr\Log\LogLevel;
 use yii\base\ErrorHandler;
-use yii\helpers\Yii;
 use yii\helpers\VarDumper;
+use yii\helpers\Yii;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to [[targets]].
@@ -36,7 +35,6 @@ use yii\helpers\VarDumper;
  * or [[DbTarget|database]], according to the [[targets]].
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class Logger implements LoggerInterface
 {
@@ -59,7 +57,7 @@ class Logger implements LoggerInterface
      * - category: string, message category.
      * - time: float, message timestamp obtained by microtime(true).
      * - trace: array, debug backtrace, contains the application code call stacks.
-     * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`, available since version 2.0.11.
+     * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`.
      */
     public $messages = [];
     /**
@@ -80,12 +78,10 @@ class Logger implements LoggerInterface
     /**
      * @var array|Target[] the log targets. Each array element represents a single [[Target|log target]] instance
      * or the configuration for creating the log target instance.
-     * @since 3.0.0
      */
     private $_targets = [];
     /**
      * @var bool whether [[targets]] have been initialized, e.g. ensured to be objects.
-     * @since 3.0.0
      */
     private $_isTargetsInitialized = false;
 
@@ -107,7 +103,6 @@ class Logger implements LoggerInterface
 
     /**
      * @return Target[] the log targets. Each array element represents a single [[Target|log target]] instance.
-     * @since 3.0.0
      */
     public function getTargets(): array
     {
@@ -136,7 +131,6 @@ class Logger implements LoggerInterface
     /**
      * @param array|Target[] $targets the log targets. Each array element represents a single [[Target|log target]] instance
      * or the configuration for creating the log target instance.
-     * @since 3.0.0
      */
     public function setTargets(array $targets): void
     {
@@ -253,7 +247,6 @@ class Logger implements LoggerInterface
      * Dispatches the logged messages to [[targets]].
      * @param array $messages the logged messages
      * @param bool $final whether this method is called at the end of the current application
-     * @since 3.0.0
      */
     protected function dispatch($messages, bool $final): void
     {
@@ -286,7 +279,6 @@ class Logger implements LoggerInterface
      * @param string $message log message.
      * @param array $context message context.
      * @return string parsed message.
-     * @since 3.0.0
      */
     protected function parseMessage(string $message, array $context): string
     {

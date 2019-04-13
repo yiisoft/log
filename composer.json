@@ -91,12 +91,12 @@
     },
     "autoload": {
         "psr-4": {
-            "yii\\log\\": "src"
+            "Yii\\Log\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "yii\\log\\tests\\": "tests"
+            "Yii\\Log\\Tests\\": "tests"
         }
     },
     "extra": {

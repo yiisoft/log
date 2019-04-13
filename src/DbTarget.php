@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log;
+namespace Yii\Log;
 
 use yii\db\ConnectionInterface;
 use yii\db\Exception;
@@ -26,7 +26,6 @@ use yii\helpers\VarDumper;
  * You may change the name of the table used to store the data by setting [[logTable]].
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
  */
 class DbTarget extends Target
 {
@@ -46,6 +45,7 @@ class DbTarget extends Target
     /**
      * Initializes the DbTarget component.
      * This method will initialize the [[db]] property to make sure it refers to a valid DB connection.
+     * @param ConnectionInterface $db
      * @throws InvalidConfigException if [[db]] is invalid.
      */
     public function __construct(ConnectionInterface $db)
@@ -55,7 +55,7 @@ class DbTarget extends Target
 
     /**
      * Stores log messages to DB.
-     * Starting from version 2.0.14, this method throws LogRuntimeException in case the log can not be exported.
+
      * @throws Exception
      * @throws LogRuntimeException
      */

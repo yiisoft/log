@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log;
+namespace Yii\Log;
 
 use Psr\Log\LogLevel;
 
@@ -13,7 +13,6 @@ use Psr\Log\LogLevel;
  * SyslogTarget writes log to syslog.
  *
  * @author miramir <gmiramir@gmail.com>
- * @since 2.0
  */
 class SyslogTarget extends Target
 {
@@ -29,7 +28,6 @@ class SyslogTarget extends Target
      * @var int openlog options. This is a bitfield passed as the `$option` parameter to [openlog()](http://php.net/openlog).
      * Defaults to `null` which means to use the default options `LOG_ODELAY | LOG_PID`.
      * @see http://php.net/openlog for available options.
-     * @since 2.0.11
      */
     public $options = LOG_ODELAY | LOG_PID;
 

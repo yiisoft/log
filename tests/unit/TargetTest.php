@@ -5,11 +5,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log\tests\unit;
+namespace Yii\Log\Tests\Unit;
 
 use Psr\Log\LogLevel;
-use yii\log\Logger;
-use yii\log\Target;
+use Yii\Log\Logger;
+use Yii\Log\Target;
 use yii\tests\TestCase;
 
 /**
@@ -133,7 +133,7 @@ class TargetTest extends TestCase
     public function testGetEnabled()
     {
         /** @var Target $target */
-        $target = $this->getMockForAbstractClass('yii\\log\\Target');
+        $target = $this->getMockForAbstractClass('Yii\\Log\\Target');
 
         $target->enabled = true;
         $this->assertTrue($target->enabled);

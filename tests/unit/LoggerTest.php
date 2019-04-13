@@ -5,11 +5,11 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log\tests\unit;
+namespace Yii\Log\tests\unit;
 
 use Psr\Log\LogLevel;
-use yii\log\Logger;
-use yii\log\Target;
+use Yii\Log\Logger;
+use Yii\Log\Target;
 use yii\tests\TestCase;
 
 /**
@@ -24,13 +24,13 @@ class LoggerTest extends TestCase
 
     protected function setUp()
     {
-        $this->logger = $this->getMockBuilder('yii\log\Logger')
+        $this->logger = $this->getMockBuilder('Yii\Log\Logger')
             ->setMethods(['dispatch'])
             ->getMock();
     }
 
     /**
-     * @covers \yii\log\Logger::Log()
+     * @covers \Yii\Log\Logger::Log()
      */
     public function testLog()
     {
@@ -53,7 +53,7 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @covers \yii\log\Logger::Log()
+     * @covers \Yii\Log\Logger::Log()
      */
     public function testLogWithTraceLevel()
     {
@@ -76,7 +76,7 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @covers \yii\log\Logger::Log()
+     * @covers \Yii\Log\Logger::Log()
      */
     public function testLogWithFlush()
     {
@@ -90,7 +90,7 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @covers \yii\log\Logger::Flush()
+     * @covers \Yii\Log\Logger::Flush()
      */
     public function testFlushWithDispatch()
     {
@@ -104,7 +104,7 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @covers \yii\log\Logger::Flush()
+     * @covers \Yii\Log\Logger::Flush()
      */
     public function testFlushWithDispatchAndDefinedParam()
     {
@@ -118,7 +118,7 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @covers \yii\log\Logger::getElapsedTime()
+     * @covers \Yii\Log\Logger::getElapsedTime()
      */
     public function testGetElapsedTime()
     {
@@ -133,7 +133,7 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @covers \yii\log\Logger::getLevelName()
+     * @covers \Yii\Log\Logger::getLevelName()
      */
     public function testGetLevelName()
     {
@@ -148,8 +148,8 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @covers \yii\log\Logger::setTargets()
-     * @covers \yii\log\Logger::getTargets()
+     * @covers \Yii\Log\Logger::setTargets()
+     * @covers \Yii\Log\Logger::getTargets()
      */
     public function testSetupTarget()
     {
@@ -173,7 +173,7 @@ class LoggerTest extends TestCase
     /**
      * @depends testSetupTarget
      *
-     * @covers \yii\log\Logger::addTarget()
+     * @covers \Yii\Log\Logger::addTarget()
      */
     public function testAddTarget()
     {
@@ -226,7 +226,7 @@ class LoggerTest extends TestCase
      * @depends testLog
      * @dataProvider dataProviderParseMessage
      *
-     * @covers \yii\log\Logger::parseMessage()
+     * @covers \Yii\Log\Logger::parseMessage()
      *
      * @param $message
      * @param array $context

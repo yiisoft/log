@@ -217,7 +217,7 @@ abstract class Target extends Component
      * The message structure follows that in [[Logger::messages]].
      * @return string the formatted message
      */
-    public function formatMessage($message): string
+    public function formatMessage(array $message): string
     {
         [$level, $text, $context] = $message;
         $category = $context['category'];
@@ -231,6 +231,7 @@ abstract class Target extends Component
         }
 
         $prefix = $this->getMessagePrefix($message);
+
         return $this->getTime($timestamp) . " {$prefix}[$level][$category] $text"
             . (empty($traces) ? '' : "\n    " . implode("\n    ", $traces));
     }
@@ -242,44 +243,15 @@ abstract class Target extends Component
      * @param array $message the message being exported.
      * The message structure follows that in [[Logger::messages]].
      * @return string the prefix string
+     * @throws \Throwable
      */
-    public function getMessagePrefix($message): string
+    public function getMessagePrefix(array $message): string
     {
         if ($this->prefix !== null) {
             return call_user_func($this->prefix, $message);
         }
 
-        $app = $this->getApp();
-
-        if ($app === null) {
-            return '';
-        }
-
-        $request = $app->getRequest();
-        $ip = $request instanceof Request ? $request->getUserIP() : '-';
-
-        /* @var $user \yii\web\User */
-        $user = $app->has('user') ? $app->user : null;
-        if ($user && ($identity = $user->getIdentity(false))) {
-            $userID = $identity->getId();
-        } else {
-            $userID = '-';
-        }
-
-        /* @var $session \yii\web\Session */
-        $session = $app->has('session') ? $app->session : null;
-        $sessionID = $session && $session->getIsActive() ? $session->getId() : '-';
-
-        return "[$ip][$userID][$sessionID]";
-    }
-
-    /**
-     * To be redefined in other targets
-     * @return Application
-     */
-    protected function getApp(): Application
-    {
-        return Yii::getApp();
+        return '';
     }
 
     /**

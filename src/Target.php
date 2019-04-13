@@ -8,13 +8,10 @@
 namespace yii\log;
 
 use Psr\Log\LogLevel;
-use yii\base\Application;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
 use yii\helpers\VarDumper;
-use yii\helpers\Yii;
-use yii\web\Request;
 
 /**
  * Target is the base class for all log target classes.
@@ -269,7 +266,7 @@ abstract class Target extends Component
      * }
      * ```
      */
-    public function setEnabled($value)
+    public function setEnabled($value): void
     {
         $this->_enabled = $value;
     }

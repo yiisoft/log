@@ -158,7 +158,7 @@ namespace Yii\Log\Tests\Unit {
          */
         public function testFailedExport()
         {
-            $syslogTarget = $this->getMockBuilder('yii\\log\\SyslogTarget')
+            $syslogTarget = $this->getMockBuilder('Yii\\Log\\SyslogTarget')
                 ->setMethods(['openlog', 'syslog', 'formatMessage', 'closelog'])
                 ->getMock();
             $syslogTarget->method('syslog')->willReturn(false);

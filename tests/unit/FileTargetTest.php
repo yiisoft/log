@@ -10,8 +10,8 @@ namespace Yii\Log\Tests\Unit;
 use Psr\Log\LogLevel;
 use yii\helpers\Yii;
 use yii\helpers\FileHelper;
-use yii\log\FileTarget;
-use yii\log\Logger;
+use Yii\Log\FileTarget;
+use Yii\Log\Logger;
 use yii\tests\TestCase;
 
 /**

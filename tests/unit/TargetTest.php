@@ -133,7 +133,7 @@ class TargetTest extends TestCase
     public function testGetEnabled()
     {
         /** @var Target $target */
-        $target = $this->getMockForAbstractClass('yii\\log\\Target');
+        $target = $this->getMockForAbstractClass('Yii\\Log\\Target');
 
         $target->enabled = true;
         $this->assertTrue($target->enabled);

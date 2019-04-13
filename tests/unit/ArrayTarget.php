@@ -8,7 +8,7 @@
 namespace Yii\Log\Tests\Unit;
 
 use yii\exceptions\Exception;
-use yii\log\Target;
+use Yii\Log\Target;
 
 /**
  * ArrayTarget logs messages into an array, useful for tracking data in tests.

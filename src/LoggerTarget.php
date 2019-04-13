@@ -21,7 +21,7 @@ use yii\exceptions\InvalidConfigException;
  *     'logger' => [
  *         'targets' => [
  *             [
- *                 '__class' => yii\log\LoggerTarget::class,
+ *                 '__class' => Yii\Log\LoggerTarget::class,
  *                 'logger' => function () {
  *                     $logger = new \Monolog\Logger('my_logger');
  *                     $logger->pushHandler(new \Monolog\Handler\SlackHandler('slack_token', 'logs', null, true, null, \Monolog\Logger::DEBUG));

@@ -34,8 +34,8 @@ class m141106_185632_log_init extends Migration
     {
         if ($this->dbTargets === []) {
             $logger = Yii::getApp()->getLogger();
-            if (!$logger instanceof \yii\log\Logger) {
-                throw new InvalidConfigException('You should configure "logger" to be instance of "\yii\log\Logger" before executing this migration.');
+            if (!$logger instanceof \Yii\Log\Logger) {
+                throw new InvalidConfigException('You should configure "logger" to be instance of "\Yii\Log\Logger" before executing this migration.');
             }
 
             $usedTargets = [];

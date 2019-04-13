@@ -58,7 +58,7 @@ namespace Yii\Log\Tests\Unit {
          */
         public function testDispatchWithDisabledTarget()
         {
-            $target = $this->getMockBuilder('yii\\log\\Target')
+            $target = $this->getMockBuilder('Yii\\Log\\Target')
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
@@ -75,7 +75,7 @@ namespace Yii\Log\Tests\Unit {
          */
         public function testDispatchWithSuccessTargetCollect()
         {
-            $target = $this->getMockBuilder('yii\\log\\Target')
+            $target = $this->getMockBuilder('Yii\\Log\\Target')
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
@@ -99,11 +99,11 @@ namespace Yii\Log\Tests\Unit {
         {
             static::$microtimeIsMocked = true;
 
-            $target1 = $this->getMockBuilder('yii\\log\\Target')
+            $target1 = $this->getMockBuilder('Yii\\Log\\Target')
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
-            $target2 = $this->getMockBuilder('yii\\log\\Target')
+            $target2 = $this->getMockBuilder('Yii\\Log\\Target')
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 

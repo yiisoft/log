@@ -5,11 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log;
+namespace Yii\Log;
 
 use Psr\Log\LoggerInterface;
 use yii\exceptions\InvalidConfigException;
-use yii\di\Instance;
 
 /**
  * PsrTarget is a log target which simply passes messages to another PSR-3 compatible logger,
@@ -43,7 +42,6 @@ use yii\di\Instance;
  *
  * @author Paul Klimov <klimov-paul@gmail.com>
  * @author Alexander Makarov <sam@rmcreative.ru>
- * @since 3.0.0
  */
 class LoggerTarget extends Target
 {

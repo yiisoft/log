@@ -5,13 +5,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\log;
+namespace Yii\Log;
 
 /**
  * LogRuntimeException represents an exception caused by problems with log delivery.
  *
  * @author Bizley <pawel@positive.codes>
- * @since 2.0.14
  */
 class LogRuntimeException extends \yii\exceptions\Exception
 {

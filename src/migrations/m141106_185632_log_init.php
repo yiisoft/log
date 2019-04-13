@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-use yii\exceptions\InvalidConfigException;
 use yii\db\Migration;
-use yii\log\DbTarget;
+use yii\exceptions\InvalidConfigException;
 use yii\helpers\Yii;
+use Yii\Log\DbTarget;
 
 /**
  * Initializes log table.
@@ -18,7 +18,6 @@ use yii\helpers\Yii;
  * want to create additional indexes (e.g. index on `log_time`).
  *
  * @author Alexander Makarov <sam@rmcreative.ru>
- * @since 2.0.1
  */
 class m141106_185632_log_init extends Migration
 {

@@ -9,7 +9,6 @@
  * @link http://www.yiiframework.com/
  * @copyright 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- * @since 2.0.1
  */
 
 drop table if exists "log";

@@ -23,4 +23,4 @@ Logging targets are implemented as separate packages:
 - [Database](https://github.com/yiisoft/log-target-db)
 - [Email](https://github.com/yiisoft/log-target-email)
 - [File](https://github.com/yiisoft/log-target-file)
-- [syslog](https://github.com/yiisoft/log-target-syslog)
+- [Syslog](https://github.com/yiisoft/log-target-syslog)

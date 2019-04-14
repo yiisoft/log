@@ -80,6 +80,7 @@
         "yiisoft/db-mysql": "^3.0@dev",
         "yiisoft/db-pgsql": "^3.0@dev",
         "yiisoft/rbac": "^3.0@dev",
+        "yiisoft/log-target-syslog": "^3.0@dev",
         "yiisoft/cache": "^3.0@dev",
         "hiqdev/composer-config-plugin": "^1.0@dev"
     },
@@ -87,7 +88,8 @@
         "psr/log-implementation": "1.0.0"
     },
     "suggest": {
-        "yiisoft/log-target-file": "version ^3.0 for saving logs to filesystem"
+        "yiisoft/log-target-file": "version ^3.0 for saving logs to filesystem",
+        "yiisoft/log-target-syslog": "version ^3.0 for saving logs to Syslog"
     },
     "autoload": {
         "psr-4": {

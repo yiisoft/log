@@ -8,15 +8,15 @@
 namespace Yii\Log {
     function microtime($get_as_float)
     {
-        if (\Yii\Log\Tests\Unit\LoggerDispatchingTest::$microtimeIsMocked) {
-            return \Yii\Log\Tests\Unit\LoggerDispatchingTest::microtime(func_get_args());
+        if (\Yii\Log\Tests\LoggerDispatchingTest::$microtimeIsMocked) {
+            return \Yii\Log\Tests\LoggerDispatchingTest::microtime(func_get_args());
         }
 
         return \microtime($get_as_float);
     }
 }
 
-namespace Yii\Log\Tests\Unit {
+namespace Yii\Log\Tests {
 
     use Psr\Log\LogLevel;
     use yii\helpers\Yii;

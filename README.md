@@ -16,3 +16,11 @@ It is used in [Yii Framework] but is supposed to be usable separately.
 [![Total Downloads](https://poser.pugx.org/yiisoft/log/downloads.png)](https://packagist.org/packages/yiisoft/log)
 [![Build Status](https://travis-ci.org/yiisoft/log.svg?branch=master)](https://travis-ci.org/yiisoft/log)
 
+## Logging targets
+
+Logging targets are implemented as separate packages:
+
+- [Database](https://github.com/yiisoft/log-target-db)
+- [Email](https://github.com/yiisoft/log-target-email)
+- [File](https://github.com/yiisoft/log-target-file)
+- [syslog](https://github.com/yiisoft/log-target-syslog)

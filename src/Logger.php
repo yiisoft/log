@@ -13,7 +13,6 @@ use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use yii\base\ErrorHandler;
 use yii\helpers\VarDumper;
-use yii\helpers\Yii;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to [[targets]].
@@ -76,22 +75,19 @@ class Logger implements LoggerInterface
     public $traceLevel = 0;
 
     /**
-     * @var array|Target[] the log targets. Each array element represents a single [[Target|log target]] instance
-     * or the configuration for creating the log target instance.
+     * @var Target[] the log targets. Each array element represents a single [[Target|log target]] instance
      */
     private $_targets = [];
-    /**
-     * @var bool whether [[targets]] have been initialized, e.g. ensured to be objects.
-     */
-    private $_isTargetsInitialized = false;
-
 
     /**
      * Initializes the logger by registering [[flush()]] as a shutdown function.
+     *
+     * @param Target[] $targets the log targets.
      */
     public function __construct(array $targets = [])
     {
         $this->setTargets($targets);
+
         register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
             $this->flush();
@@ -106,14 +102,6 @@ class Logger implements LoggerInterface
      */
     public function getTargets(): array
     {
-        if (!$this->_isTargetsInitialized) {
-            foreach ($this->_targets as $name => $target) {
-                if (!$target instanceof Target) {
-                    $this->_targets[$name] = Yii::createObject($target);
-                }
-            }
-            $this->_isTargetsInitialized = true;
-        }
         return $this->_targets;
     }
 
@@ -129,26 +117,22 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @param array|Target[] $targets the log targets. Each array element represents a single [[Target|log target]] instance
+     * @param Target[] $targets the log targets. Each array element represents a single [[Target|log target]] instance
      * or the configuration for creating the log target instance.
      */
     public function setTargets(array $targets): void
     {
         $this->_targets = $targets;
-        $this->_isTargetsInitialized = false;
     }
 
     /**
      * Adds extra target to [[targets]].
-     * @param Target|array $target the log target instance or its DI compatible configuration.
+     * @param Target $target the log target instance.
      * @param string|null $name array key to be used to store target, if `null` is given target will be append
      * to the end of the array by natural integer key.
      */
-    public function addTarget($target, string $name = null)
+    public function addTarget(Target $target, string $name = null)
     {
-        if (!$target instanceof Target) {
-            $this->_isTargetsInitialized = false;
-        }
         if ($name === null) {
             $this->_targets[] = $target;
         } else {
@@ -300,7 +284,7 @@ class Logger implements LoggerInterface
      */
     public function getElapsedTime(): float
     {
-        return microtime(true) - YII_BEGIN_TIME;
+        return \microtime(true) - YII_BEGIN_TIME;
     }
 
     /**

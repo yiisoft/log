@@ -65,7 +65,7 @@ class LoggerTarget extends Target
      * @return LoggerInterface logger instance.
      * @throws InvalidConfigException if logger is not set.
      */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         if ($this->_logger === null) {
             throw new InvalidConfigException('"' . get_class($this) . '::$logger" must be set to be "' . LoggerInterface::class . '" instance');

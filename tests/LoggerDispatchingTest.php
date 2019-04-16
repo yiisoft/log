@@ -22,7 +22,6 @@ namespace Yii\Log\Tests {
     use yii\helpers\Yii;
     use yii\exceptions\UserException;
     use Yii\Log\Logger;
-    use Yii\Log\SyslogTarget;
     use yii\tests\TestCase;
 
     /**
@@ -142,20 +141,6 @@ namespace Yii\Log\Tests {
 
             $logger->messages = 'messages';
             $logger->flush(true);
-        }
-
-        /**
-         * @covers \Yii\Log\Logger::__construct()
-         */
-        public function testConstructWithCreateTargetObject()
-        {
-            $logger = new Logger([
-                'syslog' => [
-                    '__class' => SyslogTarget::class,
-                ],
-            ]);
-
-            $this->assertEquals($logger->getTarget('syslog'), Yii::createObject(SyslogTarget::class));
         }
 
         /**

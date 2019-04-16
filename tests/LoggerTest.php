@@ -160,14 +160,6 @@ class LoggerTest extends TestCase
 
         $this->assertEquals([$target], $logger->getTargets());
         $this->assertSame($target, $logger->getTargets()[0]);
-
-        $logger->setTargets([
-            [
-                '__class' => get_class($target),
-            ],
-        ]);
-        $this->assertNotSame($target, $logger->getTarget(0));
-        $this->assertEquals(get_class($target), get_class($logger->getTarget(0)));
     }
 
     /**

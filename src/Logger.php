@@ -122,6 +122,11 @@ class Logger implements LoggerInterface
      */
     public function setTargets(array $targets): void
     {
+        foreach ($targets as $target) {
+            if (!$target instanceof Target) {
+                throw new InvalidArgumentException('You must provide an instance of \Yii\Log\Target.');
+            }
+        }
         $this->_targets = $targets;
     }
 

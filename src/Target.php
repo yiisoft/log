@@ -10,7 +10,6 @@ namespace Yii\Log;
 use Psr\Log\LogLevel;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
-use yii\helpers\StringHelper;
 use yii\helpers\VarDumper;
 
 /**
@@ -287,7 +286,8 @@ abstract class Target extends Component
      */
     protected function getTime($timestamp): string
     {
-        $parts = explode('.', StringHelper::floatToString($timestamp));
+        $toString = \str_replace(',', '.', (string) $timestamp);
+        $parts = explode('.', $toString);
 
         return date('Y-m-d H:i:s', $parts[0]) . ($this->microtime && isset($parts[1]) ? ('.' . $parts[1]) : '');
     }

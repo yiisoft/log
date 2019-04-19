@@ -155,7 +155,7 @@ class LoggerTest extends TestCase
     {
         $logger = new Logger();
 
-        $target = $this->getMockBuilder(Target::class)->getMockForAbstractClass();
+        $target = $this->getMockForAbstractClass(Target::class);
         $logger->setTargets([$target]);
 
         $this->assertEquals([$target], $logger->getTargets());
@@ -171,10 +171,10 @@ class LoggerTest extends TestCase
     {
         $logger = new Logger();
 
-        $target = $this->getMockBuilder(Target::class)->getMockForAbstractClass();
+        $target = $this->getMockForAbstractClass(Target::class);
         $logger->setTargets([$target]);
 
-        $namedTarget = $this->getMockBuilder(Target::class)->getMockForAbstractClass();
+        $namedTarget = $this->getMockForAbstractClass(Target::class);
         $logger->addTarget($namedTarget, 'test-target');
 
         $targets = $logger->getTargets();
@@ -182,7 +182,7 @@ class LoggerTest extends TestCase
         $this->assertTrue(isset($targets['test-target']));
         $this->assertSame($namedTarget, $targets['test-target']);
 
-        $namelessTarget = $this->getMockBuilder(Target::class)->getMockForAbstractClass();
+        $namelessTarget = $this->getMockForAbstractClass(Target::class);
         $logger->addTarget($namelessTarget);
         $targets = $logger->getTargets();
         $this->assertCount(3, $targets);

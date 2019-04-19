@@ -6,10 +6,13 @@
  */
 
 namespace Yii\Log {
+
+    use Yii\Log\Tests\LoggerDispatchingTest;
+
     function microtime($get_as_float)
     {
-        if (\Yii\Log\Tests\LoggerDispatchingTest::$microtimeIsMocked) {
-            return \Yii\Log\Tests\LoggerDispatchingTest::microtime(func_get_args());
+        if (LoggerDispatchingTest::$microtimeIsMocked) {
+            return LoggerDispatchingTest::microtime(func_get_args());
         }
 
         return \microtime($get_as_float);
@@ -19,7 +22,6 @@ namespace Yii\Log {
 namespace Yii\Log\Tests {
 
     use Psr\Log\LogLevel;
-    use yii\helpers\Yii;
     use yii\exceptions\UserException;
     use Yii\Log\Logger;
     use yii\tests\TestCase;

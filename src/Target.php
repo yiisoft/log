@@ -27,8 +27,6 @@ use yii\helpers\VarDumper;
  * For more details and usage information on Target, see the [guide article on logging & targets](guide:runtime-logging).
  *
  * @property bool $enabled Whether to enable this log target. Defaults to true.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
  */
 abstract class Target extends Component
 {

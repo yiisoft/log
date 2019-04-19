@@ -32,8 +32,6 @@ use yii\helpers\VarDumper;
  * When the application ends or [[flushInterval]] is reached, Logger will call [[flush()]]
  * to send logged messages to different log targets, such as [[FileTarget|file]], [[EmailTarget|email]],
  * or [[DbTarget|database]], according to the [[targets]].
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
  */
 class Logger implements LoggerInterface
 {

@@ -39,9 +39,6 @@ use yii\exceptions\InvalidConfigException;
  *   your program may fall into infinite loop.
  *
  * @property LoggerInterface $logger logger to be used by this target. Refer to [[setLogger()]] for details.
- *
- * @author Paul Klimov <klimov-paul@gmail.com>
- * @author Alexander Makarov <sam@rmcreative.ru>
  */
 class PsrTarget extends Target
 {

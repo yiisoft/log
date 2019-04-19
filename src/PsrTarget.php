@@ -21,7 +21,7 @@ use yii\exceptions\InvalidConfigException;
  *     'logger' => [
  *         'targets' => [
  *             [
- *                 '__class' => Yii\Log\LoggerTarget::class,
+ *                 '__class' => Yii\Log\PsrTarget::class,
  *                 'logger' => function () {
  *                     $logger = new \Monolog\Logger('my_logger');
  *                     $logger->pushHandler(new \Monolog\Handler\SlackHandler('slack_token', 'logs', null, true, null, \Monolog\Logger::DEBUG));
@@ -43,7 +43,7 @@ use yii\exceptions\InvalidConfigException;
  * @author Paul Klimov <klimov-paul@gmail.com>
  * @author Alexander Makarov <sam@rmcreative.ru>
  */
-class LoggerTarget extends Target
+class PsrTarget extends Target
 {
     /**
      * @var LoggerInterface logger instance to be used for messages processing.

@@ -55,6 +55,10 @@
             "email": "info@dynasource.eu",
             "homepage": "http://dynasource.eu",
             "role": "Core framework development"
+        },
+        {
+            "name": "Bizley",
+            "email": "pawel@positive.codes"
         }
     ],
     "support": {

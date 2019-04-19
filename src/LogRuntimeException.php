@@ -9,10 +9,8 @@ namespace Yii\Log;
 
 /**
  * LogRuntimeException represents an exception caused by problems with log delivery.
- *
- * @author Bizley <pawel@positive.codes>
  */
-class LogRuntimeException extends \yii\exceptions\Exception
+class LogRuntimeException extends \RuntimeException
 {
     /**
      * @return string the user-friendly name of this exception

@@ -9,7 +9,7 @@ namespace Yii\Log;
 
 use Psr\Log\LogLevel;
 use yii\base\Component;
-use yii\helpers\ArrayHelper;
+use Yiisoft\Arrays\ArrayHelper;
 use yii\helpers\VarDumper;
 
 /**
@@ -76,7 +76,7 @@ abstract class Target extends Component
      * Note that if you need $_SESSION to logged regardless if session was used you have to open it right at
      * the start of your request.
      *
-     * @see \yii\helpers\ArrayHelper::filter()
+     * @see \Yiisoft\Arrays\ArrayHelper::filter()
      */
     public $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
     /**

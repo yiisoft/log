@@ -170,7 +170,7 @@ class Logger implements LoggerInterface
     {
         if ($message instanceof \Throwable) {
             if (!isset($context['exception'])) {
-                // exceptions are string-convertable, thus should be passed as it is to the logger
+                // exceptions are string-convertible, thus should be passed as it is to the logger
                 // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
                 $context['exception'] = $message;
             }
@@ -269,7 +269,7 @@ class Logger implements LoggerInterface
      */
     protected function parseMessage(string $message, array $context): string
     {
-        return preg_replace_callback('/\\{([\\w\\.]+)\\}/is', function ($matches) use ($context) {
+        return preg_replace_callback('/\\{([\\w\\.]+)\\}/is', static function ($matches) use ($context) {
             $placeholderName = $matches[1];
             if (isset($context[$placeholderName])) {
                 return (string)$context[$placeholderName];

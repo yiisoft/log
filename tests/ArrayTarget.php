@@ -5,10 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yii\Log\Tests;
+namespace Yiisoft\Log\Tests;
 
 use yii\exceptions\Exception;
-use Yii\Log\Target;
+use Yiisoft\Log\Target;
 
 /**
  * ArrayTarget logs messages into an array, useful for tracking data in tests.

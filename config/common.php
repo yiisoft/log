@@ -7,7 +7,7 @@ return [
         ],
     ],
     'logger' => [
-        '__class' => Yii\Log\Logger::class,
+        '__class' => Yiisoft\Log\Logger::class,
         '__construct()' => [
             'targets' => [],
         ],

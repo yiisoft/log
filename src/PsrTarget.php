@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yii\Log;
+namespace Yiisoft\Log;
 
 use Psr\Log\LoggerInterface;
 use yii\exceptions\InvalidConfigException;
@@ -21,7 +21,7 @@ use yii\exceptions\InvalidConfigException;
  *     'logger' => [
  *         'targets' => [
  *             [
- *                 '__class' => Yii\Log\PsrTarget::class,
+ *                 '__class' => Yiisoft\Log\PsrTarget::class,
  *                 'logger' => function () {
  *                     $logger = new \Monolog\Logger('my_logger');
  *                     $logger->pushHandler(new \Monolog\Handler\SlackHandler('slack_token', 'logs', null, true, null, \Monolog\Logger::DEBUG));

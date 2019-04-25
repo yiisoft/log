@@ -5,9 +5,9 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yii\Log {
+namespace Yiisoft\Log {
 
-    use Yii\Log\Tests\LoggerDispatchingTest;
+    use Yiisoft\Log\Tests\LoggerDispatchingTest;
 
     function microtime($get_as_float)
     {
@@ -19,11 +19,11 @@ namespace Yii\Log {
     }
 }
 
-namespace Yii\Log\Tests {
+namespace Yiisoft\Log\Tests {
 
     use Psr\Log\LogLevel;
     use yii\exceptions\UserException;
-    use Yii\Log\Logger;
+    use Yiisoft\Log\Logger;
     use yii\tests\TestCase;
 
     /**
@@ -55,7 +55,7 @@ namespace Yii\Log\Tests {
         }
 
         /**
-         * @covers \Yii\Log\Logger::dispatch()
+         * @covers \Yiisoft\Log\Logger::dispatch()
          */
         public function testDispatchWithDisabledTarget()
         {
@@ -72,7 +72,7 @@ namespace Yii\Log\Tests {
         }
 
         /**
-         * @covers \Yii\Log\Logger::dispatch()
+         * @covers \Yiisoft\Log\Logger::dispatch()
          */
         public function testDispatchWithSuccessTargetCollect()
         {
@@ -94,7 +94,7 @@ namespace Yii\Log\Tests {
         }
 
         /**
-         * @covers \Yii\Log\Logger::dispatch()
+         * @covers \Yiisoft\Log\Logger::dispatch()
          */
         public function testDispatchWithFakeTarget2ThrowExceptionWhenCollect()
         {
@@ -116,7 +116,7 @@ namespace Yii\Log\Tests {
                         [[
                             'Unable to send log via ' . get_class($target1) . ': Exception: some error',
                             LogLevel::WARNING,
-                            'Yii\Log\Logger::dispatch',
+                            'Yiisoft\Log\Logger::dispatch',
                             'time data',
                             [],
                         ]],

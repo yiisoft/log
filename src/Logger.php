@@ -5,7 +5,7 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace Yii\Log;
+namespace Yiisoft\Log;
 
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -122,7 +122,7 @@ class Logger implements LoggerInterface
     {
         foreach ($targets as $target) {
             if (!$target instanceof Target) {
-                throw new InvalidArgumentException('You must provide an instance of \Yii\Log\Target.');
+                throw new InvalidArgumentException('You must provide an instance of \Yiisoft\Log\Target.');
             }
         }
         $this->_targets = $targets;

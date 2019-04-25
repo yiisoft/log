@@ -24,6 +24,7 @@ namespace Yiisoft\Log\Tests {
     use Psr\Log\LogLevel;
     use yii\exceptions\UserException;
     use Yiisoft\Log\Logger;
+    use Yiisoft\Log\Target;
     use yii\tests\TestCase;
 
     /**
@@ -59,7 +60,7 @@ namespace Yiisoft\Log\Tests {
          */
         public function testDispatchWithDisabledTarget()
         {
-            $target = $this->getMockBuilder('Yii\\Log\\Target')
+            $target = $this->getMockBuilder(Target::class)
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
@@ -76,7 +77,7 @@ namespace Yiisoft\Log\Tests {
          */
         public function testDispatchWithSuccessTargetCollect()
         {
-            $target = $this->getMockBuilder('Yii\\Log\\Target')
+            $target = $this->getMockBuilder(Target::class)
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
@@ -100,11 +101,11 @@ namespace Yiisoft\Log\Tests {
         {
             static::$microtimeIsMocked = true;
 
-            $target1 = $this->getMockBuilder('Yii\\Log\\Target')
+            $target1 = $this->getMockBuilder(Target::class)
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
-            $target2 = $this->getMockBuilder('Yii\\Log\\Target')
+            $target2 = $this->getMockBuilder(Target::class)
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 

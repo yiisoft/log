@@ -10,7 +10,7 @@ namespace Yiisoft\Log\Tests;
 use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
-use yii\tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group log
@@ -58,7 +58,7 @@ class LoggerTest extends TestCase
     public function testLogWithTraceLevel()
     {
         $memory = memory_get_usage();
-        $this->logger->traceLevel = 3;
+        $this->logger->setTraceLevel(3);
         $this->logger->log(LogLevel::INFO, 'test3');
         $this->assertCount(1, $this->logger->messages);
         $this->assertEquals(LogLevel::INFO, $this->logger->messages[0][0]);
@@ -84,7 +84,7 @@ class LoggerTest extends TestCase
         $logger = $this->getMockBuilder(Logger::class)
             ->setMethods(['flush'])
             ->getMock();
-        $logger->flushInterval = 1;
+        $logger->setFlushInterval(1);
         $logger->expects($this->exactly(1))->method('flush');
         $logger->log(LogLevel::INFO, 'test1');
     }
@@ -122,11 +122,11 @@ class LoggerTest extends TestCase
      */
     public function testGetElapsedTime()
     {
-        $timeBefore = \microtime(true) - YII_BEGIN_TIME;
+        $timeBefore = \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
         usleep(1);
         $actual = $this->logger->getElapsedTime();
         usleep(1);
-        $timeAfter = \microtime(true) - YII_BEGIN_TIME;
+        $timeAfter = \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
 
         $this->assertGreaterThan($timeBefore, $actual);
         $this->assertLessThan($timeAfter, $actual);

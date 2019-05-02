@@ -11,20 +11,12 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
-use yii\base\ErrorHandler;
-use yii\helpers\VarDumper;
+use Yiisoft\VarDumper\VarDumperHelper;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to [[targets]].
  *
  * A Logger instance can be accessed via `Yii::getLogger()`. You can call the method [[log()]] to record a single log message.
- * For convenience, a set of shortcut methods are provided for logging messages of various severity levels
- * via the [[Yii]] class:
- *
- * - [[Yii::debug()]]
- * - [[Yii::error()]]
- * - [[Yii::warning()]]
- * - [[Yii::info()]]
  *
  * For more details and usage information on Logger, see the [guide article on logging](guide:runtime-logging)
  * and [PSR-3 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md).
@@ -64,18 +56,21 @@ class Logger implements LoggerInterface
      * This property mainly affects how much memory will be taken by the logged messages.
      * A smaller value means less memory, but will increase the execution time due to the overhead of [[flush()]].
      */
-    public $flushInterval = 1000;
+    private $flushInterval = 1000;
+
     /**
      * @var int how much call stack information (file name and line number) should be logged for each message.
      * If it is greater than 0, at most that number of call stacks will be logged. Note that only application
      * call stacks are counted.
      */
-    public $traceLevel = 0;
+    private $traceLevel = 0;
+
+    private $startTime;
 
     /**
      * @var Target[] the log targets. Each array element represents a single [[Target|log target]] instance
      */
-    private $_targets = [];
+    private $targets = [];
 
     /**
      * Initializes the logger by registering [[flush()]] as a shutdown function.
@@ -84,15 +79,22 @@ class Logger implements LoggerInterface
      */
     public function __construct(array $targets = [])
     {
+        $this->startTime = $_SERVER['REQUEST_TIME_FLOAT'];
         $this->setTargets($targets);
 
-        register_shutdown_function(function () {
+        \register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
             $this->flush();
             // make sure log entries written by shutdown functions are also flushed
             // ensure "flush()" is called last when there are multiple shutdown functions
-            register_shutdown_function([$this, 'flush'], true);
+            \register_shutdown_function([$this, 'flush'], true);
         });
+    }
+
+    public function setStartTime($startTime): self
+    {
+        $this->startTime = $startTime;
+        return $this;
     }
 
     /**
@@ -100,7 +102,7 @@ class Logger implements LoggerInterface
      */
     public function getTargets(): array
     {
-        return $this->_targets;
+        return $this->targets;
     }
 
     /**
@@ -111,7 +113,7 @@ class Logger implements LoggerInterface
     {
         $this->getTargets();
 
-        return $this->_targets[$name] ?? null;
+        return $this->targets[$name] ?? null;
     }
 
     /**
@@ -125,7 +127,7 @@ class Logger implements LoggerInterface
                 throw new InvalidArgumentException('You must provide an instance of \Yiisoft\Log\Target.');
             }
         }
-        $this->_targets = $targets;
+        $this->targets = $targets;
     }
 
     /**
@@ -137,9 +139,9 @@ class Logger implements LoggerInterface
     public function addTarget(Target $target, string $name = null)
     {
         if ($name === null) {
-            $this->_targets[] = $target;
+            $this->targets[] = $target;
         } else {
-            $this->_targets[$name] = $target;
+            $this->targets[$name] = $target;
         }
     }
 
@@ -156,11 +158,7 @@ class Logger implements LoggerInterface
             return (string)$message;
         }
 
-        if (class_exists(VarDumper::class)) {
-            return VarDumper::export($message);
-        }
-
-        throw new InvalidArgumentException('The log message MUST be a string or object implementing __toString()');
+        return VarDumperHelper::export($message);
     }
 
     /**
@@ -185,9 +183,8 @@ class Logger implements LoggerInterface
             if ($this->traceLevel > 0) {
                 $count = 0;
                 $ts = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-                array_pop($ts); // remove the last trace since it would be the entry script, not very useful
                 foreach ($ts as $trace) {
-                    if (isset($trace['file'], $trace['line']) && strpos($trace['file'], YII_PATH) !== 0) {
+                    if (isset($trace['file'], $trace['line'])) {
                         unset($trace['object'], $trace['args']);
                         $traces[] = $trace;
                         if (++$count >= $this->traceLevel) {
@@ -239,13 +236,13 @@ class Logger implements LoggerInterface
     {
         $targetErrors = [];
         foreach ($this->getTargets() as $target) {
-            if ($target->enabled) {
+            if ($target->getEnabled()) {
                 try {
                     $target->collect($messages, $final);
                 } catch (\Exception $e) {
-                    $target->enabled = false;
+                    $target->setEnabled(false);
                     $targetErrors[] = [
-                        'Unable to send log via ' . get_class($target) . ': ' . ErrorHandler::convertExceptionToString($e),
+                        'Unable to send log via ' . get_class($target) . ': ' . get_class($e) . ': ' . $e->getMessage(),
                         LogLevel::WARNING,
                         __METHOD__,
                         microtime(true),
@@ -281,13 +278,13 @@ class Logger implements LoggerInterface
     /**
      * Returns the total elapsed time since the start of the current request.
      * This method calculates the difference between now and the timestamp
-     * defined by constant `YII_BEGIN_TIME` which is evaluated at the beginning
-     * of [[\yii\BaseYii]] class file.
+     * defined by [[startTime]] which is evaluated at the construction of the
+     * [[Logger]] instance.
      * @return float the total elapsed time in seconds for current request.
      */
     public function getElapsedTime(): float
     {
-        return \microtime(true) - YII_BEGIN_TIME;
+        return \microtime(true) - $this->startTime;
     }
 
     /**
@@ -301,5 +298,41 @@ class Logger implements LoggerInterface
             return $level;
         }
         return 'unknown';
+    }
+
+    /**
+     * @return int
+     */
+    public function getFlushInterval(): int
+    {
+        return $this->flushInterval;
+    }
+
+    /**
+     * @param int $flushInterval
+     * @return Logger
+     */
+    public function setFlushInterval(int $flushInterval): self
+    {
+        $this->flushInterval = $flushInterval;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTraceLevel(): int
+    {
+        return $this->traceLevel;
+    }
+
+    /**
+     * @param int $traceLevel
+     * @return Logger
+     */
+    public function setTraceLevel(int $traceLevel): self
+    {
+        $this->traceLevel = $traceLevel;
+        return $this;
     }
 }

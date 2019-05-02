@@ -22,10 +22,9 @@ namespace Yiisoft\Log {
 namespace Yiisoft\Log\Tests {
 
     use Psr\Log\LogLevel;
-    use yii\exceptions\UserException;
     use Yiisoft\Log\Logger;
     use Yiisoft\Log\Target;
-    use yii\tests\TestCase;
+    use PHPUnit\Framework\TestCase;
 
     /**
      * @group log
@@ -52,7 +51,7 @@ namespace Yiisoft\Log\Tests {
         protected function setUp()
         {
             static::$microtimeIsMocked = false;
-            $this->logger = new Logger([]);
+            $this->logger = new Logger();
         }
 
         /**
@@ -60,12 +59,13 @@ namespace Yiisoft\Log\Tests {
          */
         public function testDispatchWithDisabledTarget()
         {
+            /** @var Target $target */
             $target = $this->getMockBuilder(Target::class)
                 ->setMethods(['collect'])
                 ->getMockForAbstractClass();
 
             $target->expects($this->never())->method($this->anything());
-            $target->enabled = false;
+            $target->setEnabled(false);
 
             $logger = new Logger(['fakeTarget' => $target]);
             $logger->messages = 'messages';
@@ -130,7 +130,7 @@ namespace Yiisoft\Log\Tests {
                 ->with(
                     $this->equalTo('messages'),
                     $this->equalTo(true)
-                )->will($this->throwException(new UserException('some error')));
+                )->will($this->throwException(new \Exception('some error')));
 
             $logger = new Logger([
                 'fakeTarget1' => $target1,

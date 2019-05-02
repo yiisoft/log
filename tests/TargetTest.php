@@ -10,7 +10,7 @@ namespace Yiisoft\Log\Tests;
 use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
-use yii\tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group log
@@ -63,10 +63,11 @@ class TargetTest extends TestCase
         $filter = array_merge($filter, ['logVars' => []]);
         $target = new TestTarget();
         foreach ($filter as $key => $value) {
-            $target->{$key} = $value;
+            $target->{'set' . ucfirst($key)}($value);
         }
         $logger = new Logger(['test' => $target]);
-        $logger->flushInterval = 1;
+
+        $logger->setFlushInterval(1);
         $logger->log(LogLevel::INFO, 'testA');
         $logger->log(LogLevel::ERROR, 'testB');
         $logger->log(LogLevel::WARNING, 'testC');
@@ -87,11 +88,11 @@ class TargetTest extends TestCase
     public function testGetContextMessage()
     {
         $target = new TestTarget();
-        $target->logVars = [
+        $target->setLogVars([
             'A', '!A.A_b', 'A.A_d',
             'B.B_a',
             'C', 'C.C_a',
-        ];
+        ]);
         $GLOBALS['A'] = [
             'A_a' => 1,
             'A_b' => 1,
@@ -135,16 +136,16 @@ class TargetTest extends TestCase
         /** @var Target $target */
         $target = $this->getMockForAbstractClass(Target::class);
 
-        $target->enabled = true;
-        $this->assertTrue($target->enabled);
+        $target->setEnabled(true);
+        $this->assertTrue($target->getEnabled());
 
-        $target->enabled = false;
-        $this->assertFalse($target->enabled);
+        $target->setEnabled(false);
+        $this->assertFalse($target->getEnabled());
 
-        $target->enabled = function ($target) {
+        $target->setEnabled(function ($target) {
             return empty($target->messages);
-        };
-        $this->assertTrue($target->enabled);
+        });
+        $this->assertTrue($target->getEnabled());
     }
 
     public function testFormatMessage()
@@ -161,7 +162,7 @@ class TargetTest extends TestCase
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
 
-        $target->microtime = true;
+        $target->setMicrotime(true);
 
         $expectedWithMicro = '2017-10-16 13:26:30.6083 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
@@ -177,13 +178,13 @@ class TargetTest extends TestCase
 
 class TestTarget extends Target
 {
-    public $exportInterval = 1;
+    protected $exportInterval = 1;
 
     /**
      * Exports log [[messages]] to a specific destination.
      * Child classes must implement this method.
      */
-    public function export()
+    public function export(): void
     {
         TargetTest::$messages = array_merge(TargetTest::$messages, $this->messages);
         $this->messages = [];

@@ -110,7 +110,8 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/yiisoft/var-dumper"
+            "url": "https://github.com/yiisoft/var-dumper",
+            "no-api": true
         }
     ]
 }

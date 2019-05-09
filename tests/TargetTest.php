@@ -180,7 +180,6 @@ class TargetTest extends TestCase
         $expectedCustom = 'Mon 16 October 2017 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedCustom, $formatted);
-
     }
 }
 

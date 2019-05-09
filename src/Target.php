@@ -263,8 +263,8 @@ abstract class Target
      * as follows:
      *
      * ```php
-     * 'enabled' => function(\Yiisoft\Yii\Web\User $user) {
-     *     return !$user->isGuest;
+     * 'enabled' => function() {
+     *     return !Yii::getApp()->user->isGuest;
      * }
      * ```
      * @return Target

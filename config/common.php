@@ -1,5 +1,7 @@
 <?php
 
+/** @var array $params */
+
 return [
     'app' => [
         'bootstrap' => [

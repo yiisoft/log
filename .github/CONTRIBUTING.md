@@ -1,5 +1,5 @@
-Contributing to Yii 2
-=====================
+Contributing to Yii
+===================
 
 - [Report an issue](../docs/internals/report-an-issue.md)
 - [Translate documentation or messages](../docs/internals/translation-workflow.md)

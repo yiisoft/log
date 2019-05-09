@@ -98,10 +98,10 @@ abstract class Target
      */
     private $messages = [];
     /**
-     * @var bool whether to log time with microseconds.
-     * Defaults to false.
+     * @var string The date format for the log timestamp.
+     * Defaults to Y-m-d H:i:s.u
      */
-    private $microtime = false;
+    private $timestampFormat = 'Y-m-d H:i:s.u';
 
     /**
      * @var bool
@@ -310,17 +310,14 @@ abstract class Target
     }
 
     /**
-     * Returns formatted ('Y-m-d H:i:s') timestamp for message.
-     * If [[microtime]] is configured to true it will return format 'Y-m-d H:i:s.u'.
-     * @param float $timestamp
+     * Returns formatted timestamp for message, according to [[timestampFormat]]
+     * @param float|int $timestamp
      * @return string
      */
     protected function getTime($timestamp): string
     {
-        $toString = \str_replace(',', '.', (string)$timestamp);
-        $parts = explode('.', $toString);
-
-        return date('Y-m-d H:i:s', $parts[0]) . ($this->microtime && isset($parts[1]) ? ('.' . $parts[1]) : '');
+        $format = \is_int($timestamp) ? 'U' : 'U.u';
+        return \DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 
     /**
@@ -342,21 +339,13 @@ abstract class Target
     }
 
     /**
-     * @param bool $microtime
+     * @param string $format
      * @return Target
      */
-    public function setMicrotime(bool $microtime): self
+    public function setTimestampFormat(string $format): self
     {
-        $this->microtime = $microtime;
+        $this->timestampFormat = $format;
         return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getMicrotime(): bool
-    {
-        return $this->microtime;
     }
 
     /**

@@ -147,7 +147,7 @@ class TargetTest extends TestCase
         $this->assertTrue($target->isEnabled());
     }
 
-    public function testFormatMessage()
+    public function testFormatTimestamp()
     {
         /** @var Target $target */
         $target = $this->getMockForAbstractClass(Target::class);
@@ -157,21 +157,30 @@ class TargetTest extends TestCase
         $category = 'application';
         $timestamp = 1508160390.6083;
 
+        $target->setTimestampFormat('Y-m-d H:i:s');
+
         $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
 
-        $target->setMicrotime(true);
+        $target->setTimestampFormat('Y-m-d H:i:s.u');
 
-        $expectedWithMicro = '2017-10-16 13:26:30.6083 [info][application] message';
+        $expectedWithMicro = '2017-10-16 13:26:30.608300 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithMicro, $formatted);
 
+        $target->setTimestampFormat('Y-m-d H:i:s');
         $timestamp = 1508160390;
 
         $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
+
+        $target->setTimestampFormat('D d F Y');
+        $expectedCustom = 'Mon 16 October 2017 [info][application] message';
+        $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
+        $this->assertSame($expectedCustom, $formatted);
+
     }
 }
 

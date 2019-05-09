@@ -23,7 +23,6 @@ class TargetTest extends TestCase
     {
         return [
             [[], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']],
-
             [['levels' => []], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']],
             [
                 ['levels' => [LogLevel::INFO, LogLevel::WARNING, LogLevel::ERROR, LogLevel::DEBUG]],
@@ -78,7 +77,7 @@ class TargetTest extends TestCase
         $logger->log(LogLevel::ERROR, 'testH', ['category' => 'Yiisoft.Db.Command.whatever']);
         $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
-        $this->assertEquals(count($expected), count(static::$messages), 'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0)));
+        $this->assertCount(count($expected), static::$messages, 'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0)));
         $i = 0;
         foreach ($expected as $e) {
             $this->assertEquals('test' . $e, static::$messages[$i++][1]);
@@ -136,16 +135,16 @@ class TargetTest extends TestCase
         /** @var Target $target */
         $target = $this->getMockForAbstractClass(Target::class);
 
-        $target->setEnabled(true);
-        $this->assertTrue($target->getEnabled());
+        $target->enable();
+        $this->assertTrue($target->isEnabled());
 
-        $target->setEnabled(false);
-        $this->assertFalse($target->getEnabled());
+        $target->disable();
+        $this->assertFalse($target->isEnabled());
 
-        $target->setEnabled(function ($target) {
+        $target->setEnabled(static function ($target) {
             return empty($target->messages);
         });
-        $this->assertTrue($target->getEnabled());
+        $this->assertTrue($target->isEnabled());
     }
 
     public function testFormatMessage()
@@ -178,7 +177,10 @@ class TargetTest extends TestCase
 
 class TestTarget extends Target
 {
-    protected $exportInterval = 1;
+    public function __construct()
+    {
+        $this->setExportInterval(1);
+    }
 
     /**
      * Exports log [[messages]] to a specific destination.
@@ -186,8 +188,8 @@ class TestTarget extends Target
      */
     public function export(): void
     {
-        TargetTest::$messages = array_merge(TargetTest::$messages, $this->messages);
-        $this->messages = [];
+        TargetTest::$messages = array_merge(TargetTest::$messages, $this->getMessages());
+        $this->setMessages([]);
     }
 
     /**

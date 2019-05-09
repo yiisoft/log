@@ -24,7 +24,7 @@ class LoggerTest extends TestCase
 
     protected function setUp()
     {
-        $this->logger = $this->getMockBuilder('Yiisoft\Log\Logger')
+        $this->logger = $this->getMockBuilder(Logger::class)
             ->setMethods(['dispatch'])
             ->getMock();
     }
@@ -227,7 +227,7 @@ class LoggerTest extends TestCase
     public function testParseMessage($message, array $context, $expected)
     {
         $this->logger->log(LogLevel::INFO, $message, $context);
-        [$level, $message, $context] = $this->logger->messages[0];
+        [, $message] = $this->logger->messages[0];
         $this->assertEquals($expected, $message);
     }
 }

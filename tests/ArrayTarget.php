@@ -14,7 +14,10 @@ use Yiisoft\Log\Target;
  */
 class ArrayTarget extends Target
 {
-    protected $exportInterval = 1000000;
+    public function __construct()
+    {
+        $this->setExportInterval(1000000);
+    }
 
     /**
      * Exports log [[messages]] to a specific destination.

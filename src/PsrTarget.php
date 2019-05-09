@@ -68,7 +68,7 @@ class PsrTarget extends Target
      */
     public function export(): void
     {
-        foreach ($this->messages as $message) {
+        foreach ($this->getMessages() as $message) {
             [$level, $text, $context] = $message;
             $this->getLogger()->log($level, $text, $context);
         }

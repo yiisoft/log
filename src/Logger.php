@@ -11,7 +11,7 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
-use Yiisoft\VarDumper\VarDumperHelper;
+use Yiisoft\VarDumper\VarDumper;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to [[targets]].
@@ -158,7 +158,7 @@ class Logger implements LoggerInterface
             return (string)$message;
         }
 
-        return VarDumperHelper::export($message);
+        return VarDumper::export($message);
     }
 
     /**
@@ -236,11 +236,11 @@ class Logger implements LoggerInterface
     {
         $targetErrors = [];
         foreach ($this->getTargets() as $target) {
-            if ($target->getEnabled()) {
+            if ($target->isEnabled()) {
                 try {
                     $target->collect($messages, $final);
                 } catch (\Exception $e) {
-                    $target->setEnabled(false);
+                    $target->disable();
                     $targetErrors[] = [
                         'Unable to send log via ' . get_class($target) . ': ' . get_class($e) . ': ' . $e->getMessage(),
                         LogLevel::WARNING,

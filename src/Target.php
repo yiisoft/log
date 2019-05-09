@@ -9,7 +9,7 @@ namespace Yiisoft\Log;
 
 use Psr\Log\LogLevel;
 use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\VarDumper\VarDumperHelper;
+use Yiisoft\VarDumper\VarDumper;
 
 /**
  * Target is the base class for all log target classes.
@@ -23,8 +23,6 @@ use Yiisoft\VarDumper\VarDumperHelper;
  * may specify [[except]] to exclude messages of certain categories.
  *
  * For more details and usage information on Target, see the [guide article on logging & targets](guide:runtime-logging).
- *
- * @property bool $enabled Whether to enable this log target. Defaults to true.
  */
 abstract class Target
 {
@@ -34,7 +32,7 @@ abstract class Target
      * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
      */
-    protected $categories = [];
+    private $categories = [];
     /**
      * @var array list of message categories that this target is NOT interested in. Defaults to empty, meaning no uninteresting messages.
      * If this property is not empty, then any category listed here will be excluded from [[categories]].
@@ -43,7 +41,7 @@ abstract class Target
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
      * @see categories
      */
-    protected $except = [];
+    private $except = [];
     /**
      * @var array the message levels that this target is interested in.
      *
@@ -59,7 +57,7 @@ abstract class Target
      *
      * Defaults is empty array, meaning all available levels.
      */
-    protected $levels = [];
+    private $levels = [];
     /**
      * @var array list of the PHP predefined variables that should be logged in a message.
      * Note that a variable must be accessible via `$GLOBALS`. Otherwise it won't be logged.
@@ -77,7 +75,7 @@ abstract class Target
      *
      * @see \Yiisoft\Arrays\ArrayHelper::filter()
      */
-    protected $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
+    private $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
     /**
      * @var callable a PHP callable that returns a string to be prefixed to every exported message.
      *
@@ -86,29 +84,29 @@ abstract class Target
      *
      * The signature of the callable should be `function ($message)`.
      */
-    protected $prefix;
+    private $prefix;
 
     /**
      * @var int how many messages should be accumulated before they are exported.
      * Defaults to 1000. Note that messages will always be exported when the application terminates.
      * Set this property to be 0 if you don't want to export messages until the application terminates.
      */
-    protected $exportInterval = 1000;
+    private $exportInterval = 1000;
     /**
      * @var array the messages that are retrieved from the logger so far by this log target.
      * Please refer to [[Logger::messages]] for the details about the message structure.
      */
-    protected $messages = [];
+    private $messages = [];
     /**
      * @var bool whether to log time with microseconds.
      * Defaults to false.
      */
-    protected $microtime = false;
+    private $microtime = false;
 
     /**
      * @var bool
      */
-    protected $enabled = true;
+    private $enabled = true;
 
 
     /**
@@ -164,7 +162,7 @@ abstract class Target
         $context = ArrayHelper::filter($GLOBALS, $this->logVars);
         $result = [];
         foreach ($context as $key => $value) {
-            $result[] = "\${$key} = " . VarDumperHelper::dumpAsString($value);
+            $result[] = "\${$key} = " . VarDumper::dumpAsString($value);
         }
 
         return implode("\n\n", $result);
@@ -265,10 +263,11 @@ abstract class Target
      * as follows:
      *
      * ```php
-     * 'enabled' => function() {
-     *     return !Yii::getApp()->user->isGuest;
+     * 'enabled' => function(\Yiisoft\Yii\Web\User $user) {
+     *     return !$user->isGuest;
      * }
      * ```
+     * @return Target
      */
     public function setEnabled($value): self
     {
@@ -278,11 +277,30 @@ abstract class Target
     }
 
     /**
+     * Enables the log target
+     *
+     * @return Target
+     */
+    public function enable(): self
+    {
+        return $this->setEnabled(true);
+    }
+
+    /**
+     * Disables the log target
+     *
+     * @return Target
+     */
+    public function disable(): self
+    {
+        return $this->setEnabled(false);
+    }
+
+    /**
      * Check whether the log target is enabled.
      * @return bool A value indicating whether this log target is enabled.
-     * @property bool Indicates whether this log target is enabled. Defaults to true.
      */
-    public function getEnabled(): bool
+    public function isEnabled(): bool
     {
         if (is_callable($this->enabled)) {
             return call_user_func($this->enabled, $this);
@@ -334,9 +352,9 @@ abstract class Target
     }
 
     /**
-     * @return array
+     * @return bool
      */
-    public function getMicrotime(): array
+    public function getMicrotime(): bool
     {
         return $this->microtime;
     }

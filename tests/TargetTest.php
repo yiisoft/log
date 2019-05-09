@@ -40,12 +40,12 @@ class TargetTest extends TestCase
             [['categories' => ['application.components']], []],
             [['categories' => ['application.components.Test']], ['F']],
             [['categories' => ['application.components.*']], ['F']],
-            [['categories' => ['application.*', 'yii.db.*']], ['F', 'G', 'H']],
-            [['categories' => ['application.*', 'yii.db.*'], 'except' => ['yii.db.Command.*', 'yii\db\*']], ['F', 'G']],
-            [['except' => ['yii\db\*']], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']],
-            [['categories' => ['yii*'], 'except' => ['yii\db\*']], ['G', 'H']],
+            [['categories' => ['application.*', 'Yiisoft.Db.*']], ['F', 'G', 'H']],
+            [['categories' => ['application.*', 'Yiisoft.Db.*'], 'except' => ['Yiisoft.Db.Command.*', 'Yiisoft\Db\*']], ['F', 'G']],
+            [['except' => ['Yiisoft\Db\*']], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']],
+            [['categories' => ['Yiisoft*'], 'except' => ['Yiisoft\Db\*']], ['G', 'H']],
 
-            [['categories' => ['application', 'yii.db.*'], 'levels' => [LogLevel::ERROR]], ['B', 'G', 'H']],
+            [['categories' => ['application', 'Yiisoft.Db.*'], 'levels' => [LogLevel::ERROR]], ['B', 'G', 'H']],
             [['categories' => ['application'], 'levels' => [LogLevel::ERROR]], ['B']],
             [['categories' => ['application'], 'levels' => [LogLevel::ERROR, LogLevel::WARNING]], ['B', 'C']],
         ];
@@ -74,9 +74,9 @@ class TargetTest extends TestCase
         $logger->log(LogLevel::DEBUG, 'testD');
         $logger->log(LogLevel::INFO, 'testE', ['category' => 'application']);
         $logger->log(LogLevel::INFO, 'testF', ['category' => 'application.components.Test']);
-        $logger->log(LogLevel::ERROR, 'testG', ['category' => 'yii.db.Command']);
-        $logger->log(LogLevel::ERROR, 'testH', ['category' => 'yii.db.Command.whatever']);
-        $logger->log(LogLevel::ERROR, 'testI', ['category' => 'yii\db\Command::query']);
+        $logger->log(LogLevel::ERROR, 'testG', ['category' => 'Yiisoft.Db.Command']);
+        $logger->log(LogLevel::ERROR, 'testH', ['category' => 'Yiisoft.Db.Command.whatever']);
+        $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
         $this->assertEquals(count($expected), count(static::$messages), 'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0)));
         $i = 0;

@@ -65,8 +65,6 @@ class Logger implements LoggerInterface
      */
     private $traceLevel = 0;
 
-    private $startTime;
-
     /**
      * @var Target[] the log targets. Each array element represents a single [[Target|log target]] instance
      */
@@ -79,7 +77,6 @@ class Logger implements LoggerInterface
      */
     public function __construct(array $targets = [])
     {
-        $this->startTime = $_SERVER['REQUEST_TIME_FLOAT'];
         $this->setTargets($targets);
 
         \register_shutdown_function(function () {
@@ -89,12 +86,6 @@ class Logger implements LoggerInterface
             // ensure "flush()" is called last when there are multiple shutdown functions
             \register_shutdown_function([$this, 'flush'], true);
         });
-    }
-
-    public function setStartTime($startTime): self
-    {
-        $this->startTime = $startTime;
-        return $this;
     }
 
     /**
@@ -277,14 +268,13 @@ class Logger implements LoggerInterface
 
     /**
      * Returns the total elapsed time since the start of the current request.
-     * This method calculates the difference between now and the timestamp
-     * defined by [[startTime]] which is evaluated at the construction of the
-     * [[Logger]] instance.
+     * This method calculates the difference between now and the start of the
+     * request ($_SERVER['REQUEST_TIME_FLOAT']).
      * @return float the total elapsed time in seconds for current request.
      */
     public function getElapsedTime(): float
     {
-        return \microtime(true) - $this->startTime;
+        return \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
     }
 
     /**

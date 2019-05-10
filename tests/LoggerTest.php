@@ -75,6 +75,22 @@ class LoggerTest extends TestCase
         $this->assertGreaterThanOrEqual($memory, $this->logger->messages[0][2]['memory']);
     }
 
+
+    public function testExcludedTracePaths()
+    {
+        $this->logger->setTraceLevel(20);
+
+        $this->logger->info('info message');
+        $this->assertEquals(__FILE__, $this->logger->messages[0][2]['trace'][1]['file']);
+
+        $this->logger->setExcludedTracePaths([__DIR__]);
+
+        $this->logger->info('info message');
+        foreach ($this->logger->messages[1][2]['trace'] as $trace) {
+            $this->assertNotEquals(__FILE__, $trace['file']);
+        }
+    }
+
     /**
      * @covers \Yiisoft\Log\Logger::Log()
      */

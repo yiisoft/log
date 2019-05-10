@@ -57,14 +57,16 @@ class Logger implements LoggerInterface
      * A smaller value means less memory, but will increase the execution time due to the overhead of [[flush()]].
      */
     private $flushInterval = 1000;
-
     /**
      * @var int how much call stack information (file name and line number) should be logged for each message.
      * If it is greater than 0, at most that number of call stacks will be logged. Note that only application
      * call stacks are counted.
      */
     private $traceLevel = 0;
-
+    /**
+     * @var array An array of paths to exclude from the trace when tracing is enabled using [[setTraceLevel()]].
+     */
+    private $excludedTracePaths = [];
     /**
      * @var Target[] the log targets. Each array element represents a single [[Target|log target]] instance
      */
@@ -173,13 +175,18 @@ class Logger implements LoggerInterface
             $traces = [];
             if ($this->traceLevel > 0) {
                 $count = 0;
-                $ts = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-                foreach ($ts as $trace) {
+                foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
                     if (isset($trace['file'], $trace['line'])) {
-                        unset($trace['object'], $trace['args']);
-                        $traces[] = $trace;
-                        if (++$count >= $this->traceLevel) {
-                            break;
+                        $excludedMatch = array_filter($this->excludedTracePaths, static function ($path) use ($trace) {
+                            return strpos($trace['file'], $path) !== false;
+                        });
+
+                        if (empty($excludedMatch)) {
+                            unset($trace['object'], $trace['args']);
+                            $traces[] = $trace;
+                            if (++$count >= $this->traceLevel) {
+                                break;
+                            }
                         }
                     }
                 }
@@ -323,6 +330,16 @@ class Logger implements LoggerInterface
     public function setTraceLevel(int $traceLevel): self
     {
         $this->traceLevel = $traceLevel;
+        return $this;
+    }
+
+    /**
+     * @param array $excludedTracePaths
+     * @return Logger
+     */
+    public function setExcludedTracePaths(array $excludedTracePaths): self
+    {
+        $this->excludedTracePaths = $excludedTracePaths;
         return $this;
     }
 }

@@ -29,14 +29,14 @@ class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
-    const EMERGENCY = LogLevel::EMERGENCY;
-    const ALERT     = LogLevel::ALERT;
-    const CRITICAL  = LogLevel::CRITICAL;
-    const ERROR     = LogLevel::ERROR;
-    const WARNING   = LogLevel::WARNING;
-    const NOTICE    = LogLevel::NOTICE;
-    const INFO      = LogLevel::INFO;
-    const DEBUG     = LogLevel::DEBUG;
+    public const EMERGENCY = LogLevel::EMERGENCY;
+    public const ALERT     = LogLevel::ALERT;
+    public const CRITICAL  = LogLevel::CRITICAL;
+    public const ERROR     = LogLevel::ERROR;
+    public const WARNING   = LogLevel::WARNING;
+    public const NOTICE    = LogLevel::NOTICE;
+    public const INFO      = LogLevel::INFO;
+    public const DEBUG     = LogLevel::DEBUG;
 
     /**
      * @var array logged messages. This property is managed by [[log()]] and [[flush()]].

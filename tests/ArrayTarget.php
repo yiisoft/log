@@ -7,7 +7,6 @@
 
 namespace Yiisoft\Log\Tests;
 
-use yii\exceptions\Exception;
 use Yiisoft\Log\Target;
 
 /**
@@ -15,14 +14,17 @@ use Yiisoft\Log\Target;
  */
 class ArrayTarget extends Target
 {
-    public $exportInterval = 1000000;
+    public function __construct()
+    {
+        $this->setExportInterval(1000000);
+    }
 
     /**
      * Exports log [[messages]] to a specific destination.
      */
-    public function export()
+    public function export(): void
     {
         // throw exception if message limit is reached
-        throw new Exception('More than 1000000 messages logged.');
+        throw new \Exception('More than 1000000 messages logged.');
     }
 }

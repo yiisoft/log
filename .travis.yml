@@ -54,6 +54,7 @@ matrix:
     - php: 7.2
     - php: 7.3
       env: TASK_TESTS_COVERAGE=1
+    - php: 7.4snapshot
     - php: nightly
 
   allow_failures:
@@ -101,7 +102,7 @@ script:
   # PHP tests
   - |
     if [ $TASK_TESTS_PHP == 1 ]; then
-      vendor/bin/phpunit --verbose $PHPUNIT_FLAGS --exclude-group wincache,xcache
+      vendor/bin/phpunit --verbose $PHPUNIT_FLAGS
     fi
 
 after_script:

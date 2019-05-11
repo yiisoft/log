@@ -10,7 +10,7 @@ namespace Yiisoft\Log\Tests;
 use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
-use yii\tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group log
@@ -23,7 +23,6 @@ class TargetTest extends TestCase
     {
         return [
             [[], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']],
-
             [['levels' => []], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']],
             [
                 ['levels' => [LogLevel::INFO, LogLevel::WARNING, LogLevel::ERROR, LogLevel::DEBUG]],
@@ -63,10 +62,11 @@ class TargetTest extends TestCase
         $filter = array_merge($filter, ['logVars' => []]);
         $target = new TestTarget();
         foreach ($filter as $key => $value) {
-            $target->{$key} = $value;
+            $target->{'set' . ucfirst($key)}($value);
         }
         $logger = new Logger(['test' => $target]);
-        $logger->flushInterval = 1;
+
+        $logger->setFlushInterval(1);
         $logger->log(LogLevel::INFO, 'testA');
         $logger->log(LogLevel::ERROR, 'testB');
         $logger->log(LogLevel::WARNING, 'testC');
@@ -77,7 +77,7 @@ class TargetTest extends TestCase
         $logger->log(LogLevel::ERROR, 'testH', ['category' => 'Yiisoft.Db.Command.whatever']);
         $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
-        $this->assertEquals(count($expected), count(static::$messages), 'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0)));
+        $this->assertCount(count($expected), static::$messages, 'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0)));
         $i = 0;
         foreach ($expected as $e) {
             $this->assertEquals('test' . $e, static::$messages[$i++][1]);
@@ -87,11 +87,11 @@ class TargetTest extends TestCase
     public function testGetContextMessage()
     {
         $target = new TestTarget();
-        $target->logVars = [
+        $target->setLogVars([
             'A', '!A.A_b', 'A.A_d',
             'B.B_a',
             'C', 'C.C_a',
-        ];
+        ]);
         $GLOBALS['A'] = [
             'A_a' => 1,
             'A_b' => 1,
@@ -135,19 +135,19 @@ class TargetTest extends TestCase
         /** @var Target $target */
         $target = $this->getMockForAbstractClass(Target::class);
 
-        $target->enabled = true;
-        $this->assertTrue($target->enabled);
+        $target->enable();
+        $this->assertTrue($target->isEnabled());
 
-        $target->enabled = false;
-        $this->assertFalse($target->enabled);
+        $target->disable();
+        $this->assertFalse($target->isEnabled());
 
-        $target->enabled = function ($target) {
+        $target->setEnabled(static function ($target) {
             return empty($target->messages);
-        };
-        $this->assertTrue($target->enabled);
+        });
+        $this->assertTrue($target->isEnabled());
     }
 
-    public function testFormatMessage()
+    public function testFormatTimestamp()
     {
         /** @var Target $target */
         $target = $this->getMockForAbstractClass(Target::class);
@@ -157,36 +157,47 @@ class TargetTest extends TestCase
         $category = 'application';
         $timestamp = 1508160390.6083;
 
+        $target->setTimestampFormat('Y-m-d H:i:s');
+
         $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
 
-        $target->microtime = true;
+        $target->setTimestampFormat('Y-m-d H:i:s.u');
 
-        $expectedWithMicro = '2017-10-16 13:26:30.6083 [info][application] message';
+        $expectedWithMicro = '2017-10-16 13:26:30.608300 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithMicro, $formatted);
 
+        $target->setTimestampFormat('Y-m-d H:i:s');
         $timestamp = 1508160390;
 
         $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
+
+        $target->setTimestampFormat('D d F Y');
+        $expectedCustom = 'Mon 16 October 2017 [info][application] message';
+        $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
+        $this->assertSame($expectedCustom, $formatted);
     }
 }
 
 class TestTarget extends Target
 {
-    public $exportInterval = 1;
+    public function __construct()
+    {
+        $this->setExportInterval(1);
+    }
 
     /**
      * Exports log [[messages]] to a specific destination.
      * Child classes must implement this method.
      */
-    public function export()
+    public function export(): void
     {
-        TargetTest::$messages = array_merge(TargetTest::$messages, $this->messages);
-        $this->messages = [];
+        TargetTest::$messages = array_merge(TargetTest::$messages, $this->getMessages());
+        $this->setMessages([]);
     }
 
     /**

@@ -8,7 +8,6 @@
 namespace Yiisoft\Log;
 
 use Psr\Log\LoggerInterface;
-use yii\exceptions\InvalidConfigException;
 
 /**
  * PsrTarget is a log target which simply passes messages to another PSR-3 compatible logger,
@@ -35,7 +34,7 @@ use yii\exceptions\InvalidConfigException;
  * ];
  * ```
  *
- * > Warning: make sure logger specified via [[$logger]] is not the same as [[Yii::getLogger()]], otherwise
+ * > Warning: make sure logger specified via [[$logger]] is not the same as the Yii logger, otherwise
  *   your program may fall into infinite loop.
  *
  * @property LoggerInterface $logger logger to be used by this target. Refer to [[setLogger()]] for details.
@@ -47,26 +46,20 @@ class PsrTarget extends Target
      */
     private $_logger;
 
-
     /**
      * Sets the PSR-3 logger used to save messages of this target.
-     * @param LoggerInterface $logger logger instance or its DI compatible configuration.
-     * @throws InvalidConfigException
+     * @param LoggerInterface $logger logger instance.
      */
-    public function setLogger(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger)
     {
         $this->_logger = $logger;
     }
 
     /**
      * @return LoggerInterface logger instance.
-     * @throws InvalidConfigException if logger is not set.
      */
     public function getLogger(): LoggerInterface
     {
-        if ($this->_logger === null) {
-            throw new InvalidConfigException('"' . get_class($this) . '::$logger" must be set to be "' . LoggerInterface::class . '" instance');
-        }
         return $this->_logger;
     }
 
@@ -75,7 +68,7 @@ class PsrTarget extends Target
      */
     public function export(): void
     {
-        foreach ($this->messages as $message) {
+        foreach ($this->getMessages() as $message) {
             [$level, $text, $context] = $message;
             $this->getLogger()->log($level, $text, $context);
         }

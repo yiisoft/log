@@ -8,9 +8,8 @@
 namespace Yiisoft\Log;
 
 use Psr\Log\LogLevel;
-use yii\base\Component;
 use Yiisoft\Arrays\ArrayHelper;
-use yii\helpers\VarDumper;
+use Yiisoft\VarDumper\VarDumper;
 
 /**
  * Target is the base class for all log target classes.
@@ -24,10 +23,8 @@ use yii\helpers\VarDumper;
  * may specify [[except]] to exclude messages of certain categories.
  *
  * For more details and usage information on Target, see the [guide article on logging & targets](guide:runtime-logging).
- *
- * @property bool $enabled Whether to enable this log target. Defaults to true.
  */
-abstract class Target extends Component
+abstract class Target
 {
     /**
      * @var array list of message categories that this target is interested in. Defaults to empty, meaning all categories.
@@ -35,7 +32,7 @@ abstract class Target extends Component
      * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
      */
-    public $categories = [];
+    private $categories = [];
     /**
      * @var array list of message categories that this target is NOT interested in. Defaults to empty, meaning no uninteresting messages.
      * If this property is not empty, then any category listed here will be excluded from [[categories]].
@@ -44,7 +41,7 @@ abstract class Target extends Component
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
      * @see categories
      */
-    public $except = [];
+    private $except = [];
     /**
      * @var array the message levels that this target is interested in.
      *
@@ -60,7 +57,7 @@ abstract class Target extends Component
      *
      * Defaults is empty array, meaning all available levels.
      */
-    public $levels = [];
+    private $levels = [];
     /**
      * @var array list of the PHP predefined variables that should be logged in a message.
      * Note that a variable must be accessible via `$GLOBALS`. Otherwise it won't be logged.
@@ -78,7 +75,7 @@ abstract class Target extends Component
      *
      * @see \Yiisoft\Arrays\ArrayHelper::filter()
      */
-    public $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
+    private $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
     /**
      * @var callable a PHP callable that returns a string to be prefixed to every exported message.
      *
@@ -87,35 +84,36 @@ abstract class Target extends Component
      *
      * The signature of the callable should be `function ($message)`.
      */
-    public $prefix;
+    private $prefix;
+
     /**
      * @var int how many messages should be accumulated before they are exported.
      * Defaults to 1000. Note that messages will always be exported when the application terminates.
      * Set this property to be 0 if you don't want to export messages until the application terminates.
      */
-    public $exportInterval = 1000;
+    private $exportInterval = 1000;
     /**
      * @var array the messages that are retrieved from the logger so far by this log target.
      * Please refer to [[Logger::messages]] for the details about the message structure.
      */
-    public $messages = [];
+    private $messages = [];
     /**
-     * @var bool whether to log time with microseconds.
-     * Defaults to false.
+     * @var string The date format for the log timestamp.
+     * Defaults to Y-m-d H:i:s.u
      */
-    public $microtime = false;
+    private $timestampFormat = 'Y-m-d H:i:s.u';
 
     /**
      * @var bool
      */
-    private $_enabled = true;
+    private $enabled = true;
 
 
     /**
      * Exports log [[messages]] to a specific destination.
      * Child classes must implement this method.
      */
-    abstract public function export();
+    abstract public function export(): void;
 
     /**
      * Processes the given log messages.
@@ -127,11 +125,22 @@ abstract class Target extends Component
      */
     public function collect($messages, bool $final): void
     {
-        $this->messages = array_merge($this->messages, static::filterMessages($messages, $this->levels, $this->categories, $this->except));
+        $this->messages = array_merge(
+            $this->messages,
+            static::filterMessages($messages, $this->levels, $this->categories, $this->except)
+        );
+
         $count = count($this->messages);
         if ($count > 0 && ($final || $this->exportInterval > 0 && $count >= $this->exportInterval)) {
             if (($context = $this->getContextMessage()) !== '') {
-                $this->messages[] = [LogLevel::INFO, $context, ['category' => 'application', 'time' => YII_BEGIN_TIME]];
+                $this->messages[] = [
+                    LogLevel::INFO,
+                    $context,
+                    [
+                        'category' => 'application',
+                        'time' => $_SERVER['REQUEST_TIME_FLOAT']
+                    ]
+                ];
             }
             // set exportInterval to 0 to avoid triggering export again while exporting
             $oldExportInterval = $this->exportInterval;
@@ -258,37 +267,192 @@ abstract class Target extends Component
      *     return !Yii::getApp()->user->isGuest;
      * }
      * ```
+     * @return Target
      */
-    public function setEnabled($value): void
+    public function setEnabled($value): self
     {
-        $this->_enabled = $value;
+        $this->enabled = $value;
+
+        return $this;
+    }
+
+    /**
+     * Enables the log target
+     *
+     * @return Target
+     */
+    public function enable(): self
+    {
+        return $this->setEnabled(true);
+    }
+
+    /**
+     * Disables the log target
+     *
+     * @return Target
+     */
+    public function disable(): self
+    {
+        return $this->setEnabled(false);
     }
 
     /**
      * Check whether the log target is enabled.
-     * @property bool Indicates whether this log target is enabled. Defaults to true.
      * @return bool A value indicating whether this log target is enabled.
      */
-    public function getEnabled(): bool
+    public function isEnabled(): bool
     {
-        if (is_callable($this->_enabled)) {
-            return call_user_func($this->_enabled, $this);
+        if (is_callable($this->enabled)) {
+            return call_user_func($this->enabled, $this);
         }
 
-        return $this->_enabled;
+        return $this->enabled;
     }
 
     /**
-     * Returns formatted ('Y-m-d H:i:s') timestamp for message.
-     * If [[microtime]] is configured to true it will return format 'Y-m-d H:i:s.u'.
-     * @param float $timestamp
+     * Returns formatted timestamp for message, according to [[timestampFormat]]
+     * @param float|int $timestamp
      * @return string
      */
     protected function getTime($timestamp): string
     {
-        $toString = \str_replace(',', '.', (string) $timestamp);
-        $parts = explode('.', $toString);
+        $format = \is_int($timestamp) ? 'U' : 'U.u';
+        return \DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
+    }
 
-        return date('Y-m-d H:i:s', $parts[0]) . ($this->microtime && isset($parts[1]) ? ('.' . $parts[1]) : '');
+    /**
+     * @param $logVars
+     * @return Target
+     */
+    public function setLogVars(array $logVars): self
+    {
+        $this->logVars = $logVars;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLogVars(): array
+    {
+        return $this->logVars;
+    }
+
+    /**
+     * @param string $format
+     * @return Target
+     */
+    public function setTimestampFormat(string $format): self
+    {
+        $this->timestampFormat = $format;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCategories(): array
+    {
+        return $this->categories;
+    }
+
+    /**
+     * @param array $categories
+     * @return Target
+     */
+    public function setCategories(array $categories): self
+    {
+        $this->categories = $categories;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExcept(): array
+    {
+        return $this->except;
+    }
+
+    /**
+     * @param array $except
+     * @return Target
+     */
+    public function setExcept(array $except): self
+    {
+        $this->except = $except;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLevels(): array
+    {
+        return $this->levels;
+    }
+
+    /**
+     * @param array $levels
+     * @return Target
+     */
+    public function setLevels(array $levels): self
+    {
+        $this->levels = $levels;
+        return $this;
+    }
+
+    /**
+     * @return callable
+     */
+    public function getPrefix(): callable
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * @param callable $prefix
+     * @return Target
+     */
+    public function setPrefix(callable $prefix): self
+    {
+        $this->prefix = $prefix;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExportInterval(): int
+    {
+        return $this->exportInterval;
+    }
+
+    /**
+     * @param int $exportInterval
+     * @return Target
+     */
+    public function setExportInterval(int $exportInterval): self
+    {
+        $this->exportInterval = $exportInterval;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMessages(): array
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @param array $messages
+     * @return Target
+     */
+    public function setMessages(array $messages): self
+    {
+        $this->messages = $messages;
+        return $this;
     }
 }

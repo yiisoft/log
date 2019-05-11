@@ -106,12 +106,5 @@
             "params": "config/params.php",
             "common": "config/common.php"
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/yiisoft/var-dumper",
-            "no-api": true
-        }
-    ]
+    }
 }

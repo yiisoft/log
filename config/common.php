@@ -13,6 +13,6 @@ return [
         '__construct()' => [
             'targets' => [],
         ],
-        'traceLevel' => $params['logger.traceLevel'],
+        'setTraceLevel()' => [$params['logger.traceLevel']],
     ],
 ];

@@ -1,5 +1,5 @@
 Upgrading Instructions for Yii Framework Log 3.0
-=====================================================
+=================================================
 
 This file contains the upgrade notes for the Log Yii 3.0.
 These notes highlight changes that could break your application when you upgrade Yii from one version to another.

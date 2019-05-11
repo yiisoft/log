@@ -24,13 +24,13 @@ class TargetTest extends TestCase
             [[], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']],
             [['levels' => []], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']],
             [
-                ['levels' => [Logger::INFO, Logger::WARNING, Logger::ERROR, Logger::DEBUG]],
+                ['levels' => [Logger::INFO_LEVEL, Logger::WARNING_LEVEL, Logger::ERROR_LEVEL, Logger::DEBUG_LEVEL]],
                 ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
             ],
             [['levels' => ['error']], ['B', 'G', 'H', 'I']],
-            [['levels' => [Logger::ERROR]], ['B', 'G', 'H', 'I']],
+            [['levels' => [Logger::ERROR_LEVEL]], ['B', 'G', 'H', 'I']],
             [['levels' => ['error', 'warning']], ['B', 'C', 'G', 'H', 'I']],
-            [['levels' => [Logger::ERROR, Logger::WARNING]], ['B', 'C', 'G', 'H', 'I']],
+            [['levels' => [Logger::ERROR_LEVEL, Logger::WARNING_LEVEL]], ['B', 'C', 'G', 'H', 'I']],
 
             [['categories' => ['application']], ['A', 'B', 'C', 'D', 'E']],
             [['categories' => ['application*']], ['A', 'B', 'C', 'D', 'E', 'F']],
@@ -43,9 +43,9 @@ class TargetTest extends TestCase
             [['except' => ['Yiisoft\Db\*']], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']],
             [['categories' => ['Yiisoft*'], 'except' => ['Yiisoft\Db\*']], ['G', 'H']],
 
-            [['categories' => ['application', 'Yiisoft.Db.*'], 'levels' => [Logger::ERROR]], ['B', 'G', 'H']],
-            [['categories' => ['application'], 'levels' => [Logger::ERROR]], ['B']],
-            [['categories' => ['application'], 'levels' => [Logger::ERROR, Logger::WARNING]], ['B', 'C']],
+            [['categories' => ['application', 'Yiisoft.Db.*'], 'levels' => [Logger::ERROR_LEVEL]], ['B', 'G', 'H']],
+            [['categories' => ['application'], 'levels' => [Logger::ERROR_LEVEL]], ['B']],
+            [['categories' => ['application'], 'levels' => [Logger::ERROR_LEVEL, Logger::WARNING_LEVEL]], ['B', 'C']],
         ];
     }
 
@@ -66,15 +66,15 @@ class TargetTest extends TestCase
         $logger = new Logger(['test' => $target]);
 
         $logger->setFlushInterval(1);
-        $logger->log(Logger::INFO, 'testA');
-        $logger->log(Logger::ERROR, 'testB');
-        $logger->log(Logger::WARNING, 'testC');
-        $logger->log(Logger::DEBUG, 'testD');
-        $logger->log(Logger::INFO, 'testE', ['category' => 'application']);
-        $logger->log(Logger::INFO, 'testF', ['category' => 'application.components.Test']);
-        $logger->log(Logger::ERROR, 'testG', ['category' => 'Yiisoft.Db.Command']);
-        $logger->log(Logger::ERROR, 'testH', ['category' => 'Yiisoft.Db.Command.whatever']);
-        $logger->log(Logger::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
+        $logger->log(Logger::INFO_LEVEL, 'testA');
+        $logger->log(Logger::ERROR_LEVEL, 'testB');
+        $logger->log(Logger::WARNING_LEVEL, 'testC');
+        $logger->log(Logger::DEBUG_LEVEL, 'testD');
+        $logger->log(Logger::INFO_LEVEL, 'testE', ['category' => 'application']);
+        $logger->log(Logger::INFO_LEVEL, 'testF', ['category' => 'application.components.Test']);
+        $logger->log(Logger::ERROR_LEVEL, 'testG', ['category' => 'Yiisoft.Db.Command']);
+        $logger->log(Logger::ERROR_LEVEL, 'testH', ['category' => 'Yiisoft.Db.Command.whatever']);
+        $logger->log(Logger::ERROR_LEVEL, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
         $this->assertCount(count($expected), static::$messages, 'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0)));
         $i = 0;
@@ -152,7 +152,7 @@ class TargetTest extends TestCase
         $target = $this->getMockForAbstractClass(Target::class);
 
         $text = 'message';
-        $level = Logger::INFO;
+        $level = Logger::INFO_LEVEL;
         $category = 'application';
         $timestamp = 1508160390.6083;
 

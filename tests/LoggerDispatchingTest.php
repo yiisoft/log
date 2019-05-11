@@ -115,7 +115,7 @@ namespace Yiisoft\Log\Tests {
                     [
                         [[
                             'Unable to send log via ' . get_class($target1) . ': Exception: some error',
-                            Logger::WARNING,
+                            Logger::WARNING_LEVEL,
                             'Yiisoft\Log\Logger::dispatch',
                             'time data',
                             [],

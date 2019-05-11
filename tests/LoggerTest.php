@@ -7,7 +7,6 @@
 
 namespace Yiisoft\Log\Tests;
 
-use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
 use PHPUnit\Framework\TestCase;
@@ -35,17 +34,17 @@ class LoggerTest extends TestCase
     public function testLog()
     {
         $memory = memory_get_usage();
-        $this->logger->log(LogLevel::INFO, 'test1');
+        $this->logger->log(Logger::INFO, 'test1');
         $this->assertCount(1, $this->logger->messages);
-        $this->assertEquals(LogLevel::INFO, $this->logger->messages[0][0]);
+        $this->assertEquals(Logger::INFO, $this->logger->messages[0][0]);
         $this->assertEquals('test1', $this->logger->messages[0][1]);
         $this->assertEquals('application', $this->logger->messages[0][2]['category']);
         $this->assertEquals([], $this->logger->messages[0][2]['trace']);
         $this->assertGreaterThanOrEqual($memory, $this->logger->messages[0][2]['memory']);
 
-        $this->logger->log(LogLevel::ERROR, 'test2', ['category' => 'category']);
+        $this->logger->log(Logger::ERROR, 'test2', ['category' => 'category']);
         $this->assertCount(2, $this->logger->messages);
-        $this->assertEquals(LogLevel::ERROR, $this->logger->messages[1][0]);
+        $this->assertEquals(Logger::ERROR, $this->logger->messages[1][0]);
         $this->assertEquals('test2', $this->logger->messages[1][1]);
         $this->assertEquals('category', $this->logger->messages[1][2]['category']);
         $this->assertEquals([], $this->logger->messages[1][2]['trace']);
@@ -59,14 +58,14 @@ class LoggerTest extends TestCase
     {
         $memory = memory_get_usage();
         $this->logger->setTraceLevel(3);
-        $this->logger->log(LogLevel::INFO, 'test3');
+        $this->logger->log(Logger::INFO, 'test3');
         $this->assertCount(1, $this->logger->messages);
-        $this->assertEquals(LogLevel::INFO, $this->logger->messages[0][0]);
+        $this->assertEquals(Logger::INFO, $this->logger->messages[0][0]);
         $this->assertEquals('test3', $this->logger->messages[0][1]);
         $this->assertEquals('application', $this->logger->messages[0][2]['category']);
         $this->assertEquals([
             'file' => __FILE__,
-            'line' => 62,
+            'line' => 61,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',
@@ -102,7 +101,7 @@ class LoggerTest extends TestCase
             ->getMock();
         $logger->setFlushInterval(1);
         $logger->expects($this->exactly(1))->method('flush');
-        $logger->log(LogLevel::INFO, 'test1');
+        $logger->log(Logger::INFO, 'test1');
     }
 
     /**
@@ -153,13 +152,13 @@ class LoggerTest extends TestCase
      */
     public function testGetLevelName()
     {
-        $this->assertEquals('info', Logger::getLevelName(LogLevel::INFO));
-        $this->assertEquals('error', Logger::getLevelName(LogLevel::ERROR));
-        $this->assertEquals('warning', Logger::getLevelName(LogLevel::WARNING));
-        $this->assertEquals('debug', Logger::getLevelName(LogLevel::DEBUG));
-        $this->assertEquals('emergency', Logger::getLevelName(LogLevel::EMERGENCY));
-        $this->assertEquals('alert', Logger::getLevelName(LogLevel::ALERT));
-        $this->assertEquals('critical', Logger::getLevelName(LogLevel::CRITICAL));
+        $this->assertEquals('info', Logger::getLevelName(Logger::INFO));
+        $this->assertEquals('error', Logger::getLevelName(Logger::ERROR));
+        $this->assertEquals('warning', Logger::getLevelName(Logger::WARNING));
+        $this->assertEquals('debug', Logger::getLevelName(Logger::DEBUG));
+        $this->assertEquals('emergency', Logger::getLevelName(Logger::EMERGENCY));
+        $this->assertEquals('alert', Logger::getLevelName(Logger::ALERT));
+        $this->assertEquals('critical', Logger::getLevelName(Logger::CRITICAL));
         $this->assertEquals('unknown', Logger::getLevelName(0));
     }
 
@@ -242,7 +241,7 @@ class LoggerTest extends TestCase
      */
     public function testParseMessage($message, array $context, $expected)
     {
-        $this->logger->log(LogLevel::INFO, $message, $context);
+        $this->logger->log(Logger::INFO, $message, $context);
         [, $message] = $this->logger->messages[0];
         $this->assertEquals($expected, $message);
     }

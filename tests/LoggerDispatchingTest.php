@@ -21,7 +21,6 @@ namespace Yiisoft\Log {
 
 namespace Yiisoft\Log\Tests {
 
-    use Psr\Log\LogLevel;
     use Yiisoft\Log\Logger;
     use Yiisoft\Log\Target;
     use PHPUnit\Framework\TestCase;
@@ -116,7 +115,7 @@ namespace Yiisoft\Log\Tests {
                     [
                         [[
                             'Unable to send log via ' . get_class($target1) . ': Exception: some error',
-                            LogLevel::WARNING,
+                            Logger::WARNING,
                             'Yiisoft\Log\Logger::dispatch',
                             'time data',
                             [],

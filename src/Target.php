@@ -316,7 +316,7 @@ abstract class Target
      */
     protected function getTime($timestamp): string
     {
-        $format = \is_int($timestamp) ? 'U' : 'U.u';
+        $format = strpos((string) $timestamp, ',') === false ? 'U' : 'U.u';
         return \DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 

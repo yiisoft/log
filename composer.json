@@ -76,8 +76,7 @@
         "yiisoft/var-dumper": "^3.0@dev"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.3",
-        "hiqdev/composer-config-plugin": "^1.0@dev"
+        "phpunit/phpunit": "^7.3"
     },
     "provide": {
         "psr/log-implementation": "1.0.0"
@@ -101,10 +100,6 @@
     "extra": {
         "branch-alias": {
             "dev-master": "3.0.x-dev"
-        },
-        "config-plugin": {
-            "params": "config/params.php",
-            "common": "config/common.php"
         }
     }
 }

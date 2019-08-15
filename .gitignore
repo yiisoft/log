@@ -23,3 +23,4 @@ phpunit.phar
 
 # tests runtime
 /runtime
+/.phpunit.result.cache

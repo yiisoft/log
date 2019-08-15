@@ -26,6 +26,29 @@ class LoggerTest extends TestCase
     /**
      * @covers \Yiisoft\Log\Logger::Log()
      */
+    public function testLogWithTraceLevel()
+    {
+        $memory = memory_get_usage();
+        $this->logger->setTraceLevel(3);
+        $this->logger->log(LogLevel::INFO, 'test3');
+        $this->assertCount(1, $this->logger->messages);
+        $this->assertEquals(LogLevel::INFO, $this->logger->messages[0][0]);
+        $this->assertEquals('test3', $this->logger->messages[0][1]);
+        $this->assertEquals('application', $this->logger->messages[0][2]['category']);
+        $this->assertEquals([
+            'file' => __FILE__,
+            'line' => 33,
+            'function' => 'log',
+            'class' => Logger::class,
+            'type' => '->',
+        ], $this->logger->messages[0][2]['trace'][0]);
+        $this->assertCount(3, $this->logger->messages[0][2]['trace']);
+        $this->assertGreaterThanOrEqual($memory, $this->logger->messages[0][2]['memory']);
+    }
+
+    /**
+     * @covers \Yiisoft\Log\Logger::Log()
+     */
     public function testLog()
     {
         $memory = memory_get_usage();
@@ -45,30 +68,6 @@ class LoggerTest extends TestCase
         $this->assertEquals([], $this->logger->messages[1][2]['trace']);
         $this->assertGreaterThanOrEqual($memory, $this->logger->messages[1][2]['memory']);
     }
-
-    /**
-     * @covers \Yiisoft\Log\Logger::Log()
-     */
-    public function testLogWithTraceLevel()
-    {
-        $memory = memory_get_usage();
-        $this->logger->setTraceLevel(3);
-        $this->logger->log(LogLevel::INFO, 'test3');
-        $this->assertCount(1, $this->logger->messages);
-        $this->assertEquals(LogLevel::INFO, $this->logger->messages[0][0]);
-        $this->assertEquals('test3', $this->logger->messages[0][1]);
-        $this->assertEquals('application', $this->logger->messages[0][2]['category']);
-        $this->assertEquals([
-            'file' => __FILE__,
-            'line' => 62,
-            'function' => 'log',
-            'class' => Logger::class,
-            'type' => '->',
-        ], $this->logger->messages[0][2]['trace'][0]);
-        $this->assertCount(3, $this->logger->messages[0][2]['trace']);
-        $this->assertGreaterThanOrEqual($memory, $this->logger->messages[0][2]['memory']);
-    }
-
 
     public function testExcludedTracePaths()
     {

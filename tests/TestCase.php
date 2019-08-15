@@ -1,7 +1,7 @@
 <?php
 namespace Yiisoft\Log\Tests;
 
-abstract class TestCase
+abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * Sets an inaccessible object property to a designated value.

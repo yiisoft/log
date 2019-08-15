@@ -4,7 +4,6 @@ namespace Yiisoft\Log\Tests;
 use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group log
@@ -194,9 +193,6 @@ class TestTarget extends Target
         $this->setMessages([]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContextMessage(): string
     {
         return parent::getContextMessage();

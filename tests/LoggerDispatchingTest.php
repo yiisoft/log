@@ -3,13 +3,13 @@ namespace Yiisoft\Log {
 
     use Yiisoft\Log\Tests\LoggerDispatchingTest;
 
-    function microtime($get_as_float)
+    function microtime($getAsFloat)
     {
         if (LoggerDispatchingTest::$microtimeIsMocked) {
             return LoggerDispatchingTest::microtime(func_get_args());
         }
 
-        return \microtime($get_as_float);
+        return \microtime($getAsFloat);
     }
 }
 
@@ -21,7 +21,7 @@ namespace Yiisoft\Log\Tests {
 
     /**
      * @group log
-     * @method int|float microtime()
+     * @method static int|float microtime($getAsFloat)
      */
     class LoggerDispatchingTest extends TestCase
     {

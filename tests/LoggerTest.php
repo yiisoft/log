@@ -18,7 +18,7 @@ class LoggerTest extends TestCase
     protected function setUp(): void
     {
         $this->logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['dispatch'])
+            ->onlyMethods(['dispatch'])
             ->getMock();
     }
 
@@ -98,7 +98,7 @@ class LoggerTest extends TestCase
     {
         /* @var $logger Logger|\PHPUnit_Framework_MockObject_MockObject */
         $logger = $this->getMockBuilder(Logger::class)
-            ->setMethods(['flush'])
+            ->onlyMethods(['flush'])
             ->getMock();
         $logger->setFlushInterval(1);
         $logger->expects($this->once())->method('flush');

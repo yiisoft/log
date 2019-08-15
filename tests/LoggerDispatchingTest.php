@@ -21,6 +21,7 @@ namespace Yiisoft\Log\Tests {
 
     /**
      * @group log
+     * @method int|float microtime()
      */
     class LoggerDispatchingTest extends TestCase
     {
@@ -54,7 +55,7 @@ namespace Yiisoft\Log\Tests {
         {
             /** @var Target $target */
             $target = $this->getMockBuilder(Target::class)
-                ->setMethods(['collect'])
+                ->onlyMethods(['collect'])
                 ->getMockForAbstractClass();
 
             $target->expects($this->never())->method($this->anything());
@@ -73,7 +74,7 @@ namespace Yiisoft\Log\Tests {
         public function testDispatchWithSuccessTargetCollect(): void
         {
             $target = $this->getMockBuilder(Target::class)
-                ->setMethods(['collect'])
+                ->onlyMethods(['collect'])
                 ->getMockForAbstractClass();
 
             $target->expects($this->once())
@@ -101,11 +102,11 @@ namespace Yiisoft\Log\Tests {
             static::$microtimeIsMocked = true;
 
             $target1 = $this->getMockBuilder(Target::class)
-                ->setMethods(['collect'])
+                ->onlyMethods(['collect'])
                 ->getMockForAbstractClass();
 
             $target2 = $this->getMockBuilder(Target::class)
-                ->setMethods(['collect'])
+                ->onlyMethods(['collect'])
                 ->getMockForAbstractClass();
 
             $target1->expects($this->exactly(2))

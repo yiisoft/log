@@ -98,7 +98,7 @@ abstract class Target
     private $timestampFormat = 'Y-m-d H:i:s.u';
 
     /**
-     * @var bool
+     * @var bool|callable
      */
     private $enabled = true;
 

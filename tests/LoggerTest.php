@@ -4,7 +4,6 @@ namespace Yiisoft\Log\Tests;
 use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @group log
@@ -31,19 +30,21 @@ class LoggerTest extends TestCase
         $memory = memory_get_usage();
         $this->logger->setTraceLevel(3);
         $this->logger->log(LogLevel::INFO, 'test3');
-        $this->assertCount(1, $this->logger->messages);
-        $this->assertEquals(LogLevel::INFO, $this->logger->messages[0][0]);
-        $this->assertEquals('test3', $this->logger->messages[0][1]);
-        $this->assertEquals('application', $this->logger->messages[0][2]['category']);
+
+        $messages = $this->getInaccessibleProperty($this->logger, 'messages');
+        $this->assertCount(1, $messages);
+        $this->assertEquals(LogLevel::INFO, $messages[0][0]);
+        $this->assertEquals('test3', $messages[0][1]);
+        $this->assertEquals('application', $messages[0][2]['category']);
         $this->assertEquals([
             'file' => __FILE__,
             'line' => 33,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',
-        ], $this->logger->messages[0][2]['trace'][0]);
-        $this->assertCount(3, $this->logger->messages[0][2]['trace']);
-        $this->assertGreaterThanOrEqual($memory, $this->logger->messages[0][2]['memory']);
+        ], $messages[0][2]['trace'][0]);
+        $this->assertCount(3, $messages[0][2]['trace']);
+        $this->assertGreaterThanOrEqual($memory, $messages[0][2]['memory']);
     }
 
     /**
@@ -53,20 +54,24 @@ class LoggerTest extends TestCase
     {
         $memory = memory_get_usage();
         $this->logger->log(LogLevel::INFO, 'test1');
-        $this->assertCount(1, $this->logger->messages);
-        $this->assertEquals(LogLevel::INFO, $this->logger->messages[0][0]);
-        $this->assertEquals('test1', $this->logger->messages[0][1]);
-        $this->assertEquals('application', $this->logger->messages[0][2]['category']);
-        $this->assertEquals([], $this->logger->messages[0][2]['trace']);
-        $this->assertGreaterThanOrEqual($memory, $this->logger->messages[0][2]['memory']);
+
+        $messages = $this->getInaccessibleProperty($this->logger, 'messages');
+        $this->assertCount(1, $messages);
+        $this->assertEquals(LogLevel::INFO, $messages[0][0]);
+        $this->assertEquals('test1', $messages[0][1]);
+        $this->assertEquals('application', $messages[0][2]['category']);
+        $this->assertEquals([], $messages[0][2]['trace']);
+        $this->assertGreaterThanOrEqual($memory, $messages[0][2]['memory']);
 
         $this->logger->log(LogLevel::ERROR, 'test2', ['category' => 'category']);
-        $this->assertCount(2, $this->logger->messages);
-        $this->assertEquals(LogLevel::ERROR, $this->logger->messages[1][0]);
-        $this->assertEquals('test2', $this->logger->messages[1][1]);
-        $this->assertEquals('category', $this->logger->messages[1][2]['category']);
-        $this->assertEquals([], $this->logger->messages[1][2]['trace']);
-        $this->assertGreaterThanOrEqual($memory, $this->logger->messages[1][2]['memory']);
+
+        $messages = $this->getInaccessibleProperty($this->logger, 'messages');
+        $this->assertCount(2, $messages);
+        $this->assertEquals(LogLevel::ERROR, $messages[1][0]);
+        $this->assertEquals('test2', $messages[1][1]);
+        $this->assertEquals('category', $messages[1][2]['category']);
+        $this->assertEquals([], $messages[1][2]['trace']);
+        $this->assertGreaterThanOrEqual($memory, $messages[1][2]['memory']);
     }
 
     public function testExcludedTracePaths()
@@ -74,12 +79,14 @@ class LoggerTest extends TestCase
         $this->logger->setTraceLevel(20);
 
         $this->logger->info('info message');
-        $this->assertEquals(__FILE__, $this->logger->messages[0][2]['trace'][1]['file']);
+
+        $messages = $this->getInaccessibleProperty($this->logger, 'messages');
+        $this->assertEquals(__FILE__, $messages[0][2]['trace'][1]['file']);
 
         $this->logger->setExcludedTracePaths([__DIR__]);
-
         $this->logger->info('info message');
-        foreach ($this->logger->messages[1][2]['trace'] as $trace) {
+        $messages = $this->getInaccessibleProperty($this->logger, 'messages');
+        foreach ($messages[1][2]['trace'] as $trace) {
             $this->assertNotEquals(__FILE__, $trace['file']);
         }
     }

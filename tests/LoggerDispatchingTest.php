@@ -18,7 +18,6 @@ namespace Yiisoft\Log\Tests {
     use Psr\Log\LogLevel;
     use Yiisoft\Log\Logger;
     use Yiisoft\Log\Target;
-    use PHPUnit\Framework\TestCase;
 
     /**
      * @group log
@@ -62,7 +61,7 @@ namespace Yiisoft\Log\Tests {
             $target->setEnabled(false);
 
             $logger = new Logger(['fakeTarget' => $target]);
-            $logger->messages = 'messages';
+            $this->setInaccessibleProperty($logger, 'messages', 'messages');
             $logger->flush(true);
         }
 
@@ -84,7 +83,7 @@ namespace Yiisoft\Log\Tests {
 
             $logger = new Logger(['fakeTarget' => $target]);
 
-            $logger->messages = 'messages';
+            $this->setInaccessibleProperty($logger, 'messages', 'messages');
             $logger->flush(true);
         }
 
@@ -136,7 +135,7 @@ namespace Yiisoft\Log\Tests {
                 return 'time data';
             };
 
-            $logger->messages = 'messages';
+            $this->setInaccessibleProperty($logger, 'message', 'messages');
             $logger->flush(true);
         }
 

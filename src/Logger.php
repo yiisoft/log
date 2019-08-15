@@ -42,7 +42,7 @@ class Logger implements LoggerInterface
      * - trace: array, debug backtrace, contains the application code call stacks.
      * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`.
      */
-    public $messages = [];
+    private $messages = [];
     /**
      * @var int how many messages should be logged before they are flushed from memory and sent to targets.
      * Defaults to 1000, meaning the [[flush]] method will be invoked once every 1000 messages logged.

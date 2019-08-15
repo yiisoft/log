@@ -61,7 +61,9 @@ namespace Yiisoft\Log\Tests {
             $target->setEnabled(false);
 
             $logger = new Logger(['fakeTarget' => $target]);
-            $this->setInaccessibleProperty($logger, 'messages', 'messages');
+            $this->setInaccessibleProperty($logger, 'messages', [
+                [LogLevel::INFO, 'test', []]
+            ]);
             $logger->flush(true);
         }
 
@@ -77,13 +79,17 @@ namespace Yiisoft\Log\Tests {
             $target->expects($this->once())
                 ->method('collect')
                 ->with(
-                    $this->equalTo('messages'),
+                    $this->equalTo([
+                        [LogLevel::INFO, 'test', []]
+                    ]),
                     $this->equalTo(true)
                 );
 
             $logger = new Logger(['fakeTarget' => $target]);
 
-            $this->setInaccessibleProperty($logger, 'messages', 'messages');
+            $this->setInaccessibleProperty($logger, 'messages', [
+                [LogLevel::INFO, 'test', []]
+            ]);
             $logger->flush(true);
         }
 
@@ -105,7 +111,7 @@ namespace Yiisoft\Log\Tests {
             $target1->expects($this->exactly(2))
                 ->method('collect')
                 ->withConsecutive(
-                    [$this->equalTo('messages'), $this->equalTo(true)],
+                    [$this->equalTo([]), $this->equalTo(true)],
                     [
                         [[
                             'Unable to send log via ' . get_class($target1) . ': Exception: some error',
@@ -121,7 +127,7 @@ namespace Yiisoft\Log\Tests {
             $target2->expects($this->once())
                 ->method('collect')
                 ->with(
-                    $this->equalTo('messages'),
+                    $this->equalTo([]),
                     $this->equalTo(true)
                 )->will($this->throwException(new \Exception('some error')));
 
@@ -135,7 +141,7 @@ namespace Yiisoft\Log\Tests {
                 return 'time data';
             };
 
-            $this->setInaccessibleProperty($logger, 'message', 'messages');
+            $this->setInaccessibleProperty($logger, 'messages', []);
             $logger->flush(true);
         }
 

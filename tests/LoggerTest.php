@@ -38,7 +38,7 @@ class LoggerTest extends TestCase
         $this->assertEquals('application', $messages[0][2]['category']);
         $this->assertEquals([
             'file' => __FILE__,
-            'line' => 33,
+            'line' => 32,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',
@@ -101,7 +101,7 @@ class LoggerTest extends TestCase
             ->setMethods(['flush'])
             ->getMock();
         $logger->setFlushInterval(1);
-        $logger->expects($this->exactly(1))->method('flush');
+        $logger->expects($this->once())->method('flush');
         $logger->log(LogLevel::INFO, 'test1');
     }
 
@@ -114,9 +114,9 @@ class LoggerTest extends TestCase
         $this->logger->expects($this->once())
             ->method('dispatch')->with($this->equalTo($message), $this->equalTo(false));
 
-        $this->logger->messages = $message;
+        $this->setInaccessibleProperty($this->logger, 'messages', $message);
         $this->logger->flush();
-        $this->assertEmpty($this->logger->messages);
+        $this->assertEmpty($this->getInaccessibleProperty($this->logger, 'messages'));
     }
 
     /**
@@ -128,9 +128,9 @@ class LoggerTest extends TestCase
         $this->logger->expects($this->once())
             ->method('dispatch')->with($this->equalTo($message), $this->equalTo(true));
 
-        $this->logger->messages = $message;
+        $this->setInaccessibleProperty($this->logger, 'messages', $message);
         $this->logger->flush(true);
-        $this->assertEmpty($this->logger->messages);
+        $this->assertEmpty($this->getInaccessibleProperty($this->logger, 'messages'));
     }
 
     /**
@@ -240,10 +240,11 @@ class LoggerTest extends TestCase
      * @param array $context
      * @param string $expected
      */
-    public function testParseMessage(string $message, array $context, string $expected): array
+    public function testParseMessage(string $message, array $context, string $expected): void
     {
         $this->logger->log(LogLevel::INFO, $message, $context);
-        [, $message] = $this->logger->messages[0];
+        $messages = $this->getInaccessibleProperty($this->logger, 'messages');
+        [, $message] = $messages[0];
         $this->assertEquals($expected, $message);
     }
 }

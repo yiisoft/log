@@ -102,9 +102,7 @@ class Logger implements LoggerInterface
      */
     public function getTarget($name): ?Target
     {
-        $this->getTargets();
-
-        return $this->targets[$name] ?? null;
+        return $this->getTargets()[$name] ?? null;
     }
 
     /**
@@ -144,7 +142,7 @@ class Logger implements LoggerInterface
     public static function prepareMessage($message): string
     {
         if (method_exists($message, '__toString')) {
-            return $message->__toString();
+            return (string)$message;
         }
 
         if (is_scalar($message)) {

@@ -15,7 +15,7 @@ class LoggerTest extends TestCase
      */
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = $this->getMockBuilder(Logger::class)
             ->setMethods(['dispatch'])
@@ -25,7 +25,7 @@ class LoggerTest extends TestCase
     /**
      * @covers \Yiisoft\Log\Logger::Log()
      */
-    public function testLogWithTraceLevel()
+    public function testLogWithTraceLevel(): void
     {
         $memory = memory_get_usage();
         $this->logger->setTraceLevel(3);
@@ -50,7 +50,7 @@ class LoggerTest extends TestCase
     /**
      * @covers \Yiisoft\Log\Logger::Log()
      */
-    public function testLog()
+    public function testLog(): void
     {
         $memory = memory_get_usage();
         $this->logger->log(LogLevel::INFO, 'test1');
@@ -74,7 +74,7 @@ class LoggerTest extends TestCase
         $this->assertGreaterThanOrEqual($memory, $messages[1][2]['memory']);
     }
 
-    public function testExcludedTracePaths()
+    public function testExcludedTracePaths(): void
     {
         $this->logger->setTraceLevel(20);
 
@@ -94,7 +94,7 @@ class LoggerTest extends TestCase
     /**
      * @covers \Yiisoft\Log\Logger::Log()
      */
-    public function testLogWithFlush()
+    public function testLogWithFlush(): void
     {
         /* @var $logger Logger|\PHPUnit_Framework_MockObject_MockObject */
         $logger = $this->getMockBuilder(Logger::class)
@@ -108,7 +108,7 @@ class LoggerTest extends TestCase
     /**
      * @covers \Yiisoft\Log\Logger::Flush()
      */
-    public function testFlushWithDispatch()
+    public function testFlushWithDispatch(): void
     {
         $message = ['anything'];
         $this->logger->expects($this->once())
@@ -122,7 +122,7 @@ class LoggerTest extends TestCase
     /**
      * @covers \Yiisoft\Log\Logger::Flush()
      */
-    public function testFlushWithDispatchAndDefinedParam()
+    public function testFlushWithDispatchAndDefinedParam(): void
     {
         $message = ['anything'];
         $this->logger->expects($this->once())
@@ -136,7 +136,7 @@ class LoggerTest extends TestCase
     /**
      * @covers \Yiisoft\Log\Logger::getElapsedTime()
      */
-    public function testGetElapsedTime()
+    public function testGetElapsedTime(): void
     {
         $timeBefore = \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
         usleep(1);
@@ -151,7 +151,7 @@ class LoggerTest extends TestCase
     /**
      * @covers \Yiisoft\Log\Logger::getLevelName()
      */
-    public function testGetLevelName()
+    public function testGetLevelName(): void
     {
         $this->assertEquals('info', Logger::getLevelName(LogLevel::INFO));
         $this->assertEquals('error', Logger::getLevelName(LogLevel::ERROR));
@@ -167,7 +167,7 @@ class LoggerTest extends TestCase
      * @covers \Yiisoft\Log\Logger::setTargets()
      * @covers \Yiisoft\Log\Logger::getTargets()
      */
-    public function testSetupTarget()
+    public function testSetupTarget(): void
     {
         $logger = new Logger();
 
@@ -183,7 +183,7 @@ class LoggerTest extends TestCase
      *
      * @covers \Yiisoft\Log\Logger::addTarget()
      */
-    public function testAddTarget()
+    public function testAddTarget(): void
     {
         $logger = new Logger();
 
@@ -209,7 +209,7 @@ class LoggerTest extends TestCase
      * Data provider for [[testParseMessage()]]
      * @return array test data.
      */
-    public function dataProviderParseMessage()
+    public function dataProviderParseMessage(): array
     {
         return [
             [
@@ -236,11 +236,11 @@ class LoggerTest extends TestCase
      *
      * @covers \Yiisoft\Log\Logger::parseMessage()
      *
-     * @param $message
+     * @param string $message
      * @param array $context
-     * @param $expected
+     * @param string $expected
      */
-    public function testParseMessage($message, array $context, $expected)
+    public function testParseMessage(string $message, array $context, string $expected): array
     {
         $this->logger->log(LogLevel::INFO, $message, $context);
         [, $message] = $this->logger->messages[0];

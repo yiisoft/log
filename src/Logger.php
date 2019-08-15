@@ -123,7 +123,7 @@ class Logger implements LoggerInterface
      * @param string|null $name array key to be used to store target, if `null` is given target will be append
      * to the end of the array by natural integer key.
      */
-    public function addTarget(Target $target, string $name = null)
+    public function addTarget(Target $target, string $name = null): void
     {
         if ($name === null) {
             $this->targets[] = $target;
@@ -134,8 +134,10 @@ class Logger implements LoggerInterface
 
     /**
      * Prepares message for logging.
+     * @param mixed $message
+     * @return string
      */
-    public static function prepareMessage($message)
+    public static function prepareMessage($message): string
     {
         if (method_exists($message, '__toString')) {
             return $message->__toString();
@@ -148,10 +150,7 @@ class Logger implements LoggerInterface
         return VarDumper::export($message);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if ($message instanceof \Throwable) {
             if (!isset($context['exception'])) {
@@ -224,7 +223,7 @@ class Logger implements LoggerInterface
      * @param array $messages the logged messages
      * @param bool $final whether this method is called at the end of the current application
      */
-    protected function dispatch($messages, bool $final): void
+    protected function dispatch(array $messages, bool $final): void
     {
         $targetErrors = [];
         foreach ($this->getTargets() as $target) {
@@ -258,7 +257,7 @@ class Logger implements LoggerInterface
      */
     protected function parseMessage(string $message, array $context): string
     {
-        return preg_replace_callback('/\\{([\\w\\.]+)\\}/is', static function ($matches) use ($context) {
+        return preg_replace_callback('/{([\w.]+)}/', static function ($matches) use ($context) {
             $placeholderName = $matches[1];
             if (isset($context[$placeholderName])) {
                 return (string)$context[$placeholderName];

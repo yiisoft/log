@@ -41,7 +41,7 @@ namespace Yiisoft\Log\Tests {
          */
         public static $functions = [];
 
-        protected function setUp()
+        protected function setUp(): void
         {
             static::$microtimeIsMocked = false;
             $this->logger = new Logger();
@@ -50,7 +50,7 @@ namespace Yiisoft\Log\Tests {
         /**
          * @covers \Yiisoft\Log\Logger::dispatch()
          */
-        public function testDispatchWithDisabledTarget()
+        public function testDispatchWithDisabledTarget(): void
         {
             /** @var Target $target */
             $target = $this->getMockBuilder(Target::class)
@@ -68,7 +68,7 @@ namespace Yiisoft\Log\Tests {
         /**
          * @covers \Yiisoft\Log\Logger::dispatch()
          */
-        public function testDispatchWithSuccessTargetCollect()
+        public function testDispatchWithSuccessTargetCollect(): void
         {
             $target = $this->getMockBuilder(Target::class)
                 ->setMethods(['collect'])
@@ -90,7 +90,7 @@ namespace Yiisoft\Log\Tests {
         /**
          * @covers \Yiisoft\Log\Logger::dispatch()
          */
-        public function testDispatchWithFakeTarget2ThrowExceptionWhenCollect()
+        public function testDispatchWithFakeTarget2ThrowExceptionWhenCollect(): void
         {
             static::$microtimeIsMocked = true;
 

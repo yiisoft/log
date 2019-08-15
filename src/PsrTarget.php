@@ -30,15 +30,13 @@ use Psr\Log\LoggerInterface;
  *
  * > Warning: make sure logger specified via [[$logger]] is not the same as the Yii logger, otherwise
  *   your program may fall into infinite loop.
- *
- * @property LoggerInterface $logger logger to be used by this target. Refer to [[setLogger()]] for details.
  */
 class PsrTarget extends Target
 {
     /**
      * @var LoggerInterface logger instance to be used for messages processing.
      */
-    private $_logger;
+    private $logger;
 
     /**
      * Sets the PSR-3 logger used to save messages of this target.
@@ -46,7 +44,7 @@ class PsrTarget extends Target
      */
     public function __construct(LoggerInterface $logger)
     {
-        $this->_logger = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -54,12 +52,9 @@ class PsrTarget extends Target
      */
     public function getLogger(): LoggerInterface
     {
-        return $this->_logger;
+        return $this->logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function export(): void
     {
         foreach ($this->getMessages() as $message) {

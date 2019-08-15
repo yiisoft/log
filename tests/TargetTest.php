@@ -13,7 +13,7 @@ class TargetTest extends TestCase
 {
     public static $messages;
 
-    public function filters()
+    public function filters(): array
     {
         return [
             [[], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']],
@@ -49,7 +49,7 @@ class TargetTest extends TestCase
      * @param array $filter
      * @param array $expected
      */
-    public function testFilter($filter, $expected)
+    public function testFilter(array $filter, array $expected): void
     {
         static::$messages = [];
 
@@ -78,7 +78,7 @@ class TargetTest extends TestCase
         }
     }
 
-    public function testGetContextMessage()
+    public function testGetContextMessage(): void
     {
         $target = new TestTarget();
         $target->setLogVars([
@@ -124,7 +124,7 @@ class TargetTest extends TestCase
         $this->assertNotContains('E_c', $context);
     }
 
-    public function testGetEnabled()
+    public function testGetEnabled(): void
     {
         /** @var Target $target */
         $target = $this->getMockForAbstractClass(Target::class);
@@ -141,7 +141,7 @@ class TargetTest extends TestCase
         $this->assertTrue($target->isEnabled());
     }
 
-    public function testFormatTimestamp()
+    public function testFormatTimestamp(): void
     {
         /** @var Target $target */
         $target = $this->getMockForAbstractClass(Target::class);

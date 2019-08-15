@@ -117,7 +117,7 @@ abstract class Target
      * of each message.
      * @param bool $final whether this method is called at the end of the current application
      */
-    public function collect($messages, bool $final): void
+    public function collect(array $messages, bool $final): void
     {
         $this->messages = array_merge(
             $this->messages,
@@ -125,7 +125,7 @@ abstract class Target
         );
 
         $count = count($this->messages);
-        if ($count > 0 && ($final || $this->exportInterval > 0 && $count >= $this->exportInterval)) {
+        if ($count > 0 && ($final || ($this->exportInterval > 0 && $count >= $this->exportInterval))) {
             if (($context = $this->getContextMessage()) !== '') {
                 $this->messages[] = [
                     LogLevel::INFO,
@@ -171,7 +171,7 @@ abstract class Target
      * @param array $except the message categories to exclude. If empty, it means all categories are allowed.
      * @return array the filtered messages.
      */
-    public static function filterMessages($messages, array $levels = [], array $categories = [], array $except = []): array
+    public static function filterMessages(array $messages, array $levels = [], array $categories = [], array $except = []): array
     {
         foreach ($messages as $i => $message) {
             if (!empty($levels) && !in_array($message[0], $levels, true)) {
@@ -181,7 +181,7 @@ abstract class Target
 
             $matched = empty($categories);
             foreach ($categories as $category) {
-                if ($message[2]['category'] === $category || !empty($category) && substr_compare($category, '*', -1, 1) === 0 && strpos($message[2]['category'], rtrim($category, '*')) === 0) {
+                if ($message[2]['category'] === $category || (!empty($category) && substr_compare($category, '*', -1, 1) === 0 && strpos($message[2]['category'], rtrim($category, '*')) === 0)) {
                     $matched = true;
                     break;
                 }
@@ -210,6 +210,7 @@ abstract class Target
      * @param array $message the log message to be formatted.
      * The message structure follows that in [[Logger::messages]].
      * @return string the formatted message
+     * @throws \Throwable
      */
     public function formatMessage(array $message): string
     {
@@ -314,136 +315,83 @@ abstract class Target
         return \DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 
-    /**
-     * @param $logVars
-     * @return Target
-     */
     public function setLogVars(array $logVars): self
     {
         $this->logVars = $logVars;
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getLogVars(): array
     {
         return $this->logVars;
     }
 
-    /**
-     * @param string $format
-     * @return Target
-     */
     public function setTimestampFormat(string $format): self
     {
         $this->timestampFormat = $format;
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getCategories(): array
     {
         return $this->categories;
     }
 
-    /**
-     * @param array $categories
-     * @return Target
-     */
     public function setCategories(array $categories): self
     {
         $this->categories = $categories;
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getExcept(): array
     {
         return $this->except;
     }
 
-    /**
-     * @param array $except
-     * @return Target
-     */
     public function setExcept(array $except): self
     {
         $this->except = $except;
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getLevels(): array
     {
         return $this->levels;
     }
 
-    /**
-     * @param array $levels
-     * @return Target
-     */
     public function setLevels(array $levels): self
     {
         $this->levels = $levels;
         return $this;
     }
 
-    /**
-     * @return callable
-     */
     public function getPrefix(): callable
     {
         return $this->prefix;
     }
 
-    /**
-     * @param callable $prefix
-     * @return Target
-     */
     public function setPrefix(callable $prefix): self
     {
         $this->prefix = $prefix;
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getExportInterval(): int
     {
         return $this->exportInterval;
     }
 
-    /**
-     * @param int $exportInterval
-     * @return Target
-     */
     public function setExportInterval(int $exportInterval): self
     {
         $this->exportInterval = $exportInterval;
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getMessages(): array
     {
         return $this->messages;
     }
 
-    /**
-     * @param array $messages
-     * @return Target
-     */
     public function setMessages(array $messages): self
     {
         $this->messages = $messages;

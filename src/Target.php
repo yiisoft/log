@@ -8,13 +8,13 @@ use Yiisoft\VarDumper\VarDumper;
 /**
  * Target is the base class for all log target classes.
  *
- * A log target object will filter the messages logged by [[Logger]] according
- * to its [[levels]] and [[categories]] properties. It may also export the filtered
+ * A log target object will filter the messages logged by {@see \Yiisoft\Log\Logger} according
+ * to its {@see Target::$levels} and {@see Target::$categories}. It may also export the filtered
  * messages to specific destination defined by the target, such as emails, files.
  *
  * Level filter and category filter are combinatorial, i.e., only messages
  * satisfying both filter conditions will be handled. Additionally, you
- * may specify [[except]] to exclude messages of certain categories.
+ * may specify {@see Target::$except} to exclude messages of certain categories.
  *
  * For more details and usage information on Target, see the [guide article on logging & targets](guide:runtime-logging).
  */
@@ -29,7 +29,7 @@ abstract class Target
     private $categories = [];
     /**
      * @var array list of message categories that this target is NOT interested in. Defaults to empty, meaning no uninteresting messages.
-     * If this property is not empty, then any category listed here will be excluded from [[categories]].
+     * If this property is not empty, then any category listed here will be excluded from {@see Target::$categories}.
      * You can use an asterisk at the end of a category so that the category can be used to
      * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
@@ -39,7 +39,7 @@ abstract class Target
     /**
      * @var array the message levels that this target is interested in.
      *
-     * The parameter should be an array of interested level names. See [[LogLevel]] constants for valid level names.
+     * The parameter should be an array of interested level names. See {@see LogLevel} constants for valid level names.
      *
      * For example:
      *
@@ -73,7 +73,7 @@ abstract class Target
     /**
      * @var callable a PHP callable that returns a string to be prefixed to every exported message.
      *
-     * If not set, [[getMessagePrefix()]] will be used, which prefixes the message with context information
+     * If not set, {@see Target::getMessagePrefix()} will be used, which prefixes the message with context information
      * such as user IP, user ID and session ID.
      *
      * The signature of the callable should be `function ($message)`.
@@ -88,7 +88,7 @@ abstract class Target
     private $exportInterval = 1000;
     /**
      * @var array the messages that are retrieved from the logger so far by this log target.
-     * Please refer to [[Logger::messages]] for the details about the message structure.
+     * Please refer to {@see Logger::$messages} for the details about the message structure.
      */
     private $messages = [];
     /**
@@ -104,16 +104,16 @@ abstract class Target
 
 
     /**
-     * Exports log [[messages]] to a specific destination.
+     * Exports log {@see Target::$messages} to a specific destination.
      * Child classes must implement this method.
      */
     abstract public function export(): void;
 
     /**
      * Processes the given log messages.
-     * This method will filter the given messages with [[levels]] and [[categories]].
+     * This method will filter the given messages with {@see Target::$levels} and {@see Target::$categories}.
      * And if requested, it will also export the filtering result to specific medium (e.g. email).
-     * @param array $messages log messages to be processed. See [[Logger::messages]] for the structure
+     * @param array $messages log messages to be processed. See {@see Logger::$messages} for the structure
      * of each message.
      * @param bool $final whether this method is called at the end of the current application
      */
@@ -165,7 +165,7 @@ abstract class Target
     /**
      * Filters the given messages according to their categories and levels.
      * @param array $messages messages to be filtered.
-     * The message structure follows that in [[Logger::messages]].
+     * The message structure follows that in {@see Logger::$messages}.
      * @param array $levels the message levels to filter by. Empty value means allowing all levels.
      * @param array $categories the message categories to filter by. If empty, it means all categories are allowed.
      * @param array $except the message categories to exclude. If empty, it means all categories are allowed.
@@ -208,7 +208,7 @@ abstract class Target
     /**
      * Formats a log message for display as a string.
      * @param array $message the log message to be formatted.
-     * The message structure follows that in [[Logger::messages]].
+     * The message structure follows that in {@see Logger::$messages}.
      * @return string the formatted message
      * @throws \Throwable
      */
@@ -233,10 +233,10 @@ abstract class Target
 
     /**
      * Returns a string to be prefixed to the given message.
-     * If [[prefix]] is configured it will return the result of the callback.
+     * If {@see Target::$prefix} is configured it will return the result of the callback.
      * The default implementation will return user IP, user ID and session ID as a prefix.
      * @param array $message the message being exported.
-     * The message structure follows that in [[Logger::messages]].
+     * The message structure follows that in {@see Logger::$messages}.
      * @return string the prefix string
      * @throws \Throwable
      */
@@ -305,7 +305,7 @@ abstract class Target
     }
 
     /**
-     * Returns formatted timestamp for message, according to [[timestampFormat]]
+     * Returns formatted timestamp for message, according to {@see Target::$timestampFormat}
      * @param float|int $timestamp
      * @return string
      */

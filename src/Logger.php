@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Log;
 
 use Psr\Log\InvalidArgumentException;
@@ -8,23 +9,22 @@ use Psr\Log\LogLevel;
 use Yiisoft\VarDumper\VarDumper;
 
 /**
- * Logger records logged messages in memory and sends them to different targets according to [[targets]].
+ * Logger records logged messages in memory and sends them to different targets according to {@see Logger::$targets}.
  *
- * A Logger instance can be accessed via `Yii::getLogger()`. You can call the method [[log()]] to record a single log message.
+ * You can call the method {@see Logger::log()} to record a single log message.
  *
- * For more details and usage information on Logger, see the [guide article on logging](guide:runtime-logging)
- * and [PSR-3 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md).
+ * For more details and usage information on Logger,
+ * see [PSR-3 specification](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md).
  *
- * When the application ends or [[flushInterval]] is reached, Logger will call [[flush()]]
- * to send logged messages to different log targets, such as [[FileTarget|file]], [[EmailTarget|email]],
- * or [[DbTarget|database]], according to the [[targets]].
+ * When the application ends or {@see Logger::$flushInterval} is reached, Logger will call {@see Logger::flush()}
+ * to send logged messages to different log targets, such as file or email according to the {@see Logger::$targets}.
  */
 class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
     /**
-     * @var array logged messages. This property is managed by [[log()]] and [[flush()]].
+     * @var array logged messages. This property is managed by {@see Logger::log()} and {@see Logger::flush()}.
      * Each log message is of the following structure:
      *
      * ```
@@ -43,31 +43,35 @@ class Logger implements LoggerInterface
      * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`.
      */
     private $messages = [];
+
     /**
      * @var int how many messages should be logged before they are flushed from memory and sent to targets.
-     * Defaults to 1000, meaning the [[flush]] method will be invoked once every 1000 messages logged.
+     * Defaults to 1000, meaning the {@see Logger::flush()} method will be invoked once every 1000 messages logged.
      * Set this property to be 0 if you don't want to flush messages until the application terminates.
      * This property mainly affects how much memory will be taken by the logged messages.
-     * A smaller value means less memory, but will increase the execution time due to the overhead of [[flush()]].
+     * A smaller value means less memory, but will increase the execution time due to the overhead of {@see Logger::flush()}.
      */
     private $flushInterval = 1000;
+
     /**
      * @var int how much call stack information (file name and line number) should be logged for each message.
      * If it is greater than 0, at most that number of call stacks will be logged. Note that only application
      * call stacks are counted.
      */
     private $traceLevel = 0;
+
     /**
-     * @var array An array of paths to exclude from the trace when tracing is enabled using [[setTraceLevel()]].
+     * @var array An array of paths to exclude from the trace when tracing is enabled using {@see Logger::setTraceLevel()}.
      */
     private $excludedTracePaths = [];
+
     /**
-     * @var Target[] the log targets. Each array element represents a single [[Target|log target]] instance
+     * @var Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance
      */
     private $targets = [];
 
     /**
-     * Initializes the logger by registering [[flush()]] as a shutdown function.
+     * Initializes the logger by registering {@see Logger::flush()} as a shutdown function.
      *
      * @param Target[] $targets the log targets.
      */
@@ -85,7 +89,7 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @return Target[] the log targets. Each array element represents a single [[Target|log target]] instance.
+     * @return Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
      */
     public function getTargets(): array
     {
@@ -104,7 +108,7 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @param Target[] $targets the log targets. Each array element represents a single [[Target|log target]] instance
+     * @param Target[] $targets the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance
      * or the configuration for creating the log target instance.
      */
     public function setTargets(array $targets): void
@@ -118,7 +122,7 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Adds extra target to [[targets]].
+     * Adds extra target to {@see Logger::$targets}.
      * @param Target $target the log target instance.
      * @param string|null $name array key to be used to store target, if `null` is given target will be append
      * to the end of the array by natural integer key.
@@ -219,7 +223,7 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Dispatches the logged messages to [[targets]].
+     * Dispatches the logged messages to {@see Logger::$targets}.
      * @param array $messages the logged messages
      * @param bool $final whether this method is called at the end of the current application
      */
@@ -279,7 +283,7 @@ class Logger implements LoggerInterface
 
     /**
      * Returns the text display of the specified level.
-     * @param mixed $level the message level, e.g. [[LogLevel::ERROR]], [[LogLevel::WARNING]].
+     * @param mixed $level the message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
      * @return string the text display of the level
      */
     public static function getLevelName($level): string

@@ -167,26 +167,7 @@ class Logger implements LoggerInterface
             $context['time'] = microtime(true);
         }
         if (!isset($context['trace'])) {
-            $traces = [];
-            if ($this->traceLevel > 0) {
-                $count = 0;
-                foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
-                    if (isset($trace['file'], $trace['line'])) {
-                        $excludedMatch = array_filter($this->excludedTracePaths, static function ($path) use ($trace) {
-                            return strpos($trace['file'], $path) !== false;
-                        });
-
-                        if (empty($excludedMatch)) {
-                            unset($trace['object'], $trace['args']);
-                            $traces[] = $trace;
-                            if (++$count >= $this->traceLevel) {
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            $context['trace'] = $traces;
+            $context['trace'] = $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         }
 
         if (!isset($context['memory'])) {
@@ -292,49 +273,55 @@ class Logger implements LoggerInterface
         return 'unknown';
     }
 
-    /**
-     * @return int
-     */
     public function getFlushInterval(): int
     {
         return $this->flushInterval;
     }
 
-    /**
-     * @param int $flushInterval
-     * @return Logger
-     */
     public function setFlushInterval(int $flushInterval): self
     {
         $this->flushInterval = $flushInterval;
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getTraceLevel(): int
     {
         return $this->traceLevel;
     }
 
-    /**
-     * @param int $traceLevel
-     * @return Logger
-     */
     public function setTraceLevel(int $traceLevel): self
     {
         $this->traceLevel = $traceLevel;
         return $this;
     }
 
-    /**
-     * @param array $excludedTracePaths
-     * @return Logger
-     */
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {
         $this->excludedTracePaths = $excludedTracePaths;
         return $this;
+    }
+
+    private function collectTrace(array $backtrace): array
+    {
+        $traces = [];
+        if ($this->traceLevel > 0) {
+            $count = 0;
+            foreach ($backtrace as $trace) {
+                if (isset($trace['file'], $trace['line'])) {
+                    $excludedMatch = array_filter($this->excludedTracePaths, static function ($path) use ($trace) {
+                        return strpos($trace['file'], $path) !== false;
+                    });
+
+                    if (empty($excludedMatch)) {
+                        unset($trace['object'], $trace['args']);
+                        $traces[] = $trace;
+                        if (++$count >= $this->traceLevel) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return $traces;
     }
 }

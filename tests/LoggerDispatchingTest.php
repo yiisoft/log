@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Log {
 
     use Yiisoft\Log\Tests\LoggerDispatchingTest;

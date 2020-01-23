@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Log\Tests;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase

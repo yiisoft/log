@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Log;
 
 use Psr\Log\LoggerInterface;

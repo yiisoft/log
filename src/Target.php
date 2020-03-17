@@ -157,7 +157,7 @@ abstract class Target
         $context = ArrayHelper::filter($GLOBALS, $this->logVars);
         $result = [];
         foreach ($context as $key => $value) {
-            $result[] = "\${$key} = " . VarDumper::dumpAsString($value);
+            $result[] = "\${$key} = " . VarDumper::create($value)->asString();
         }
 
         return implode("\n\n", $result);

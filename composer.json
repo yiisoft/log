@@ -29,7 +29,7 @@
         "phpunit/phpunit": "^9.0"
     },
     "provide": {
-        "psr/log-implementation": "1.0.0"
+        "psr/log-implementation": "^1.1"
     },
     "suggest": {
         "yiisoft/log-target-db": "version ^3.0 for saving logs to the database",

@@ -30,6 +30,7 @@ jobs:
           coverage: "pcov"
           php-version: "${{ matrix.php-version }}"
           ini-values: memory_limit=-1
+          tools: composer:v2
 
       - name: Determine composer cache directory
         run: echo "::set-env name=COMPOSER_CACHE_DIR::$(composer config cache-dir)"

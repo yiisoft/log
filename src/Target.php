@@ -312,7 +312,8 @@ abstract class Target
      */
     protected function getTime($timestamp): string
     {
-        $format = strpos((string) $timestamp, '.') === false ? 'U' : 'U.u';
+        $timestamp = (string) $timestamp;
+        $format = strpos($timestamp, '.') === false ? 'U' : 'U.u';
         return \DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 

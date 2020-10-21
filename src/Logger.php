@@ -149,7 +149,7 @@ class Logger implements LoggerInterface
             return (string)$message;
         }
 
-        return VarDumper::export($message);
+        return VarDumper::create($message)->export();
     }
 
     public function log($level, $message, array $context = []): void

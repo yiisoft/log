@@ -26,7 +26,7 @@
         "yiisoft/var-dumper": "^3.0@dev"
     },
     "require-dev": {
-        "infection/infection": "^0.17.0 || ^0.18.0",
+        "infection/infection": "^0.18.0",
         "phpunit/phpunit": "^9.3",
         "phan/phan": "^3.0"
     },

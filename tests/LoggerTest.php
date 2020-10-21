@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Log\Tests;
 
 use Psr\Log\LogLevel;
@@ -39,7 +41,7 @@ class LoggerTest extends TestCase
         $this->assertEquals('application', $messages[0][2]['category']);
         $this->assertEquals([
             'file' => __FILE__,
-            'line' => 33,
+            'line' => 35,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',

@@ -26,8 +26,8 @@
         "yiisoft/var-dumper": "^3.0@dev"
     },
     "require-dev": {
-        "infection/infection": "^0.18.0 || ^0.20.0",
-        "phpunit/phpunit": "^9.3",
+        "infection/infection": "^0.20.0",
+        "phpunit/phpunit": "^9.4",
         "vimeo/psalm": "^4.0"
     },
     "provide": {

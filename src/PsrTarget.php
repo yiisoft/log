@@ -15,7 +15,7 @@ class PsrTarget extends Target
     /**
      * @var LoggerInterface logger instance to be used for messages processing.
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * Sets the PSR-3 logger used to save messages of this target.

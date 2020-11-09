@@ -4,9 +4,21 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
+use DateTime;
 use Psr\Log\LogLevel;
+use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\VarDumper\VarDumper;
+
+use function array_merge;
+use function call_user_func;
+use function count;
+use function implode;
+use function in_array;
+use function is_callable;
+use function rtrim;
+use function strpos;
+use function substr_compare;
 
 /**
  * Target is the base class for all log target classes.
@@ -29,7 +41,8 @@ abstract class Target
      * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
      */
-    private $categories = [];
+    private array $categories = [];
+
     /**
      * @var array list of message categories that this target is NOT interested in. Defaults to empty, meaning no uninteresting messages.
      * If this property is not empty, then any category listed here will be excluded from {@see Target::$categories}.
@@ -38,7 +51,8 @@ abstract class Target
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
      * @see categories
      */
-    private $except = [];
+    private array $except = [];
+
     /**
      * @var array the message levels that this target is interested in.
      *
@@ -54,7 +68,8 @@ abstract class Target
      *
      * Defaults is empty array, meaning all available levels.
      */
-    private $levels = [];
+    private array $levels = [];
+
     /**
      * @var array list of the PHP predefined variables that should be logged in a message.
      * Note that a variable must be accessible via `$GLOBALS`. Otherwise it won't be logged.
@@ -72,9 +87,10 @@ abstract class Target
      *
      * @see \Yiisoft\Arrays\ArrayHelper::filter()
      */
-    private $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
+    private array $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
+
     /**
-     * @var callable a PHP callable that returns a string to be prefixed to every exported message.
+     * @var callable|null a PHP callable that returns a string to be prefixed to every exported message.
      *
      * If not set, {@see Target::getMessagePrefix()} will be used, which prefixes the message with context information
      * such as user IP, user ID and session ID.
@@ -88,23 +104,25 @@ abstract class Target
      * Defaults to 1000. Note that messages will always be exported when the application terminates.
      * Set this property to be 0 if you don't want to export messages until the application terminates.
      */
-    private $exportInterval = 1000;
+    private int $exportInterval = 1000;
+
     /**
      * @var array the messages that are retrieved from the logger so far by this log target.
      * Please refer to {@see Logger::$messages} for the details about the message structure.
      */
-    private $messages = [];
+    private array $messages = [];
+
     /**
      * @var string The date format for the log timestamp.
      * Defaults to Y-m-d H:i:s.u
      */
-    private $timestampFormat = 'Y-m-d H:i:s.u';
+    private string $timestampFormat = 'Y-m-d H:i:s.u';
+
 
     /**
      * @var bool|callable
      */
     private $enabled = true;
-
 
     /**
      * Exports log {@see Target::$messages} to a specific destination.
@@ -213,7 +231,7 @@ abstract class Target
      * @param array $message the log message to be formatted.
      * The message structure follows that in {@see Logger::$messages}.
      * @return string the formatted message
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function formatMessage(array $message): string
     {
@@ -241,7 +259,7 @@ abstract class Target
      * @param array $message the message being exported.
      * The message structure follows that in {@see Logger::$messages}.
      * @return string the prefix string
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function getMessagePrefix(array $message): string
     {
@@ -316,7 +334,7 @@ abstract class Target
     {
         $timestamp = (string) $timestamp;
         $format = strpos($timestamp, '.') === false ? 'U' : 'U.u';
-        return \DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
+        return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 
     public function setLogVars(array $logVars): self
@@ -369,7 +387,7 @@ abstract class Target
         return $this;
     }
 
-    public function getPrefix(): callable
+    public function getPrefix(): ?callable
     {
         return $this->prefix;
     }

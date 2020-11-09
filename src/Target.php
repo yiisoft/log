@@ -283,7 +283,7 @@ abstract class Target
      *     return !Yii::getApp()->user->isGuest;
      * }
      * ```
-     * @return Target
+     * @return $this
      */
     public function setEnabled($value): self
     {
@@ -295,7 +295,7 @@ abstract class Target
     /**
      * Enables the log target
      *
-     * @return Target
+     * @return $this
      */
     public function enable(): self
     {
@@ -305,7 +305,7 @@ abstract class Target
     /**
      * Disables the log target
      *
-     * @return Target
+     * @return $this
      */
     public function disable(): self
     {

@@ -4,11 +4,25 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
+use Exception;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
+use Throwable;
 use Yiisoft\VarDumper\VarDumper;
+
+use function array_filter;
+use function count;
+use function debug_backtrace;
+use function get_class;
+use function is_scalar;
+use function is_string;
+use function memory_get_usage;
+use function method_exists;
+use function preg_replace_callback;
+use function register_shutdown_function;
+use function strpos;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to {@see Logger::$targets}.
@@ -44,7 +58,7 @@ class Logger implements LoggerInterface
      * - trace: array, debug backtrace, contains the application code call stacks.
      * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`.
      */
-    private $messages = [];
+    private array $messages = [];
 
     /**
      * @var int how many messages should be logged before they are flushed from memory and sent to targets.
@@ -53,24 +67,25 @@ class Logger implements LoggerInterface
      * This property mainly affects how much memory will be taken by the logged messages.
      * A smaller value means less memory, but will increase the execution time due to the overhead of {@see Logger::flush()}.
      */
-    private $flushInterval = 1000;
+    private int $flushInterval = 1000;
 
     /**
      * @var int how much call stack information (file name and line number) should be logged for each message.
      * If it is greater than 0, at most that number of call stacks will be logged. Note that only application
      * call stacks are counted.
      */
-    private $traceLevel = 0;
+    private int $traceLevel = 0;
 
     /**
-     * @var array An array of paths to exclude from the trace when tracing is enabled using {@see Logger::setTraceLevel()}.
+     * @var array An array of paths to exclude from the trace when tracing is enabled using
+     * {@see Logger::setTraceLevel()}.
      */
-    private $excludedTracePaths = [];
+    private array $excludedTracePaths = [];
 
     /**
      * @var Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance
      */
-    private $targets = [];
+    private array $targets = [];
 
     /**
      * Initializes the logger by registering {@see Logger::flush()} as a shutdown function.
@@ -81,12 +96,12 @@ class Logger implements LoggerInterface
     {
         $this->setTargets($targets);
 
-        \register_shutdown_function(function () {
+        register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
             $this->flush();
             // make sure log entries written by shutdown functions are also flushed
             // ensure "flush()" is called last when there are multiple shutdown functions
-            \register_shutdown_function([$this, 'flush'], true);
+            register_shutdown_function([$this, 'flush'], true);
         });
     }
 
@@ -108,8 +123,8 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @param Target[] $targets the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance
-     * or the configuration for creating the log target instance.
+     * @param array $targets the log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
+     * instance or the configuration for creating the log target instance.
      */
     public function setTargets(array $targets): void
     {
@@ -156,12 +171,10 @@ class Logger implements LoggerInterface
 
     public function log($level, $message, array $context = []): void
     {
-        if ($message instanceof \Throwable) {
-            if (!isset($context['exception'])) {
-                // exceptions are string-convertible, thus should be passed as it is to the logger
-                // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
-                $context['exception'] = $message;
-            }
+        if (($message instanceof Throwable) && !isset($context['exception'])) {
+            // exceptions are string-convertible, thus should be passed as it is to the logger
+            // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
+            $context['exception'] = $message;
         }
         $message = static::prepareMessage($message);
 
@@ -215,7 +228,7 @@ class Logger implements LoggerInterface
             if ($target->isEnabled()) {
                 try {
                     $target->collect($messages, $final);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $target->disable();
                     $targetErrors[] = [
                         'Unable to send log via ' . get_class($target) . ': ' . get_class($e) . ': ' . $e->getMessage(),
@@ -242,7 +255,7 @@ class Logger implements LoggerInterface
      */
     protected function parseMessage(string $message, array $context): string
     {
-        return preg_replace_callback('/{([\w.]+)}/', static function ($matches) use ($context) {
+        return preg_replace_callback('/{([\w.]+)}/', static function (array $matches) use ($context) {
             $placeholderName = $matches[1];
             if (isset($context[$placeholderName])) {
                 return (string)$context[$placeholderName];

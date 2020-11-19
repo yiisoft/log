@@ -179,20 +179,10 @@ class Logger implements LoggerInterface
         }
         $message = static::prepareMessage($message);
 
-        if (!isset($context['time'])) {
-            $context['time'] = microtime(true);
-        }
-        if (!isset($context['trace'])) {
-            $context['trace'] = $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-        }
-
-        if (!isset($context['memory'])) {
-            $context['memory'] = memory_get_usage();
-        }
-
-        if (!isset($context['category'])) {
-            $context['category'] = 'application';
-        }
+        $context['time'] ??= microtime(true);
+        $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+        $context['memory'] ??= memory_get_usage();
+        $context['category'] ??= 'application';
 
         $message = $this->parseMessage($message, $context);
 

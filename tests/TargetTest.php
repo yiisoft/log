@@ -7,13 +7,14 @@ namespace Yiisoft\Log\Tests;
 use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
+use Yiisoft\Log\Tests\TestAsset\TestTarget;
 
 /**
  * @group log
  */
 class TargetTest extends TestCase
 {
-    public static $messages;
+    public static array $messages;
 
     public function filters(): array
     {
@@ -36,7 +37,13 @@ class TargetTest extends TestCase
             [['categories' => ['application.components.Test']], ['F']],
             [['categories' => ['application.components.*']], ['F']],
             [['categories' => ['application.*', 'Yiisoft.Db.*']], ['F', 'G', 'H']],
-            [['categories' => ['application.*', 'Yiisoft.Db.*'], 'except' => ['Yiisoft.Db.Command.*', 'Yiisoft\Db\*']], ['F', 'G']],
+            [
+                [
+                    'categories' => ['application.*', 'Yiisoft.Db.*'],
+                    'except' => ['Yiisoft.Db.Command.*', 'Yiisoft\Db\*'],
+                ],
+                ['F', 'G'],
+            ],
             [['except' => ['Yiisoft\Db\*']], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']],
             [['categories' => ['Yiisoft*'], 'except' => ['Yiisoft\Db\*']], ['G', 'H']],
 
@@ -73,7 +80,12 @@ class TargetTest extends TestCase
         $logger->log(LogLevel::ERROR, 'testH', ['category' => 'Yiisoft.Db.Command.whatever']);
         $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
-        $this->assertCount(count($expected), static::$messages, 'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0)));
+        $this->assertCount(
+            count($expected),
+            static::$messages,
+            'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0))
+        );
+
         $i = 0;
         foreach ($expected as $e) {
             $this->assertEquals('test' . $e, static::$messages[$i++][1]);
@@ -176,28 +188,5 @@ class TargetTest extends TestCase
         $expectedCustom = 'Mon 16 October 2017 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedCustom, $formatted);
-    }
-}
-
-class TestTarget extends Target
-{
-    public function __construct()
-    {
-        $this->setExportInterval(1);
-    }
-
-    /**
-     * Exports log [[messages]] to a specific destination.
-     * Child classes must implement this method.
-     */
-    public function export(): void
-    {
-        TargetTest::$messages = array_merge(TargetTest::$messages, $this->getMessages());
-        $this->setMessages([]);
-    }
-
-    public function getContextMessage(): string
-    {
-        return parent::getContextMessage();
     }
 }

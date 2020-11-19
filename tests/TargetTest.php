@@ -7,13 +7,14 @@ namespace Yiisoft\Log\Tests;
 use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
+use Yiisoft\Log\Tests\TestAsset\TestTarget;
 
 /**
  * @group log
  */
 class TargetTest extends TestCase
 {
-    public static $messages;
+    public static array $messages;
 
     public function filters(): array
     {
@@ -187,28 +188,5 @@ class TargetTest extends TestCase
         $expectedCustom = 'Mon 16 October 2017 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedCustom, $formatted);
-    }
-}
-
-class TestTarget extends Target
-{
-    public function __construct()
-    {
-        $this->setExportInterval(1);
-    }
-
-    /**
-     * Exports log [[messages]] to a specific destination.
-     * Child classes must implement this method.
-     */
-    public function export(): void
-    {
-        TargetTest::$messages = array_merge(TargetTest::$messages, $this->getMessages());
-        $this->setMessages([]);
-    }
-
-    public function getContextMessage(): string
-    {
-        return parent::getContextMessage();
     }
 }

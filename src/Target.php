@@ -11,7 +11,6 @@ use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\VarDumper\VarDumper;
 
 use function array_merge;
-use function call_user_func;
 use function count;
 use function implode;
 use function in_array;
@@ -281,7 +280,7 @@ abstract class Target
     public function getMessagePrefix(array $message): string
     {
         if ($this->prefix !== null) {
-            return call_user_func($this->prefix, $message);
+            return ($this->prefix)($message);
         }
 
         return '';
@@ -336,7 +335,7 @@ abstract class Target
     public function isEnabled(): bool
     {
         if (is_callable($this->enabled)) {
-            return call_user_func($this->enabled, $this);
+            return ($this->enabled)($this);
         }
 
         return $this->enabled;

@@ -36,7 +36,13 @@ class TargetTest extends TestCase
             [['categories' => ['application.components.Test']], ['F']],
             [['categories' => ['application.components.*']], ['F']],
             [['categories' => ['application.*', 'Yiisoft.Db.*']], ['F', 'G', 'H']],
-            [['categories' => ['application.*', 'Yiisoft.Db.*'], 'except' => ['Yiisoft.Db.Command.*', 'Yiisoft\Db\*']], ['F', 'G']],
+            [
+                [
+                    'categories' => ['application.*', 'Yiisoft.Db.*'],
+                    'except' => ['Yiisoft.Db.Command.*', 'Yiisoft\Db\*'],
+                ],
+                ['F', 'G'],
+            ],
             [['except' => ['Yiisoft\Db\*']], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']],
             [['categories' => ['Yiisoft*'], 'except' => ['Yiisoft\Db\*']], ['G', 'H']],
 
@@ -73,7 +79,12 @@ class TargetTest extends TestCase
         $logger->log(LogLevel::ERROR, 'testH', ['category' => 'Yiisoft.Db.Command.whatever']);
         $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
-        $this->assertCount(count($expected), static::$messages, 'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0)));
+        $this->assertCount(
+            count($expected),
+            static::$messages,
+            'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0))
+        );
+
         $i = 0;
         foreach ($expected as $e) {
             $this->assertEquals('test' . $e, static::$messages[$i++][1]);

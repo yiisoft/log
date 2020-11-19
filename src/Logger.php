@@ -65,7 +65,8 @@ class Logger implements LoggerInterface
      * Defaults to 1000, meaning the {@see Logger::flush()} method will be invoked once every 1000 messages logged.
      * Set this property to be 0 if you don't want to flush messages until the application terminates.
      * This property mainly affects how much memory will be taken by the logged messages.
-     * A smaller value means less memory, but will increase the execution time due to the overhead of {@see Logger::flush()}.
+     * A smaller value means less memory, but will increase the execution
+     * time due to the overhead of {@see Logger::flush()}.
      */
     private int $flushInterval = 1000;
 

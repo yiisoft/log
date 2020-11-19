@@ -11,7 +11,6 @@ use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\VarDumper\VarDumper;
 
 use function array_merge;
-use function call_user_func;
 use function count;
 use function implode;
 use function in_array;
@@ -31,12 +30,14 @@ use function substr_compare;
  * satisfying both filter conditions will be handled. Additionally, you
  * may specify {@see Target::$except} to exclude messages of certain categories.
  *
- * For more details and usage information on Target, see the [guide article on logging & targets](guide:runtime-logging).
+ * For more details and usage information on Target, see the
+ * [guide article on logging & targets](guide:runtime-logging).
  */
 abstract class Target
 {
     /**
-     * @var array list of message categories that this target is interested in. Defaults to empty, meaning all categories.
+     * @var array list of message categories that this target is interested in.
+     * Defaults to empty, meaning all categories.
      * You can use an asterisk at the end of a category so that the category may be used to
      * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
@@ -44,7 +45,8 @@ abstract class Target
     private array $categories = [];
 
     /**
-     * @var array list of message categories that this target is NOT interested in. Defaults to empty, meaning no uninteresting messages.
+     * @var array list of message categories that this target is NOT interested in.
+     * Defaults to empty, meaning no uninteresting messages.
      * If this property is not empty, then any category listed here will be excluded from {@see Target::$categories}.
      * You can use an asterisk at the end of a category so that the category can be used to
      * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
@@ -192,8 +194,12 @@ abstract class Target
      * @param array $except the message categories to exclude. If empty, it means all categories are allowed.
      * @return array the filtered messages.
      */
-    public static function filterMessages(array $messages, array $levels = [], array $categories = [], array $except = []): array
-    {
+    public static function filterMessages(
+        array $messages,
+        array $levels = [],
+        array $categories = [],
+        array $except = []
+    ): array {
         foreach ($messages as $i => $message) {
             if (!empty($levels) && !in_array($message[0], $levels, true)) {
                 unset($messages[$i]);
@@ -202,7 +208,14 @@ abstract class Target
 
             $matched = empty($categories);
             foreach ($categories as $category) {
-                if ($message[2]['category'] === $category || (!empty($category) && substr_compare($category, '*', -1, 1) === 0 && strpos($message[2]['category'], rtrim($category, '*')) === 0)) {
+                if (
+                    $message[2]['category'] === $category
+                    || (
+                        !empty($category)
+                        && substr_compare($category, '*', -1, 1) === 0
+                        && strpos($message[2]['category'], rtrim($category, '*')) === 0
+                    )
+                ) {
                     $matched = true;
                     break;
                 }
@@ -211,7 +224,10 @@ abstract class Target
             if ($matched) {
                 foreach ($except as $category) {
                     $prefix = rtrim($category, '*');
-                    if (($message[2]['category'] === $category || $prefix !== $category) && strpos($message[2]['category'], $prefix) === 0) {
+                    if (
+                        ($message[2]['category'] === $category || $prefix !== $category)
+                        && strpos($message[2]['category'], $prefix) === 0
+                    ) {
                         $matched = false;
                         break;
                     }
@@ -264,7 +280,7 @@ abstract class Target
     public function getMessagePrefix(array $message): string
     {
         if ($this->prefix !== null) {
-            return call_user_func($this->prefix, $message);
+            return ($this->prefix)($message);
         }
 
         return '';
@@ -319,7 +335,7 @@ abstract class Target
     public function isEnabled(): bool
     {
         if (is_callable($this->enabled)) {
-            return call_user_func($this->enabled, $this);
+            return ($this->enabled)($this);
         }
 
         return $this->enabled;

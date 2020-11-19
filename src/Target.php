@@ -194,7 +194,7 @@ abstract class Target
      * @param array $except the message categories to exclude. If empty, it means all categories are allowed.
      * @return array the filtered messages.
      */
-    public static function filterMessages(
+    protected static function filterMessages(
         array $messages,
         array $levels = [],
         array $categories = [],

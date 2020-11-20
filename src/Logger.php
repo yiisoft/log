@@ -107,6 +107,19 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * Returns the text display of the specified level.
+     * @param mixed $level the message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
+     * @return string the text display of the level
+     */
+    public static function getLevelName($level): string
+    {
+        if (is_string($level)) {
+            return $level;
+        }
+        return 'unknown';
+    }
+
+    /**
      * @return Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
      */
     public function getTargets(): array
@@ -160,14 +173,14 @@ class Logger implements LoggerInterface
             $context['exception'] = $message;
         }
 
-        $message = static::prepareMessage($message);
+        $message = $this->prepareMessage($message);
 
         $context['time'] ??= microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         $context['memory'] ??= memory_get_usage();
         $context['category'] ??= Target::DEFAULT_CATEGORY;
 
-        $message = static::parseMessage($message, $context);
+        $message = $this->parseMessage($message, $context);
 
         $this->messages[] = [$level, $message, $context];
 
@@ -188,6 +201,34 @@ class Logger implements LoggerInterface
         $this->messages = [];
 
         $this->dispatch($messages, $final);
+    }
+
+    public function getFlushInterval(): int
+    {
+        return $this->flushInterval;
+    }
+
+    public function setFlushInterval(int $flushInterval): self
+    {
+        $this->flushInterval = $flushInterval;
+        return $this;
+    }
+
+    public function getTraceLevel(): int
+    {
+        return $this->traceLevel;
+    }
+
+    public function setTraceLevel(int $traceLevel): self
+    {
+        $this->traceLevel = $traceLevel;
+        return $this;
+    }
+
+    public function setExcludedTracePaths(array $excludedTracePaths): self
+    {
+        $this->excludedTracePaths = $excludedTracePaths;
+        return $this;
     }
 
     /**
@@ -225,7 +266,7 @@ class Logger implements LoggerInterface
      * @param mixed $message
      * @return string
      */
-    protected static function prepareMessage($message): string
+    protected function prepareMessage($message): string
     {
         if (method_exists($message, '__toString')) {
             return (string) $message;
@@ -245,7 +286,7 @@ class Logger implements LoggerInterface
      * @param array $context message context.
      * @return string parsed message.
      */
-    protected static function parseMessage(string $message, array $context): string
+    protected function parseMessage(string $message, array $context): string
     {
         return preg_replace_callback('/{([\w.]+)}/', static function (array $matches) use ($context) {
             $placeholderName = $matches[1];
@@ -254,47 +295,6 @@ class Logger implements LoggerInterface
             }
             return $matches[0];
         }, $message);
-    }
-
-    /**
-     * Returns the text display of the specified level.
-     * @param mixed $level the message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
-     * @return string the text display of the level
-     */
-    public static function getLevelName($level): string
-    {
-        if (is_string($level)) {
-            return $level;
-        }
-        return 'unknown';
-    }
-
-    public function getFlushInterval(): int
-    {
-        return $this->flushInterval;
-    }
-
-    public function setFlushInterval(int $flushInterval): self
-    {
-        $this->flushInterval = $flushInterval;
-        return $this;
-    }
-
-    public function getTraceLevel(): int
-    {
-        return $this->traceLevel;
-    }
-
-    public function setTraceLevel(int $traceLevel): self
-    {
-        $this->traceLevel = $traceLevel;
-        return $this;
-    }
-
-    public function setExcludedTracePaths(array $excludedTracePaths): self
-    {
-        $this->excludedTracePaths = $excludedTracePaths;
-        return $this;
     }
 
     private function collectTrace(array $backtrace): array

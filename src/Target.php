@@ -151,7 +151,7 @@ abstract class Target
     {
         $this->messages = array_merge(
             $this->messages,
-            static::filterMessages($messages, $this->levels, $this->categories, $this->except)
+            $this->filterMessages($messages, $this->levels, $this->categories, $this->except)
         );
 
         $count = count($this->messages);
@@ -201,14 +201,14 @@ abstract class Target
      * @return array the filtered messages.
      * @throws InvalidArgumentException for invalid message structure.
      */
-    protected static function filterMessages(
+    protected function filterMessages(
         array $messages,
         array $levels = [],
         array $categories = [],
         array $except = []
     ): array {
         foreach ($messages as $i => $message) {
-            static::checkMessageStructure($message);
+            $this->checkMessageStructure($message);
 
             if (!empty($levels) && !in_array($message[0], $levels, true)) {
                 unset($messages[$i]);
@@ -258,7 +258,7 @@ abstract class Target
      * @param mixed $message the log message to be checked.
      * @throws InvalidArgumentException for invalid message structure.
      */
-    protected static function checkMessageStructure($message): void
+    protected function checkMessageStructure($message): void
     {
         if (!isset($message[0], $message[1], $message[2]) || !is_string($message[0]) || !is_array($message[2])) {
             throw new InvalidArgumentException('The message structure is not valid.');
@@ -274,7 +274,7 @@ abstract class Target
      */
     protected function formatMessage(array $message): string
     {
-        static::checkMessageStructure($message);
+        $this->checkMessageStructure($message);
         [$level, $text, $context] = $message;
 
         $category = $context['category'] ?? static::DEFAULT_CATEGORY;

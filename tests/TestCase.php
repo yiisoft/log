@@ -8,10 +8,12 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * Sets an inaccessible object property to a designated value.
+     *
      * @param $object
      * @param $propertyName
      * @param $value
      * @param bool $revoke whether to make property inaccessible after setting
+     *
      * @throws \ReflectionException
      */
     protected function setInaccessibleProperty($object, $propertyName, $value, bool $revoke = true): void
@@ -30,11 +32,14 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     /**
      * Gets an inaccessible object property.
+     *
      * @param $object
      * @param $propertyName
      * @param bool $revoke whether to make property inaccessible after getting
-     * @return mixed
+     *
      * @throws \ReflectionException
+     *
+     * @return mixed
      */
     protected function getInaccessibleProperty($object, $propertyName, bool $revoke = true)
     {

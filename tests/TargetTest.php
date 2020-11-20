@@ -56,6 +56,7 @@ class TargetTest extends TestCase
 
     /**
      * @dataProvider filters
+     *
      * @param array $filter
      * @param array $expected
      */
@@ -228,6 +229,7 @@ class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidMessageStructureProvider
+     *
      * @param array $message
      */
     public function testFormatMessageThrowExceptionForInvalidMessageStructure(array $message): void
@@ -239,6 +241,7 @@ class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidMessageStructureProvider
+     *
      * @param array $message
      */
     public function testCollectThrowExceptionForInvalidMessageStructure(array $message): void

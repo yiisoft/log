@@ -107,6 +107,19 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * Returns the text display of the specified level.
+     * @param mixed $level the message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
+     * @return string the text display of the level
+     */
+    public static function getLevelName($level): string
+    {
+        if (is_string($level)) {
+            return $level;
+        }
+        return 'unknown';
+    }
+
+    /**
      * @return Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
      */
     public function getTargets(): array
@@ -152,24 +165,6 @@ class Logger implements LoggerInterface
         }
     }
 
-    /**
-     * Prepares message for logging.
-     * @param mixed $message
-     * @return string
-     */
-    public static function prepareMessage($message): string
-    {
-        if (method_exists($message, '__toString')) {
-            return (string)$message;
-        }
-
-        if (is_scalar($message)) {
-            return (string)$message;
-        }
-
-        return VarDumper::create($message)->export();
-    }
-
     public function log($level, $message, array $context = []): void
     {
         if (($message instanceof Throwable) && !isset($context['exception'])) {
@@ -177,22 +172,13 @@ class Logger implements LoggerInterface
             // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
             $context['exception'] = $message;
         }
-        $message = static::prepareMessage($message);
 
-        if (!isset($context['time'])) {
-            $context['time'] = microtime(true);
-        }
-        if (!isset($context['trace'])) {
-            $context['trace'] = $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-        }
+        $message = $this->prepareMessage($message);
 
-        if (!isset($context['memory'])) {
-            $context['memory'] = memory_get_usage();
-        }
-
-        if (!isset($context['category'])) {
-            $context['category'] = 'application';
-        }
+        $context['time'] ??= microtime(true);
+        $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+        $context['memory'] ??= memory_get_usage();
+        $context['category'] ??= Target::DEFAULT_CATEGORY;
 
         $message = $this->parseMessage($message, $context);
 
@@ -215,6 +201,34 @@ class Logger implements LoggerInterface
         $this->messages = [];
 
         $this->dispatch($messages, $final);
+    }
+
+    public function getFlushInterval(): int
+    {
+        return $this->flushInterval;
+    }
+
+    public function setFlushInterval(int $flushInterval): self
+    {
+        $this->flushInterval = $flushInterval;
+        return $this;
+    }
+
+    public function getTraceLevel(): int
+    {
+        return $this->traceLevel;
+    }
+
+    public function setTraceLevel(int $traceLevel): self
+    {
+        $this->traceLevel = $traceLevel;
+        return $this;
+    }
+
+    public function setExcludedTracePaths(array $excludedTracePaths): self
+    {
+        $this->excludedTracePaths = $excludedTracePaths;
+        return $this;
     }
 
     /**
@@ -248,6 +262,24 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * Prepares message for logging.
+     * @param mixed $message
+     * @return string
+     */
+    protected function prepareMessage($message): string
+    {
+        if (method_exists($message, '__toString')) {
+            return (string) $message;
+        }
+
+        if (is_scalar($message)) {
+            return (string) $message;
+        }
+
+        return VarDumper::create($message)->export();
+    }
+
+    /**
      * Parses log message resolving placeholders in the form: '{foo}', where foo
      * will be replaced by the context data in key "foo".
      * @param string $message log message.
@@ -259,62 +291,10 @@ class Logger implements LoggerInterface
         return preg_replace_callback('/{([\w.]+)}/', static function (array $matches) use ($context) {
             $placeholderName = $matches[1];
             if (isset($context[$placeholderName])) {
-                return (string)$context[$placeholderName];
+                return (string) $context[$placeholderName];
             }
             return $matches[0];
         }, $message);
-    }
-
-    /**
-     * Returns the total elapsed time since the start of the current request.
-     * This method calculates the difference between now and the start of the
-     * request ($_SERVER['REQUEST_TIME_FLOAT']).
-     * @return float the total elapsed time in seconds for current request.
-     */
-    public function getElapsedTime(): float
-    {
-        return \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
-    }
-
-    /**
-     * Returns the text display of the specified level.
-     * @param mixed $level the message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
-     * @return string the text display of the level
-     */
-    public static function getLevelName($level): string
-    {
-        if (is_string($level)) {
-            return $level;
-        }
-        return 'unknown';
-    }
-
-    public function getFlushInterval(): int
-    {
-        return $this->flushInterval;
-    }
-
-    public function setFlushInterval(int $flushInterval): self
-    {
-        $this->flushInterval = $flushInterval;
-        return $this;
-    }
-
-    public function getTraceLevel(): int
-    {
-        return $this->traceLevel;
-    }
-
-    public function setTraceLevel(int $traceLevel): self
-    {
-        $this->traceLevel = $traceLevel;
-        return $this;
-    }
-
-    public function setExcludedTracePaths(array $excludedTracePaths): self
-    {
-        $this->excludedTracePaths = $excludedTracePaths;
-        return $this;
     }
 
     private function collectTrace(array $backtrace): array

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Yiisoft\Log;
 
 use DateTime;
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
-use Throwable;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\VarDumper\VarDumper;
 
@@ -14,7 +14,9 @@ use function array_merge;
 use function count;
 use function implode;
 use function in_array;
+use function is_array;
 use function is_callable;
+use function is_string;
 use function rtrim;
 use function strpos;
 use function substr_compare;
@@ -192,12 +194,12 @@ abstract class Target
 
     /**
      * Filters the given messages according to their categories and levels.
-     * @param array $messages messages to be filtered.
-     * The message structure follows that in {@see Logger::$messages}.
+     * @param array $messages messages to be filtered. The message structure follows that in {@see Logger::$messages}.
      * @param array $levels the message levels to filter by. Empty value means allowing all levels.
      * @param array $categories the message categories to filter by. If empty, it means all categories are allowed.
      * @param array $except the message categories to exclude. If empty, it means all categories are allowed.
      * @return array the filtered messages.
+     * @throws InvalidArgumentException for invalid message structure.
      */
     protected static function filterMessages(
         array $messages,
@@ -206,19 +208,23 @@ abstract class Target
         array $except = []
     ): array {
         foreach ($messages as $i => $message) {
+            static::checkMessageStructure($message);
+
             if (!empty($levels) && !in_array($message[0], $levels, true)) {
                 unset($messages[$i]);
                 continue;
             }
 
+            $messageCategory = $message[2]['category'] ?? '';
             $matched = empty($categories);
+
             foreach ($categories as $category) {
                 if (
-                    $message[2]['category'] === $category
+                    ($messageCategory && $messageCategory === $category)
                     || (
                         !empty($category)
                         && substr_compare($category, '*', -1, 1) === 0
-                        && strpos($message[2]['category'], rtrim($category, '*')) === 0
+                        && strpos($messageCategory, rtrim($category, '*')) === 0
                     )
                 ) {
                     $matched = true;
@@ -230,8 +236,8 @@ abstract class Target
                 foreach ($except as $category) {
                     $prefix = rtrim($category, '*');
                     if (
-                        ($message[2]['category'] === $category || $prefix !== $category)
-                        && strpos($message[2]['category'], $prefix) === 0
+                        (($messageCategory && $messageCategory === $category) || $prefix !== $category)
+                        && strpos($messageCategory, $prefix) === 0
                     ) {
                         $matched = false;
                         break;
@@ -248,22 +254,39 @@ abstract class Target
     }
 
     /**
+     * Checks message structure {@see Logger::$messages}.
+     * @param mixed $message the log message to be checked.
+     * @throws InvalidArgumentException for invalid message structure.
+     */
+    protected static function checkMessageStructure($message): void
+    {
+        if (!isset($message[0], $message[1], $message[2]) || !is_string($message[0]) || !is_array($message[2])) {
+            throw new InvalidArgumentException('The message structure is not valid.');
+        }
+    }
+
+    /**
      * Formats a log message for display as a string.
      * @param array $message the log message to be formatted.
      * The message structure follows that in {@see Logger::$messages}.
-     * @return string the formatted message
-     * @throws Throwable
+     * @return string the formatted message.
+     * @throws InvalidArgumentException for invalid message structure.
      */
     protected function formatMessage(array $message): string
     {
+        static::checkMessageStructure($message);
         [$level, $text, $context] = $message;
-        $category = $context['category'];
-        $timestamp = $context['time'];
+
+        $category = $context['category'] ?? static::DEFAULT_CATEGORY;
+        $timestamp = $context['time'] ?? \microtime(true);
         $level = Logger::getLevelName($level);
+
         $traces = [];
         if (isset($context['trace'])) {
             foreach ($context['trace'] as $trace) {
-                $traces[] = "in {$trace['file']}:{$trace['line']}";
+                if (isset($trace['file'], $trace['line'])) {
+                    $traces[] = "in {$trace['file']}:{$trace['line']}";
+                }
             }
         }
 
@@ -280,7 +303,6 @@ abstract class Target
      * @param array $message the message being exported.
      * The message structure follows that in {@see Logger::$messages}.
      * @return string the prefix string
-     * @throws Throwable
      */
     protected function getMessagePrefix(array $message): string
     {

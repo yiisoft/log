@@ -165,7 +165,7 @@ class Logger implements LoggerInterface
         $context['time'] ??= microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         $context['memory'] ??= memory_get_usage();
-        $context['category'] ??= 'application';
+        $context['category'] ??= Target::DEFAULT_CATEGORY;
 
         $message = static::parseMessage($message, $context);
 

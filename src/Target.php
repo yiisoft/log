@@ -36,6 +36,11 @@ use function substr_compare;
 abstract class Target
 {
     /**
+     * The default category will be used if the category was not passed in the message context {@see Target::$messages}.
+     */
+    public const DEFAULT_CATEGORY = 'application';
+
+    /**
      * @var array list of message categories that this target is interested in.
      * Defaults to empty, meaning all categories.
      * You can use an asterisk at the end of a category so that the category may be used to
@@ -154,7 +159,7 @@ abstract class Target
                     LogLevel::INFO,
                     $context,
                     [
-                        'category' => 'application',
+                        'category' => static::DEFAULT_CATEGORY,
                         'time' => $_SERVER['REQUEST_TIME_FLOAT']
                     ]
                 ];

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests;
 
+use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target;
@@ -157,8 +158,7 @@ class TargetTest extends TestCase
 
     public function testFormatTimestamp(): void
     {
-        /** @var Target $target */
-        $target = $this->getMockForAbstractClass(Target::class);
+        $target = new TestTarget();
 
         $text = 'message';
         $level = LogLevel::INFO;
@@ -188,5 +188,63 @@ class TargetTest extends TestCase
         $expectedCustom = 'Mon 16 October 2017 [info][application] message';
         $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedCustom, $formatted);
+    }
+
+    public function testFormatTimestampWithoutContextParameters(): void
+    {
+        $target = new TestTarget();
+
+        $text = 'message';
+        $level = LogLevel::INFO;
+        $category = 'application';
+        $timestamp = 1508160390.6083;
+
+        $target->setTimestampFormat('Y-m-d H:i:s.u');
+
+        $expectedWithMicro = '2017-10-16 13:26:30.608300 [info][application] message';
+        $formatted = $target->formatMessage([$level, $text, ['time' => $timestamp]]);
+        $this->assertSame($expectedWithMicro, $formatted);
+
+        $target->setTimestampFormat('Y-m-d H:i:s');
+        $expectedPatternWithoutMicro = '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[info\]\[application\] message$/';
+
+        $formatted = $target->formatMessage([$level, $text, ['category' => $category]]);
+        $this->assertMatchesRegularExpression($expectedPatternWithoutMicro, $formatted);
+
+        $formatted = $target->formatMessage([$level, $text, []]);
+        $this->assertMatchesRegularExpression($expectedPatternWithoutMicro, $formatted);
+    }
+
+    public function invalidMessageStructureProvider(): array
+    {
+        return [
+            'not-exist-index-0' => [['level' => 'info', 1 => 'message', 2 => []]],
+            'not-exist-index-1' => [['level', 5 => 'message', 2 => []]],
+            'not-exist-index-2' => [['level', 'message', 'context' => []]],
+            'non-string-context' => [[1, 'message', []]],
+            'non-array-context' => [['level', 'message', 'context']],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidMessageStructureProvider
+     * @param array $message
+     */
+    public function testFormatMessageThrowExceptionForInvalidMessageStructure(array $message): void
+    {
+        $target = new TestTarget();
+        $this->expectException(InvalidArgumentException::class);
+        $target->formatMessage($message);
+    }
+
+    /**
+     * @dataProvider invalidMessageStructureProvider
+     * @param array $message
+     */
+    public function testCollectThrowExceptionForInvalidMessageStructure(array $message): void
+    {
+        $target = new TestTarget();
+        $this->expectException(InvalidArgumentException::class);
+        $target->collect([$message], true);
     }
 }

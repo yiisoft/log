@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
+use function array_filter;
+use function count;
+use function debug_backtrace;
 use Exception;
+use function get_class;
+use function is_scalar;
+use function is_string;
+
+use function memory_get_usage;
+use function method_exists;
+use function preg_replace_callback;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
-use Throwable;
-use Yiisoft\VarDumper\VarDumper;
-
-use function array_filter;
-use function count;
-use function debug_backtrace;
-use function get_class;
-use function is_scalar;
-use function is_string;
-use function memory_get_usage;
-use function method_exists;
-use function preg_replace_callback;
 use function register_shutdown_function;
 use function strpos;
+use Throwable;
+use Yiisoft\VarDumper\VarDumper;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to {@see Logger::$targets}.
@@ -108,7 +108,9 @@ class Logger implements LoggerInterface
 
     /**
      * Returns the text display of the specified level.
+     *
      * @param mixed $level the message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
+     *
      * @return string the text display of the level
      */
     public static function getLevelName($level): string
@@ -129,6 +131,7 @@ class Logger implements LoggerInterface
 
     /**
      * @param int|string $name string name or integer index
+     *
      * @return Target|null
      */
     public function getTarget($name): ?Target
@@ -152,6 +155,7 @@ class Logger implements LoggerInterface
 
     /**
      * Adds extra target to {@see Logger::$targets}.
+     *
      * @param Target $target the log target instance.
      * @param string|null $name array key to be used to store target, if `null` is given target will be append
      * to the end of the array by natural integer key.
@@ -191,6 +195,7 @@ class Logger implements LoggerInterface
 
     /**
      * Flushes log messages from memory to targets.
+     *
      * @param bool $final whether this is a final call during a request.
      */
     public function flush(bool $final = false): void
@@ -233,6 +238,7 @@ class Logger implements LoggerInterface
 
     /**
      * Dispatches the logged messages to {@see Logger::$targets}.
+     *
      * @param array $messages the logged messages
      * @param bool $final whether this method is called at the end of the current application
      */
@@ -263,7 +269,9 @@ class Logger implements LoggerInterface
 
     /**
      * Prepares message for logging.
+     *
      * @param mixed $message
+     *
      * @return string
      */
     protected function prepareMessage($message): string
@@ -282,8 +290,10 @@ class Logger implements LoggerInterface
     /**
      * Parses log message resolving placeholders in the form: '{foo}', where foo
      * will be replaced by the context data in key "foo".
+     *
      * @param string $message log message.
      * @param array $context message context.
+     *
      * @return string parsed message.
      */
     protected function parseMessage(string $message, array $context): string

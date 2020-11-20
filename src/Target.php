@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
-use DateTime;
-use Psr\Log\InvalidArgumentException;
-use Psr\Log\LogLevel;
-use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\VarDumper\VarDumper;
-
 use function array_merge;
 use function count;
+use DateTime;
 use function implode;
 use function in_array;
+
 use function is_array;
 use function is_callable;
 use function is_string;
+use Psr\Log\InvalidArgumentException;
+use Psr\Log\LogLevel;
 use function rtrim;
 use function strpos;
 use function substr_compare;
+use Yiisoft\Arrays\ArrayHelper;
+use Yiisoft\VarDumper\VarDumper;
 
 /**
  * Target is the base class for all log target classes.
@@ -58,6 +58,7 @@ abstract class Target
      * You can use an asterisk at the end of a category so that the category can be used to
      * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
      * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
+     *
      * @see categories
      */
     private array $except = [];
@@ -143,6 +144,7 @@ abstract class Target
      * Processes the given log messages.
      * This method will filter the given messages with {@see Target::$levels} and {@see Target::$categories}.
      * And if requested, it will also export the filtering result to specific medium (e.g. email).
+     *
      * @param array $messages log messages to be processed. See {@see Logger::$messages} for the structure
      * of each message.
      * @param bool $final whether this method is called at the end of the current application
@@ -162,8 +164,8 @@ abstract class Target
                     $context,
                     [
                         'category' => static::DEFAULT_CATEGORY,
-                        'time' => $_SERVER['REQUEST_TIME_FLOAT'] ?? \microtime(true)
-                    ]
+                        'time' => $_SERVER['REQUEST_TIME_FLOAT'] ?? \microtime(true),
+                    ],
                 ];
             }
             // set exportInterval to 0 to avoid triggering export again while exporting
@@ -179,6 +181,7 @@ abstract class Target
     /**
      * Generates the context information to be logged.
      * The default implementation will dump user information, system variables, etc.
+     *
      * @return string the context information. If an empty string, it means no context information.
      */
     protected function getContextMessage(): string
@@ -194,12 +197,15 @@ abstract class Target
 
     /**
      * Filters the given messages according to their categories and levels.
+     *
      * @param array $messages messages to be filtered. The message structure follows that in {@see Logger::$messages}.
      * @param array $levels the message levels to filter by. Empty value means allowing all levels.
      * @param array $categories the message categories to filter by. If empty, it means all categories are allowed.
      * @param array $except the message categories to exclude. If empty, it means all categories are allowed.
-     * @return array the filtered messages.
+     *
      * @throws InvalidArgumentException for invalid message structure.
+     *
+     * @return array the filtered messages.
      */
     protected function filterMessages(
         array $messages,
@@ -255,7 +261,9 @@ abstract class Target
 
     /**
      * Checks message structure {@see Logger::$messages}.
+     *
      * @param mixed $message the log message to be checked.
+     *
      * @throws InvalidArgumentException for invalid message structure.
      */
     protected function checkMessageStructure($message): void
@@ -267,10 +275,13 @@ abstract class Target
 
     /**
      * Formats a log message for display as a string.
+     *
      * @param array $message the log message to be formatted.
      * The message structure follows that in {@see Logger::$messages}.
-     * @return string the formatted message.
+     *
      * @throws InvalidArgumentException for invalid message structure.
+     *
+     * @return string the formatted message.
      */
     protected function formatMessage(array $message): string
     {
@@ -300,8 +311,10 @@ abstract class Target
      * Returns a string to be prefixed to the given message.
      * If {@see Target::$prefix} is configured it will return the result of the callback.
      * The default implementation will return user IP, user ID and session ID as a prefix.
+     *
      * @param array $message the message being exported.
      * The message structure follows that in {@see Logger::$messages}.
+     *
      * @return string the prefix string
      */
     protected function getMessagePrefix(array $message): string
@@ -315,7 +328,9 @@ abstract class Target
 
     /**
      * Returns formatted timestamp for message, according to {@see Target::$timestampFormat}
+     *
      * @param float|int $timestamp
+     *
      * @return string
      */
     protected function getTime($timestamp): string
@@ -327,6 +342,7 @@ abstract class Target
 
     /**
      * Sets a value indicating whether this log target is enabled.
+     *
      * @param bool|callable $value a boolean value or a callable to obtain the value from.
      *
      * A callable may be used to determine whether the log target should be enabled in a dynamic way.
@@ -338,6 +354,7 @@ abstract class Target
      *     return !Yii::getApp()->user->isGuest;
      * }
      * ```
+     *
      * @return $this
      */
     public function setEnabled($value): self
@@ -369,6 +386,7 @@ abstract class Target
 
     /**
      * Check whether the log target is enabled.
+     *
      * @return bool A value indicating whether this log target is enabled.
      */
     public function isEnabled(): bool

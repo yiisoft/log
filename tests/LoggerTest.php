@@ -195,6 +195,7 @@ class LoggerTest extends TestCase
 
     /**
      * Data provider for [[testParseMessage()]]
+     *
      * @return array test data.
      */
     public function dataProviderParseMessage(): array

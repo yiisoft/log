@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace Yiisoft\Log {
-
     use Yiisoft\Log\Tests\LoggerDispatchingTest;
 
     function microtime($getAsFloat)
@@ -17,13 +16,13 @@ namespace Yiisoft\Log {
 }
 
 namespace Yiisoft\Log\Tests {
-
     use Psr\Log\LogLevel;
     use Yiisoft\Log\Logger;
     use Yiisoft\Log\Target;
 
     /**
      * @group log
+     *
      * @method static int|float microtime($getAsFloat)
      */
     class LoggerDispatchingTest extends TestCase
@@ -66,7 +65,7 @@ namespace Yiisoft\Log\Tests {
 
             $logger = new Logger(['fakeTarget' => $target]);
             $this->setInaccessibleProperty($logger, 'messages', [
-                [LogLevel::INFO, 'test', []]
+                [LogLevel::INFO, 'test', []],
             ]);
             $logger->flush(true);
         }
@@ -84,7 +83,7 @@ namespace Yiisoft\Log\Tests {
                 ->method('collect')
                 ->with(
                     $this->equalTo([
-                        [LogLevel::INFO, 'test', []]
+                        [LogLevel::INFO, 'test', []],
                     ]),
                     $this->equalTo(true)
                 );
@@ -92,7 +91,7 @@ namespace Yiisoft\Log\Tests {
             $logger = new Logger(['fakeTarget' => $target]);
 
             $this->setInaccessibleProperty($logger, 'messages', [
-                [LogLevel::INFO, 'test', []]
+                [LogLevel::INFO, 'test', []],
             ]);
             $logger->flush(true);
         }
@@ -152,6 +151,7 @@ namespace Yiisoft\Log\Tests {
         /**
          * @param $name
          * @param $arguments
+         *
          * @return mixed
          */
         public static function __callStatic($name, $arguments)

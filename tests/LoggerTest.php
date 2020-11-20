@@ -137,21 +137,6 @@ class LoggerTest extends TestCase
     }
 
     /**
-     * @covers \Yiisoft\Log\Logger::getElapsedTime()
-     */
-    public function testGetElapsedTime(): void
-    {
-        $timeBefore = \microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? 0);
-        usleep(1);
-        $actual = Logger::getElapsedTime();
-        usleep(1);
-        $timeAfter = \microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? 0);
-
-        $this->assertGreaterThan($timeBefore, $actual);
-        $this->assertLessThan($timeAfter, $actual);
-    }
-
-    /**
      * @covers \Yiisoft\Log\Logger::getLevelName()
      */
     public function testGetLevelName(): void

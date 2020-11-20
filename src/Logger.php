@@ -257,17 +257,6 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Returns the total elapsed time since the start of the current request.
-     * This method calculates the difference between now and the start of the
-     * request ($_SERVER['REQUEST_TIME_FLOAT']).
-     * @return float the total elapsed time in seconds for current request.
-     */
-    public static function getElapsedTime(): float
-    {
-        return \microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? 0);
-    }
-
-    /**
      * Returns the text display of the specified level.
      * @param mixed $level the message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
      * @return string the text display of the level

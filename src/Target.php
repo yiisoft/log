@@ -160,7 +160,7 @@ abstract class Target
                     $context,
                     [
                         'category' => static::DEFAULT_CATEGORY,
-                        'time' => $_SERVER['REQUEST_TIME_FLOAT']
+                        'time' => $_SERVER['REQUEST_TIME_FLOAT'] ?? \microtime(true)
                     ]
                 ];
             }

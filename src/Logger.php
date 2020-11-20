@@ -264,7 +264,7 @@ class Logger implements LoggerInterface
      */
     public static function getElapsedTime(): float
     {
-        return \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
+        return \microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? 0);
     }
 
     /**

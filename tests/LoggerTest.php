@@ -141,11 +141,11 @@ class LoggerTest extends TestCase
      */
     public function testGetElapsedTime(): void
     {
-        $timeBefore = \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
+        $timeBefore = \microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? 0);
         usleep(1);
         $actual = Logger::getElapsedTime();
         usleep(1);
-        $timeAfter = \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
+        $timeAfter = \microtime(true) - ($_SERVER['REQUEST_TIME_FLOAT'] ?? 0);
 
         $this->assertGreaterThan($timeBefore, $actual);
         $this->assertLessThan($timeAfter, $actual);

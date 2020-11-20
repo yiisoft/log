@@ -152,24 +152,6 @@ class Logger implements LoggerInterface
         }
     }
 
-    /**
-     * Prepares message for logging.
-     * @param mixed $message
-     * @return string
-     */
-    public static function prepareMessage($message): string
-    {
-        if (method_exists($message, '__toString')) {
-            return (string)$message;
-        }
-
-        if (is_scalar($message)) {
-            return (string)$message;
-        }
-
-        return VarDumper::create($message)->export();
-    }
-
     public function log($level, $message, array $context = []): void
     {
         if (($message instanceof Throwable) && !isset($context['exception'])) {
@@ -177,6 +159,7 @@ class Logger implements LoggerInterface
             // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
             $context['exception'] = $message;
         }
+
         $message = static::prepareMessage($message);
 
         $context['time'] ??= microtime(true);
@@ -184,7 +167,7 @@ class Logger implements LoggerInterface
         $context['memory'] ??= memory_get_usage();
         $context['category'] ??= 'application';
 
-        $message = $this->parseMessage($message, $context);
+        $message = static::parseMessage($message, $context);
 
         $this->messages[] = [$level, $message, $context];
 
@@ -238,18 +221,36 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * Prepares message for logging.
+     * @param mixed $message
+     * @return string
+     */
+    protected static function prepareMessage($message): string
+    {
+        if (method_exists($message, '__toString')) {
+            return (string) $message;
+        }
+
+        if (is_scalar($message)) {
+            return (string) $message;
+        }
+
+        return VarDumper::create($message)->export();
+    }
+
+    /**
      * Parses log message resolving placeholders in the form: '{foo}', where foo
      * will be replaced by the context data in key "foo".
      * @param string $message log message.
      * @param array $context message context.
      * @return string parsed message.
      */
-    protected function parseMessage(string $message, array $context): string
+    protected static function parseMessage(string $message, array $context): string
     {
         return preg_replace_callback('/{([\w.]+)}/', static function (array $matches) use ($context) {
             $placeholderName = $matches[1];
             if (isset($context[$placeholderName])) {
-                return (string)$context[$placeholderName];
+                return (string) $context[$placeholderName];
             }
             return $matches[0];
         }, $message);
@@ -261,7 +262,7 @@ class Logger implements LoggerInterface
      * request ($_SERVER['REQUEST_TIME_FLOAT']).
      * @return float the total elapsed time in seconds for current request.
      */
-    public function getElapsedTime(): float
+    public static function getElapsedTime(): float
     {
         return \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
     }

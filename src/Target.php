@@ -249,7 +249,7 @@ abstract class Target
      * @return string the formatted message
      * @throws Throwable
      */
-    public function formatMessage(array $message): string
+    protected function formatMessage(array $message): string
     {
         [$level, $text, $context] = $message;
         $category = $context['category'];
@@ -277,13 +277,25 @@ abstract class Target
      * @return string the prefix string
      * @throws Throwable
      */
-    public function getMessagePrefix(array $message): string
+    protected function getMessagePrefix(array $message): string
     {
         if ($this->prefix !== null) {
             return ($this->prefix)($message);
         }
 
         return '';
+    }
+
+    /**
+     * Returns formatted timestamp for message, according to {@see Target::$timestampFormat}
+     * @param float|int $timestamp
+     * @return string
+     */
+    protected function getTime($timestamp): string
+    {
+        $timestamp = (string) $timestamp;
+        $format = strpos($timestamp, '.') === false ? 'U' : 'U.u';
+        return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 
     /**
@@ -339,18 +351,6 @@ abstract class Target
         }
 
         return $this->enabled;
-    }
-
-    /**
-     * Returns formatted timestamp for message, according to {@see Target::$timestampFormat}
-     * @param float|int $timestamp
-     * @return string
-     */
-    protected function getTime($timestamp): string
-    {
-        $timestamp = (string) $timestamp;
-        $format = strpos($timestamp, '.') === false ? 'U' : 'U.u';
-        return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 
     public function setLogVars(array $logVars): self

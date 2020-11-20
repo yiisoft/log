@@ -143,7 +143,7 @@ class LoggerTest extends TestCase
     {
         $timeBefore = \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
         usleep(1);
-        $actual = $this->logger->getElapsedTime();
+        $actual = Logger::getElapsedTime();
         usleep(1);
         $timeAfter = \microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
 

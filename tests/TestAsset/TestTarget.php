@@ -24,6 +24,11 @@ class TestTarget extends Target
         $this->setMessages([]);
     }
 
+    public function formatMessage(array $message): string
+    {
+        return parent::formatMessage($message);
+    }
+
     public function getContextMessage(): string
     {
         return parent::getContextMessage();

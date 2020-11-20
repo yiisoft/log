@@ -157,8 +157,7 @@ class TargetTest extends TestCase
 
     public function testFormatTimestamp(): void
     {
-        /** @var Target $target */
-        $target = $this->getMockForAbstractClass(Target::class);
+        $target = new TestTarget();
 
         $text = 'message';
         $level = LogLevel::INFO;

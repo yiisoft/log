@@ -7,20 +7,20 @@ namespace Yiisoft\Log;
 use function array_filter;
 use function count;
 use function debug_backtrace;
-use Exception;
 use function get_class;
 use function is_scalar;
 use function is_string;
-
 use function memory_get_usage;
 use function method_exists;
 use function preg_replace_callback;
+use function register_shutdown_function;
+use function strpos;
+
+use Exception;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
-use function register_shutdown_function;
-use function strpos;
 use Throwable;
 use Yiisoft\VarDumper\VarDumper;
 

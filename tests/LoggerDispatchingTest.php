@@ -18,6 +18,7 @@ namespace Yiisoft\Log {
 
 namespace Yiisoft\Log\Tests {
 
+    use Exception;
     use Psr\Log\LogLevel;
     use Yiisoft\Log\Logger;
     use Yiisoft\Log\Target;
@@ -103,6 +104,7 @@ namespace Yiisoft\Log\Tests {
         public function testDispatchWithFakeTarget2ThrowExceptionWhenCollect(): void
         {
             static::$microtimeIsMocked = true;
+            $exception = new Exception('some error');
 
             $target1 = $this->getMockBuilder(Target::class)
                 ->onlyMethods(['collect'])
@@ -118,11 +120,9 @@ namespace Yiisoft\Log\Tests {
                     [$this->equalTo([]), $this->equalTo(true)],
                     [
                         [[
-                            'Unable to send log via ' . get_class($target1) . ': Exception: some error',
                             LogLevel::WARNING,
-                            'Yiisoft\Log\Logger::dispatch',
-                            'time data',
-                            [],
+                            'Unable to send log via ' . get_class($target1) . ': Exception: some error',
+                            ['time' => 'time data', 'trace' => $exception->getTrace()],
                         ]],
                         true,
                     ]
@@ -133,7 +133,7 @@ namespace Yiisoft\Log\Tests {
                 ->with(
                     $this->equalTo([]),
                     $this->equalTo(true)
-                )->will($this->throwException(new \Exception('some error')));
+                )->will($this->throwException($exception));
 
             $logger = new Logger([
                 'fakeTarget1' => $target1,

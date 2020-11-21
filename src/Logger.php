@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
-use Exception;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -239,18 +238,17 @@ class Logger implements LoggerInterface
     protected function dispatch(array $messages, bool $final): void
     {
         $targetErrors = [];
+
         foreach ($this->getTargets() as $target) {
             if ($target->isEnabled()) {
                 try {
                     $target->collect($messages, $final);
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     $target->disable();
                     $targetErrors[] = [
-                        'Unable to send log via ' . get_class($target) . ': ' . get_class($e) . ': ' . $e->getMessage(),
                         LogLevel::WARNING,
-                        __METHOD__,
-                        microtime(true),
-                        [],
+                        'Unable to send log via ' . get_class($target) . ': ' . get_class($e) . ': ' . $e->getMessage(),
+                        ['time' => microtime(true), 'trace' => $e->getTrace()],
                     ];
                 }
             }

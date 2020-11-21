@@ -9,18 +9,16 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Throwable;
-use Yiisoft\VarDumper\VarDumper;
 
 use function array_filter;
-use function count;
 use function debug_backtrace;
+use function gettype;
 use function get_class;
-use function is_scalar;
 use function is_string;
 use function memory_get_usage;
-use function method_exists;
-use function preg_replace_callback;
+use function microtime;
 use function register_shutdown_function;
+use function sprintf;
 use function strpos;
 
 /**
@@ -34,33 +32,25 @@ use function strpos;
  * When the application ends or {@see Logger::$flushInterval} is reached, Logger will call {@see Logger::flush()}
  * to send logged messages to different log targets, such as file or email according to the {@see Logger::$targets}.
  */
-class Logger implements LoggerInterface
+final class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
-    /**
-     * @var array logged messages. This property is managed by {@see Logger::log()} and {@see Logger::flush()}.
-     * Each log message is of the following structure:
-     *
-     * ```
-     * [
-     *   [0] => level (string)
-     *   [1] => message (mixed, can be a string or some complex data, such as an exception object)
-     *   [2] => context (array)
-     * ]
-     * ```
-     *
-     * Message context has a following keys:
-     *
-     * - category: string, message category.
-     * - time: float, message timestamp obtained by microtime(true).
-     * - trace: array, debug backtrace, contains the application code call stacks.
-     * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`.
-     */
-    private array $messages = [];
+    private MessageGroupInterface $messages;
 
     /**
-     * @var int how many messages should be logged before they are flushed from memory and sent to targets.
+     * @var Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
+     */
+    private array $targets = [];
+
+    /**
+     * @var string[] Array of paths to exclude from tracing when tracing is enabled with {@see Logger::setTraceLevel()}.
+     */
+    private array $excludedTracePaths = [];
+
+    /**
+     * @var int How many log messages should be logged before they are flushed from memory and sent to targets.
+     *
      * Defaults to 1000, meaning the {@see Logger::flush()} method will be invoked once every 1000 messages logged.
      * Set this property to be 0 if you don't want to flush messages until the application terminates.
      * This property mainly affects how much memory will be taken by the logged messages.
@@ -70,31 +60,23 @@ class Logger implements LoggerInterface
     private int $flushInterval = 1000;
 
     /**
-     * @var int how much call stack information (file name and line number) should be logged for each message.
-     * If it is greater than 0, at most that number of call stacks will be logged. Note that only application
-     * call stacks are counted.
+     * @var int How much call stack information (file name and line number) should be logged for each log message.
+     *
+     * If it is greater than 0, at most that number of call stacks will be logged.
+     * Note that only application call stacks are counted.
      */
     private int $traceLevel = 0;
 
     /**
-     * @var array An array of paths to exclude from the trace when tracing is enabled using
-     * {@see Logger::setTraceLevel()}.
-     */
-    private array $excludedTracePaths = [];
-
-    /**
-     * @var Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance
-     */
-    private array $targets = [];
-
-    /**
      * Initializes the logger by registering {@see Logger::flush()} as a shutdown function.
      *
-     * @param Target[] $targets the log targets.
+     * @param Target[] $targets The log targets.
+     * @param MessageGroupInterface|null $messages If `null`, {@see \Yiisoft\Log\MessageGroup} instance will be used.
      */
-    public function __construct(array $targets = [])
+    public function __construct(array $targets = [], MessageGroupInterface $messages = null)
     {
         $this->setTargets($targets);
+        $this->messages = $messages ?? new MessageGroup();
 
         register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
@@ -107,14 +89,16 @@ class Logger implements LoggerInterface
 
     /**
      * Returns the text display of the specified level.
-     * @param mixed $level the message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
-     * @return string the text display of the level
+     *
+     * @param mixed $level The message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
+     * @return string The text display of the level.
      */
     public static function getLevelName($level): string
     {
         if (is_string($level)) {
             return $level;
         }
+
         return 'unknown';
     }
 
@@ -127,7 +111,7 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @param int|string $name string name or integer index
+     * @param int|string $name The string name or integer index.
      * @return Target|null
      */
     public function getTarget($name): ?Target
@@ -136,21 +120,25 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @param array $targets the log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
+     * Sets a target to {@see Logger::$targets}.
+     *
+     * @param array $targets The log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
      * instance or the configuration for creating the log target instance.
      */
     public function setTargets(array $targets): void
     {
         foreach ($targets as $target) {
-            if (!$target instanceof Target) {
+            if (!($target instanceof Target)) {
                 throw new InvalidArgumentException('You must provide an instance of \Yiisoft\Log\Target.');
             }
         }
+
         $this->targets = $targets;
     }
 
     /**
-     * Adds extra target to {@see Logger::$targets}.
+     * Adds an extra target to {@see Logger::$targets}.
+     *
      * @param Target $target the log target instance.
      * @param string|null $name array key to be used to store target, if `null` is given target will be append
      * to the end of the array by natural integer key.
@@ -172,70 +160,106 @@ class Logger implements LoggerInterface
             $context['exception'] = $message;
         }
 
-        $message = $this->prepareMessage($message);
-
         $context['time'] ??= microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         $context['memory'] ??= memory_get_usage();
-        $context['category'] ??= Target::DEFAULT_CATEGORY;
+        $context['category'] ??= MessageCategory::DEFAULT;
 
-        $message = $this->parseMessage($message, $context);
+        $this->messages->add(self::getLevelName($level), $message, $context);
 
-        $this->messages[] = [$level, $message, $context];
-
-        if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {
+        if ($this->flushInterval > 0 && $this->messages->count() >= $this->flushInterval) {
             $this->flush();
         }
     }
 
     /**
      * Flushes log messages from memory to targets.
-     * @param bool $final whether this is a final call during a request.
+     *
+     * @param bool $final Whether this is a final call during a request.
      */
     public function flush(bool $final = false): void
     {
-        $messages = $this->messages;
+        $messages = $this->messages->all();
         // https://github.com/yiisoft/yii2/issues/5619
         // new messages could be logged while the existing ones are being handled by targets
-        $this->messages = [];
+        $this->messages->clear();
 
         $this->dispatch($messages, $final);
     }
 
-    public function getFlushInterval(): int
-    {
-        return $this->flushInterval;
-    }
-
+    /**
+     * Sets how many log messages should be logged before they are flushed from memory and sent to targets.
+     *
+     * @param int $flushInterval The number of messages to accumulate before flushing.
+     * @return self
+     */
     public function setFlushInterval(int $flushInterval): self
     {
         $this->flushInterval = $flushInterval;
         return $this;
     }
 
-    public function getTraceLevel(): int
+    /**
+     * Gets how many log messages should be logged before they are flushed from memory and sent to targets.
+     *
+     * @return int The number of messages to accumulate before flushing.
+     */
+    public function getFlushInterval(): int
     {
-        return $this->traceLevel;
+        return $this->flushInterval;
     }
 
+    /**
+     * Sets how much call stack information (file name and line number) should be logged for each log message.
+     *
+     * @param int $traceLevel The number of call stack information.
+     * @return self
+     */
     public function setTraceLevel(int $traceLevel): self
     {
         $this->traceLevel = $traceLevel;
         return $this;
     }
 
+    /**
+     * Gets how much call stack information (file name and line number) should be logged for each log message.
+     *
+     * @return int The number of call stack information.
+     */
+    public function getTraceLevel(): int
+    {
+        return $this->traceLevel;
+    }
+
+    /**
+     * Sets an array of paths to exclude from tracing when tracing is enabled with {@see Logger::setTraceLevel()}.
+     *
+     * @param string[] $excludedTracePaths The paths to exclude from tracing.
+     * @return self
+     * @throws InvalidArgumentException for non-string values.
+     */
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {
+        foreach ($excludedTracePaths as $excludedTracePath) {
+            if (!is_string($excludedTracePath)) {
+                throw new InvalidArgumentException(sprintf(
+                    "The HP predefined variable must be a string, %s received.",
+                    gettype($excludedTracePath)
+                ));
+            }
+        }
+
         $this->excludedTracePaths = $excludedTracePaths;
         return $this;
     }
 
     /**
      * Dispatches the logged messages to {@see Logger::$targets}.
-     * @param array $messages the logged messages
-     * @param bool $final whether this method is called at the end of the current application
+     *
+     * @param array[] $messages The logg messages.
+     * @param bool $final Whether this method is called at the end of the current application.
      */
-    protected function dispatch(array $messages, bool $final): void
+    private function dispatch(array $messages, bool $final): void
     {
         $targetErrors = [];
 
@@ -260,46 +284,18 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Prepares message for logging.
-     * @param mixed $message
-     * @return string
+     * Collects a trace when tracing is enabled with {@see Logger::setTraceLevel()}.
+     *
+     * @param array $backtrace The list of call stack information.
+     * @return array Collected a list of call stack information.
      */
-    protected function prepareMessage($message): string
-    {
-        if (method_exists($message, '__toString')) {
-            return (string) $message;
-        }
-
-        if (is_scalar($message)) {
-            return (string) $message;
-        }
-
-        return VarDumper::create($message)->export();
-    }
-
-    /**
-     * Parses log message resolving placeholders in the form: '{foo}', where foo
-     * will be replaced by the context data in key "foo".
-     * @param string $message log message.
-     * @param array $context message context.
-     * @return string parsed message.
-     */
-    protected function parseMessage(string $message, array $context): string
-    {
-        return preg_replace_callback('/{([\w.]+)}/', static function (array $matches) use ($context) {
-            $placeholderName = $matches[1];
-            if (isset($context[$placeholderName])) {
-                return (string) $context[$placeholderName];
-            }
-            return $matches[0];
-        }, $message);
-    }
-
     private function collectTrace(array $backtrace): array
     {
         $traces = [];
+
         if ($this->traceLevel > 0) {
             $count = 0;
+
             foreach ($backtrace as $trace) {
                 if (isset($trace['file'], $trace['line'])) {
                     $excludedMatch = array_filter($this->excludedTracePaths, static function ($path) use ($trace) {
@@ -316,6 +312,7 @@ class Logger implements LoggerInterface
                 }
             }
         }
+
         return $traces;
     }
 }

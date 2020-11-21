@@ -7,27 +7,29 @@ namespace Yiisoft\Log;
 use Psr\Log\LoggerInterface;
 
 /**
- * PsrTarget is a log target which simply passes messages to another PSR-3 compatible logger,
- * which is specified via constructor.
+ * PsrTarget is a log target which simply passes messages to another PSR-3 compatible logger.
  */
-class PsrTarget extends Target
+final class PsrTarget extends Target
 {
     /**
-     * @var LoggerInterface logger instance to be used for messages processing.
+     * @var LoggerInterface The logger instance to be used for messages processing.
      */
     private LoggerInterface $logger;
 
     /**
      * Sets the PSR-3 logger used to save messages of this target.
-     * @param LoggerInterface $logger logger instance.
+     *
+     * @param LoggerInterface $logger The logger instance.
+     * @param MessageGroupInterface|null $messages If `null`, {@see \Yiisoft\Log\MessageGroup} instance will be used.
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, MessageGroupInterface $messages = null)
     {
         $this->logger = $logger;
+        parent::__construct($messages);
     }
 
     /**
-     * @return LoggerInterface logger instance.
+     * @return LoggerInterface The logger instance.
      */
     public function getLogger(): LoggerInterface
     {

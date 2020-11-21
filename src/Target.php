@@ -6,18 +6,18 @@ namespace Yiisoft\Log;
 
 use function array_merge;
 use function count;
-use DateTime;
 use function implode;
 use function in_array;
-
 use function is_array;
 use function is_callable;
 use function is_string;
-use Psr\Log\InvalidArgumentException;
-use Psr\Log\LogLevel;
 use function rtrim;
 use function strpos;
 use function substr_compare;
+
+use DateTime;
+use Psr\Log\InvalidArgumentException;
+use Psr\Log\LogLevel;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\VarDumper\VarDumper;
 

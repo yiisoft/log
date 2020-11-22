@@ -14,6 +14,8 @@ use function array_filter;
 use function debug_backtrace;
 use function gettype;
 use function get_class;
+use function implode;
+use function in_array;
 use function is_string;
 use function memory_get_usage;
 use function microtime;
@@ -35,6 +37,20 @@ use function strpos;
 final class Logger implements LoggerInterface
 {
     use LoggerTrait;
+
+    /**
+     * The list of log message levels. See {@see LogLevel} constants for valid level names.
+     */
+    private const LEVELS = [
+        LogLevel::EMERGENCY,
+        LogLevel::ALERT,
+        LogLevel::CRITICAL,
+        LogLevel::ERROR,
+        LogLevel::WARNING,
+        LogLevel::NOTICE,
+        LogLevel::INFO,
+        LogLevel::DEBUG,
+    ];
 
     private MessageCollection $messages;
 
@@ -91,14 +107,28 @@ final class Logger implements LoggerInterface
      *
      * @param mixed $level The message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
      * @return string The text display of the level.
+     * @throws InvalidArgumentException for invalid log message level.
      */
     public static function getLevelName($level): string
     {
-        if (is_string($level)) {
-            return $level;
+        if (!is_string($level)) {
+            throw new InvalidArgumentException(sprintf(
+                "The log message level must be a string, %s received.",
+                gettype($level)
+            ));
         }
 
-        return 'unknown';
+        $level = strtolower($level);
+
+        if (!in_array($level, self::LEVELS, true)) {
+            throw new InvalidArgumentException(sprintf(
+                'Invalid log message level "%s" provided. The following strings are supported: "%s".',
+                $level,
+                implode('", "', self::LEVELS)
+            ));
+        }
+
+        return $level;
     }
 
     /**
@@ -164,7 +194,7 @@ final class Logger implements LoggerInterface
         $context['memory'] ??= memory_get_usage();
         $context['category'] ??= MessageCategory::DEFAULT;
 
-        $this->messages->add(self::getLevelName($level), $message, $context);
+        $this->messages->add($level, $message, $context);
 
         if ($this->flushInterval > 0 && $this->messages->count() >= $this->flushInterval) {
             $this->flush();

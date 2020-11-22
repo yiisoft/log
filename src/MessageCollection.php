@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Yiisoft\Log;
 
 use Psr\Log\InvalidArgumentException;
+use Psr\Log\LogLevel;
 use Yiisoft\VarDumper\VarDumper;
 
 use function count;
-use function gettype;
 use function is_array;
 use function is_scalar;
-use function is_string;
 use function method_exists;
 use function preg_replace_callback;
 
@@ -63,14 +62,15 @@ final class MessageCollection
     /**
      * Adds a log message to the collection.
      *
-     * @param string $level Log message level.
+     * @param mixed $level Log message level.
      * @param mixed $message Log message.
      * @param array $context Log message context.
      * @see MessageCollection::$messages
+     * @see LoggerTrait::log()
      */
-    public function add(string $level, $message, array $context = []): void
+    public function add($level, $message, array $context = []): void
     {
-        $this->messages[] = [$level, $this->parse($this->prepare($message), $context), $context];
+        $this->messages[] = [Logger::getLevelName($level), $this->parse($this->prepare($message), $context), $context];
     }
 
     /**
@@ -82,7 +82,7 @@ final class MessageCollection
     public function addMultiple(array $messages): void
     {
         foreach ($messages as $message) {
-            if (!isset($message[0], $message[1], $message[2]) || !is_string($message[0]) || !is_array($message[2])) {
+            if (!isset($message[0], $message[1], $message[2]) || !is_array($message[2])) {
                 throw new InvalidArgumentException('The message structure is not valid.');
             }
 
@@ -124,16 +124,12 @@ final class MessageCollection
      *
      * @param string[] $levels The log message levels.
      * @see MessageCollection::$levels
+     * @throws InvalidArgumentException for invalid log message level.
      */
     public function setLevels(array $levels): void
     {
-        foreach ($levels as $item) {
-            if (!is_string($item)) {
-                throw new InvalidArgumentException(sprintf(
-                    "The log message levels must be a string, %s received.",
-                    gettype($item)
-                ));
-            }
+        foreach ($levels as $key => $level) {
+            $levels[$key] = Logger::getLevelName($level);
         }
 
         $this->levels = $levels;

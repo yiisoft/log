@@ -124,7 +124,7 @@ abstract class Target
      */
     public function setCategories(array $categories): self
     {
-        $this->categories->setAllowed($categories);
+        $this->categories->include($categories);
         return $this;
     }
 
@@ -135,7 +135,7 @@ abstract class Target
      */
     public function getCategories(): array
     {
-        return $this->categories->getAllowed();
+        return $this->categories->getIncluded();
     }
 
     /**
@@ -146,7 +146,7 @@ abstract class Target
      */
     public function setExcept(array $except): self
     {
-        $this->categories->setExcepted($except);
+        $this->categories->exclude($except);
         return $this;
     }
 
@@ -157,7 +157,7 @@ abstract class Target
      */
     public function getExcept(): array
     {
-        return $this->categories->getExcepted();
+        return $this->categories->getExcluded();
     }
 
     /**
@@ -396,7 +396,7 @@ abstract class Target
 
             $category = (string) ($message[2]['category'] ?? '');
 
-            if (!$this->categories->isAllowed($category) || $this->categories->isExcepted($category)) {
+            if ($this->categories->isExcluded($category)) {
                 unset($messages[$i]);
             }
         }

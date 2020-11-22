@@ -23,7 +23,7 @@ use function strpos;
 abstract class Target
 {
     private MessageCategory $categories;
-    private MessageGroupInterface $messages;
+    private MessageCollection $messages;
 
     /**
      * @var string[] list of the PHP predefined variables that should be logged in a message.
@@ -79,20 +79,17 @@ abstract class Target
      */
     abstract public function export(): void;
 
-    /**
-     * @param MessageGroupInterface|null $messages If `null`, {@see \Yiisoft\Log\MessageGroup} instance will be used.
-     */
-    public function __construct(MessageGroupInterface $messages = null)
+    public function __construct()
     {
         $this->categories = new MessageCategory();
-        $this->messages = $messages ?? new MessageGroup();
+        $this->messages = new MessageCollection();
     }
 
     /**
      * Processes the given log messages.
      *
      * This method will filter the given messages with levels and categories.
-     * The message structure follows that in {@see MessageGroupInterface::add()}.
+     * The message structure follows that in {@see MessageCollection::$messages}.
      * And if requested, it will also export the filtering result to specific medium (e.g. email).
      *
      * @param array $messages Log messages to be processed.
@@ -382,7 +379,7 @@ abstract class Target
     /**
      * Filters the given messages according to their categories and levels.
      *
-     * The message structure follows that in {@see MessageGroupInterface::add()}.
+     * The message structure follows that in {@see MessageCollection::$messages}.
      *
      * @param array[] $messages List log messages to be filtered.
      * @return array[] The filtered log messages.
@@ -410,7 +407,7 @@ abstract class Target
     /**
      * Formats a log message for display as a string.
      *
-     * The message structure follows that in {@see MessageGroupInterface::add()}.
+     * The message structure follows that in {@see MessageCollection::$messages}.
      *
      * @param array $message The log message to be formatted.
      * @return string The formatted log message.
@@ -442,7 +439,7 @@ abstract class Target
      *
      * If {@see Target::$prefix} is configured it will return the result of the callback.
      * The default implementation will return user IP, user ID and session ID as a prefix.
-     * The message structure follows that in {@see MessageGroupInterface::add()}.
+     * The message structure follows that in {@see MessageCollection::$messages}.
      *
      * @param array $message The log message being exported.
      * @return string The log  prefix string.

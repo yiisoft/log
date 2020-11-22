@@ -20,12 +20,11 @@ final class PsrTarget extends Target
      * Sets the PSR-3 logger used to save messages of this target.
      *
      * @param LoggerInterface $logger The logger instance.
-     * @param MessageGroupInterface|null $messages If `null`, {@see \Yiisoft\Log\MessageGroup} instance will be used.
      */
-    public function __construct(LoggerInterface $logger, MessageGroupInterface $messages = null)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-        parent::__construct($messages);
+        parent::__construct();
     }
 
     /**

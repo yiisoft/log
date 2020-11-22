@@ -36,7 +36,7 @@ final class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
-    private MessageGroupInterface $messages;
+    private MessageCollection $messages;
 
     /**
      * @var Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
@@ -71,12 +71,11 @@ final class Logger implements LoggerInterface
      * Initializes the logger by registering {@see Logger::flush()} as a shutdown function.
      *
      * @param Target[] $targets The log targets.
-     * @param MessageGroupInterface|null $messages If `null`, {@see \Yiisoft\Log\MessageGroup} instance will be used.
      */
-    public function __construct(array $targets = [], MessageGroupInterface $messages = null)
+    public function __construct(array $targets = [])
     {
         $this->setTargets($targets);
-        $this->messages = $messages ?? new MessageGroup();
+        $this->messages = new MessageCollection();
 
         register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
@@ -243,7 +242,7 @@ final class Logger implements LoggerInterface
         foreach ($excludedTracePaths as $excludedTracePath) {
             if (!is_string($excludedTracePath)) {
                 throw new InvalidArgumentException(sprintf(
-                    "The HP predefined variable must be a string, %s received.",
+                    "The PHP predefined variable must be a string, %s received.",
                     gettype($excludedTracePath)
                 ));
             }

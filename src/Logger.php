@@ -22,6 +22,7 @@ use function microtime;
 use function register_shutdown_function;
 use function sprintf;
 use function strpos;
+use function strtolower;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to {@see Logger::$targets}.
@@ -263,7 +264,7 @@ final class Logger implements LoggerInterface
     /**
      * Sets an array of paths to exclude from tracing when tracing is enabled with {@see Logger::setTraceLevel()}.
      *
-     * @param string[] $excludedTracePaths The paths to exclude from tracing.
+     * @param array $excludedTracePaths The paths to exclude from tracing.
      * @return self
      * @throws InvalidArgumentException for non-string values.
      */

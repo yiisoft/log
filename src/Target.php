@@ -131,7 +131,7 @@ abstract class Target
     /**
      * Gets a list of log message categories that this target is interested in.
      *
-     * @return array The list of log message categories.
+     * @return string[] The list of log message categories.
      */
     public function getCategories(): array
     {
@@ -153,7 +153,7 @@ abstract class Target
     /**
      * Gets a list of log message categories that this target is NOT interested in.
      *
-     * @return array The list of excluded categories of log messages.
+     * @return string[] The list of excluded categories of log messages.
      */
     public function getExcept(): array
     {
@@ -163,7 +163,7 @@ abstract class Target
     /**
      * Sets a list of log messages that are retrieved from the logger so far by this log target.
      *
-     * @param array $messages The list of log messages.
+     * @param array[] $messages The list of log messages.
      * @return self
      */
     public function setMessages(array $messages): self
@@ -175,7 +175,7 @@ abstract class Target
     /**
      * Gets a list of log messages that are retrieved from the logger so far by this log target.
      *
-     * @return array The list of log messages.
+     * @return array[] The list of log messages.
      */
     public function getMessages(): array
     {
@@ -197,7 +197,7 @@ abstract class Target
     /**
      * Gets a list of log message levels that current target is interested in.
      *
-     * @return array The list of log message levels.
+     * @return string[] The list of log message levels.
      */
     public function getLevels(): array
     {
@@ -207,7 +207,7 @@ abstract class Target
     /**
      * Sets a list of the PHP predefined variables that should be logged in a message.
      *
-     * @param string[] $logVars The list of PHP predefined variables.
+     * @param array $logVars The list of PHP predefined variables.
      * @return self
      * @throws InvalidArgumentException for non-string values.
      */

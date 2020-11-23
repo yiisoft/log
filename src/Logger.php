@@ -18,7 +18,6 @@ use function implode;
 use function in_array;
 use function is_string;
 use function memory_get_usage;
-use function microtime;
 use function register_shutdown_function;
 use function sprintf;
 use function strpos;
@@ -191,7 +190,7 @@ final class Logger implements LoggerInterface
             $context['exception'] = $message;
         }
 
-        $context['time'] ??= microtime(true);
+        $context['time'] ??= \microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         $context['memory'] ??= memory_get_usage();
         $context['category'] ??= MessageCategory::DEFAULT;

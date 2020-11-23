@@ -6,16 +6,24 @@ namespace Yiisoft\Log\Tests;
 
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 use Yiisoft\Log\Logger;
-use Yiisoft\Log\Target;
-use Yiisoft\Log\Tests\TestAsset\TestTarget;
+use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
-/**
- * @group log
- */
-class TargetTest extends TestCase
+use function array_column;
+use function array_merge;
+use function implode;
+use function ucfirst;
+
+final class TargetTest extends TestCase
 {
-    public static array $messages;
+    private DummyTarget $target;
+
+    public function setUp(): void
+    {
+        $this->target = new DummyTarget();
+    }
 
     public function filters(): array
     {
@@ -56,19 +64,18 @@ class TargetTest extends TestCase
 
     /**
      * @dataProvider filters
+     *
      * @param array $filter
      * @param array $expected
      */
     public function testFilter(array $filter, array $expected): void
     {
-        static::$messages = [];
-
         $filter = array_merge($filter, ['logVars' => []]);
-        $target = new TestTarget();
+
         foreach ($filter as $key => $value) {
-            $target->{'set' . ucfirst($key)}($value);
+            $this->target->{'set' . ucfirst($key)}($value);
         }
-        $logger = new Logger(['test' => $target]);
+        $logger = new Logger([DummyTarget::class => $this->target]);
 
         $logger->setFlushInterval(1);
         $logger->log(LogLevel::INFO, 'testA');
@@ -81,22 +88,23 @@ class TargetTest extends TestCase
         $logger->log(LogLevel::ERROR, 'testH', ['category' => 'Yiisoft.Db.Command.whatever']);
         $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
+        $messages = $this->target->getMessages();
+
         $this->assertCount(
             count($expected),
-            static::$messages,
-            'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column(static::$messages, 0))
+            $messages,
+            'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column($messages, 0))
         );
 
         $i = 0;
         foreach ($expected as $e) {
-            $this->assertEquals('test' . $e, static::$messages[$i++][1]);
+            $this->assertEquals('test' . $e, $messages[$i++][1]);
         }
     }
 
     public function testGetContextMessage(): void
     {
-        $target = new TestTarget();
-        $target->setLogVars([
+        $this->target->setLogVars([
             'A', '!A.A_b', 'A.A_d',
             'B.B_a',
             'C', 'C.C_a',
@@ -121,7 +129,7 @@ class TargetTest extends TestCase
             'C_b' => 1,
             'C_c' => 1,
         ];
-        $context = $target->getContextMessage();
+        $context = $this->target->getContextMessage();
         $this->assertStringContainsString('A_a', $context);
         $this->assertStringNotContainsString('A_b', $context);
         $this->assertStringContainsString('A_c', $context);
@@ -141,77 +149,92 @@ class TargetTest extends TestCase
 
     public function testGetEnabled(): void
     {
-        /** @var Target $target */
-        $target = $this->getMockForAbstractClass(Target::class);
+        $this->target->enable();
+        $this->assertTrue($this->target->isEnabled());
 
-        $target->enable();
-        $this->assertTrue($target->isEnabled());
+        $this->target->disable();
+        $this->assertFalse($this->target->isEnabled());
 
-        $target->disable();
-        $this->assertFalse($target->isEnabled());
-
-        $target->setEnabled(static function ($target) {
+        $this->target->setEnabled(static function ($target) {
             return empty($target->messages);
         });
-        $this->assertTrue($target->isEnabled());
+        $this->assertTrue($this->target->isEnabled());
+    }
+
+    public function invalidEnabledProvider(): array
+    {
+        return [
+            'string' => ['a'],
+            'int' => [1],
+            'float' => [1.1],
+            'array' => [[]],
+            'object' => [[new stdClass()]],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidEnabledProvider
+     *
+     * @param mixed $value
+     */
+    public function testSetEnabledThrowExceptionForNonBoolOrCallable($value): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->target->setEnabled($value);
     }
 
     public function testFormatTimestamp(): void
     {
-        $target = new TestTarget();
-
         $text = 'message';
         $level = LogLevel::INFO;
         $category = 'application';
         $timestamp = 1508160390.6083;
 
-        $target->setTimestampFormat('Y-m-d H:i:s');
+        $this->target->setTimestampFormat('Y-m-d H:i:s');
 
         $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
-        $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
+        $formatted = $this->target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
 
-        $target->setTimestampFormat('Y-m-d H:i:s.u');
+        $this->target->setTimestampFormat('Y-m-d H:i:s.u');
 
         $expectedWithMicro = '2017-10-16 13:26:30.608300 [info][application] message';
-        $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
+        $formatted = $this->target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithMicro, $formatted);
 
-        $target->setTimestampFormat('Y-m-d H:i:s');
+        $this->target->setTimestampFormat('Y-m-d H:i:s');
         $timestamp = 1508160390;
 
         $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
-        $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
+        $formatted = $this->target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedWithoutMicro, $formatted);
 
-        $target->setTimestampFormat('D d F Y');
+        $this->target->setTimestampFormat('D d F Y');
         $expectedCustom = 'Mon 16 October 2017 [info][application] message';
-        $formatted = $target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
+        $formatted = $this->target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedCustom, $formatted);
     }
 
     public function testFormatTimestampWithoutContextParameters(): void
     {
-        $target = new TestTarget();
-
         $text = 'message';
         $level = LogLevel::INFO;
         $category = 'application';
         $timestamp = 1508160390.6083;
 
-        $target->setTimestampFormat('Y-m-d H:i:s.u');
+        $this->target->setTimestampFormat('Y-m-d H:i:s.u');
 
         $expectedWithMicro = '2017-10-16 13:26:30.608300 [info][application] message';
-        $formatted = $target->formatMessage([$level, $text, ['time' => $timestamp]]);
+        $formatted = $this->target->formatMessage([$level, $text, ['time' => $timestamp]]);
         $this->assertSame($expectedWithMicro, $formatted);
 
-        $target->setTimestampFormat('Y-m-d H:i:s');
+        $this->target->setTimestampFormat('Y-m-d H:i:s');
         $expectedPatternWithoutMicro = '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[info\]\[application\] message$/';
 
-        $formatted = $target->formatMessage([$level, $text, ['category' => $category]]);
+        $formatted = $this->target->formatMessage([$level, $text, ['category' => $category]]);
         $this->assertMatchesRegularExpression($expectedPatternWithoutMicro, $formatted);
 
-        $formatted = $target->formatMessage([$level, $text, []]);
+        $formatted = $this->target->formatMessage([$level, $text, []]);
         $this->assertMatchesRegularExpression($expectedPatternWithoutMicro, $formatted);
     }
 
@@ -228,23 +251,79 @@ class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidMessageStructureProvider
+     *
      * @param array $message
      */
     public function testFormatMessageThrowExceptionForInvalidMessageStructure(array $message): void
     {
-        $target = new TestTarget();
         $this->expectException(InvalidArgumentException::class);
-        $target->formatMessage($message);
+        $this->target->formatMessage($message);
     }
 
     /**
      * @dataProvider invalidMessageStructureProvider
+     *
      * @param array $message
      */
     public function testCollectThrowExceptionForInvalidMessageStructure(array $message): void
     {
-        $target = new TestTarget();
         $this->expectException(InvalidArgumentException::class);
-        $target->collect([$message], true);
+        $this->target->collect([$message], true);
+    }
+
+    public function invalidStringListProvider(): array
+    {
+        return [
+            'int' => [[1]],
+            'float' => [[1.1]],
+            'array' => [[[]]],
+            'bool' => [[true]],
+            'callable' => [[fn () => null]],
+            'object' => [[new stdClass()]],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidStringListProvider
+     *
+     * @param array $list
+     */
+    public function testSetCategoriesThrowExceptionForNonStringList(array $list): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->target->setCategories($list);
+    }
+
+    /**
+     * @dataProvider invalidStringListProvider
+     *
+     * @param array $list
+     */
+    public function testSetExceptThrowExceptionForNonStringList(array $list): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->target->setExcept($list);
+    }
+
+    /**
+     * @dataProvider invalidStringListProvider
+     *
+     * @param array $list
+     */
+    public function testSetLevelsThrowExceptionForNonStringList(array $list): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->target->setLevels($list);
+    }
+
+    /**
+     * @dataProvider invalidStringListProvider
+     *
+     * @param array $list
+     */
+    public function testSetLogVarsThrowExceptionForNonStringList(array $list): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->target->setLogVars($list);
     }
 }

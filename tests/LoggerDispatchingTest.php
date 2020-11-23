@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log {
 
-    use Yiisoft\Log\Tests\LoggerDispatchingTest;
+    use Yiisoft\Log\Tests\LoggerDispatchingLoggerTest;
 
     function microtime($getAsFloat)
     {
-        if (LoggerDispatchingTest::$microtimeIsMocked) {
-            return LoggerDispatchingTest::microtime(func_get_args());
+        if (LoggerDispatchingLoggerTest::$microtimeIsMocked) {
+            return LoggerDispatchingLoggerTest::microtime(func_get_args());
         }
 
         return \microtime($getAsFloat);
@@ -27,7 +27,7 @@ namespace Yiisoft\Log\Tests {
      * @group log
      * @method static int|float microtime($getAsFloat)
      */
-    class LoggerDispatchingTest extends TestCase
+    final class LoggerDispatchingLoggerTest extends LoggerTestCase
     {
         /**
          * @var Logger
@@ -66,9 +66,7 @@ namespace Yiisoft\Log\Tests {
             $target->setEnabled(false);
 
             $logger = new Logger(['fakeTarget' => $target]);
-            $this->setInaccessibleProperty($logger, 'messages', [
-                [LogLevel::INFO, 'test', []]
-            ]);
+            $this->setInaccessibleMessages($logger, [[LogLevel::INFO, 'test', []]]);
             $logger->flush(true);
         }
 
@@ -92,9 +90,7 @@ namespace Yiisoft\Log\Tests {
 
             $logger = new Logger(['fakeTarget' => $target]);
 
-            $this->setInaccessibleProperty($logger, 'messages', [
-                [LogLevel::INFO, 'test', []]
-            ]);
+            $this->setInaccessibleMessages($logger, [[LogLevel::INFO, 'test', []]]);
             $logger->flush(true);
         }
 
@@ -145,7 +141,7 @@ namespace Yiisoft\Log\Tests {
                 return 'time data';
             };
 
-            $this->setInaccessibleProperty($logger, 'messages', []);
+            $this->setInaccessibleMessages($logger, []);
             $logger->flush(true);
         }
 

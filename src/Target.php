@@ -434,10 +434,13 @@ abstract class Target
      *
      * @param array $message The log message to be formatted.
      * @return string The formatted log message.
+     * @throws InvalidArgumentException for invalid message structure.
      */
     protected function formatMessage(array $message): string
     {
+        $this->messages->checkStructure($message);
         [$level, $text, $context] = $message;
+
         $level = Logger::getLevelName($level);
         $timestamp = $context['time'] ?? microtime(true);
         $category = $context['category'] ?? MessageCategory::DEFAULT;

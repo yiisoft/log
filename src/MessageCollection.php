@@ -65,6 +65,7 @@ final class MessageCollection
      * @param mixed $level Log message level.
      * @param mixed $message Log message.
      * @param array $context Log message context.
+     * @throws InvalidArgumentException for invalid log message level.
      * @see MessageCollection::$messages
      * @see LoggerTrait::log()
      */
@@ -77,15 +78,13 @@ final class MessageCollection
      * Adds multiple log messages to the collection.
      *
      * @param array $messages The list of log messages.
+     * @throws InvalidArgumentException for invalid message structure.
      * @see MessageCollection::$messages
      */
     public function addMultiple(array $messages): void
     {
         foreach ($messages as $message) {
-            if (!isset($message[0], $message[1], $message[2]) || !is_array($message[2])) {
-                throw new InvalidArgumentException('The message structure is not valid.');
-            }
-
+            $this->checkStructure($message);
             $this->add($message[0], $message[1], $message[2]);
         }
     }
@@ -117,6 +116,20 @@ final class MessageCollection
     public function count(): int
     {
         return count($this->messages);
+    }
+
+    /**
+     * Checks log message structure.
+     *
+     * @param mixed $message The log message to be checked.
+     * @throws InvalidArgumentException for invalid message structure.
+     * @see MessageCollection::$messages
+     */
+    public function checkStructure($message): void
+    {
+        if (!isset($message[0], $message[1], $message[2]) || !is_array($message[2])) {
+            throw new InvalidArgumentException('The message structure is not valid.');
+        }
     }
 
     /**

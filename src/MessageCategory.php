@@ -46,6 +46,7 @@ final class MessageCategory
      * Sets the log message categories to be included.
      *
      * @param string[] $categories List of log message categories to be included.
+     * @throws InvalidArgumentException for invalid log message categories structure.
      */
     public function include(array $categories): void
     {
@@ -67,6 +68,7 @@ final class MessageCategory
      * Sets the log message categories to be excluded.
      *
      * @param string[] $categories The list of log message categories to be excluded.
+     * @throws InvalidArgumentException for invalid log message categories structure.
      */
     public function exclude(array $categories): void
     {

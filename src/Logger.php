@@ -154,6 +154,7 @@ final class Logger implements LoggerInterface
      *
      * @param array $targets The log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
      * instance or the configuration for creating the log target instance.
+     * @throws InvalidArgumentException for non-instance Target.
      */
     public function setTargets(array $targets): void
     {

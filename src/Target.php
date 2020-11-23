@@ -124,6 +124,7 @@ abstract class Target
      *
      * @param array $categories The list of log message categories.
      * @return self
+     * @throws InvalidArgumentException for invalid log message categories structure.
      * @see MessageCategory::$include
      */
     public function setCategories(array $categories): self
@@ -148,6 +149,7 @@ abstract class Target
      *
      * @param array $except The list of log message categories.
      * @return self
+     * @throws InvalidArgumentException for invalid log message categories structure.
      * @see MessageCategory::$exclude
      */
     public function setExcept(array $except): self
@@ -172,6 +174,7 @@ abstract class Target
      *
      * @param array[] $messages The list of log messages.
      * @return self
+     * @throws InvalidArgumentException for invalid message structure.
      * @see MessageCollection::$messages
      */
     public function setMessages(array $messages): self
@@ -196,6 +199,7 @@ abstract class Target
      *
      * @param array $levels The list of log message levels.
      * @return self
+     * @throws InvalidArgumentException for invalid log message level.
      * @see MessageCollection::$levels
      */
     public function setLevels(array $levels): self
@@ -440,7 +444,6 @@ abstract class Target
     {
         $this->messages->checkStructure($message);
         [$level, $text, $context] = $message;
-
         $level = Logger::getLevelName($level);
         $timestamp = $context['time'] ?? microtime(true);
         $category = $context['category'] ?? MessageCategory::DEFAULT;

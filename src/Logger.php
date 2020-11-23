@@ -222,6 +222,7 @@ final class Logger implements LoggerInterface
      *
      * @param int $flushInterval The number of messages to accumulate before flushing.
      * @return self
+     * @see Logger::$flushInterval
      */
     public function setFlushInterval(int $flushInterval): self
     {
@@ -233,6 +234,7 @@ final class Logger implements LoggerInterface
      * Gets how many log messages should be logged before they are flushed from memory and sent to targets.
      *
      * @return int The number of messages to accumulate before flushing.
+     * @see Logger::$flushInterval
      */
     public function getFlushInterval(): int
     {
@@ -244,6 +246,7 @@ final class Logger implements LoggerInterface
      *
      * @param int $traceLevel The number of call stack information.
      * @return self
+     * @see Logger::$traceLevel
      */
     public function setTraceLevel(int $traceLevel): self
     {
@@ -255,6 +258,7 @@ final class Logger implements LoggerInterface
      * Gets how much call stack information (file name and line number) should be logged for each log message.
      *
      * @return int The number of call stack information.
+     * @see Logger::$traceLevel
      */
     public function getTraceLevel(): int
     {
@@ -267,6 +271,7 @@ final class Logger implements LoggerInterface
      * @param array $excludedTracePaths The paths to exclude from tracing.
      * @return self
      * @throws InvalidArgumentException for non-string values.
+     * @see Logger::$excludedTracePaths
      */
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {

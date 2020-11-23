@@ -79,6 +79,9 @@ abstract class Target
      */
     abstract public function export(): void;
 
+    /**
+     * When defining a constructor in child classes, you must call `parent::__construct()`.
+     */
     public function __construct()
     {
         $this->categories = new MessageCategory();
@@ -121,6 +124,7 @@ abstract class Target
      *
      * @param array $categories The list of log message categories.
      * @return self
+     * @see MessageCategory::$include
      */
     public function setCategories(array $categories): self
     {
@@ -132,6 +136,7 @@ abstract class Target
      * Gets a list of log message categories that this target is interested in.
      *
      * @return string[] The list of log message categories.
+     * @see MessageCategory::$include
      */
     public function getCategories(): array
     {
@@ -143,6 +148,7 @@ abstract class Target
      *
      * @param array $except The list of log message categories.
      * @return self
+     * @see MessageCategory::$exclude
      */
     public function setExcept(array $except): self
     {
@@ -154,6 +160,7 @@ abstract class Target
      * Gets a list of log message categories that this target is NOT interested in.
      *
      * @return string[] The list of excluded categories of log messages.
+     * @see MessageCategory::$exclude
      */
     public function getExcept(): array
     {
@@ -165,6 +172,7 @@ abstract class Target
      *
      * @param array[] $messages The list of log messages.
      * @return self
+     * @see MessageCollection::$messages
      */
     public function setMessages(array $messages): self
     {
@@ -176,6 +184,7 @@ abstract class Target
      * Gets a list of log messages that are retrieved from the logger so far by this log target.
      *
      * @return array[] The list of log messages.
+     * @see MessageCollection::$messages
      */
     public function getMessages(): array
     {
@@ -187,6 +196,7 @@ abstract class Target
      *
      * @param array $levels The list of log message levels.
      * @return self
+     * @see MessageCollection::$levels
      */
     public function setLevels(array $levels): self
     {
@@ -198,6 +208,7 @@ abstract class Target
      * Gets a list of log message levels that current target is interested in.
      *
      * @return string[] The list of log message levels.
+     * @see MessageCollection::$levels
      */
     public function getLevels(): array
     {
@@ -210,6 +221,7 @@ abstract class Target
      * @param array $logVars The list of PHP predefined variables.
      * @return self
      * @throws InvalidArgumentException for non-string values.
+     * @see Target::$logVars
      */
     public function setLogVars(array $logVars): self
     {
@@ -230,6 +242,7 @@ abstract class Target
      * Gets a list of the PHP predefined variables that should be logged in a message.
      *
      * @return string[] The list of the PHP predefined variables.
+     * @see Target::$logVars
      */
     public function getLogVars(): array
     {
@@ -241,6 +254,7 @@ abstract class Target
      *
      * @param callable $prefix The PHP callable to get a string value from.
      * @return self
+     * @see Target::$prefix
      */
     public function setPrefix(callable $prefix): self
     {
@@ -252,6 +266,7 @@ abstract class Target
      * Gets a PHP callable that returns a string to be prefixed to every exported message.
      *
      * @return callable|null The PHP callable to get a string value from or null.
+     * @see Target::$prefix
      */
     public function getPrefix(): ?callable
     {
@@ -263,6 +278,7 @@ abstract class Target
      *
      * @param int $exportInterval The number of log messages to accumulate before exporting.
      * @return self
+     * @see Target::$exportInterval
      */
     public function setExportInterval(int $exportInterval): self
     {
@@ -274,6 +290,7 @@ abstract class Target
      * Gets how many messages should be accumulated before they are exported.
      *
      * @return int The number of messages to accumulate before exporting.
+     * @see Target::$exportInterval
      */
     public function getExportInterval(): int
     {
@@ -285,6 +302,7 @@ abstract class Target
      *
      * @param string $format The date format for the log timestamp.
      * @return self
+     * @see Target::$timestampFormat
      */
     public function setTimestampFormat(string $format): self
     {
@@ -296,6 +314,7 @@ abstract class Target
      * Gets a date format for the log timestamp.
      *
      * @return string The date format for the log timestamp.
+     * @see Target::$timestampFormat
      */
     public function getTimestampFormat(): string
     {
@@ -310,6 +329,7 @@ abstract class Target
      * @param bool|callable $value The boolean value or a callable to get a boolean value from.
      * @return self
      * @throws InvalidArgumentException for non-boolean or non-callable value.
+     * @see Target::$enabled
      */
     public function setEnabled($value): self
     {
@@ -328,6 +348,7 @@ abstract class Target
      * Enables the log target.
      *
      * @return self
+     * @see Target::setEnabled()
      */
     public function enable(): self
     {
@@ -338,6 +359,7 @@ abstract class Target
      * Disables the log target.
      *
      * @return self
+     * @see Target::setEnabled()
      */
     public function disable(): self
     {
@@ -348,6 +370,7 @@ abstract class Target
      * Check whether the log target is enabled.
      *
      * @return bool The value indicating whether this log target is enabled.
+     * @see Target::$enabled
      */
     public function isEnabled(): bool
     {

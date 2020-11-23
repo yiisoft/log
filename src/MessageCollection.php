@@ -123,8 +123,8 @@ final class MessageCollection
      * Sets the log message levels that current collection is interested in.
      *
      * @param string[] $levels The log message levels.
-     * @see MessageCollection::$levels
      * @throws InvalidArgumentException for invalid log message level.
+     * @see MessageCollection::$levels
      */
     public function setLevels(array $levels): void
     {

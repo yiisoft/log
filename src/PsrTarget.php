@@ -39,7 +39,7 @@ final class PsrTarget extends Target
     {
         foreach ($this->getMessages() as $message) {
             [$level, $text, $context] = $message;
-            $this->getLogger()->log($level, $text, $context);
+            $this->logger->log($level, $text, $context);
         }
     }
 }

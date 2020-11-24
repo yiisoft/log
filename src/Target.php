@@ -20,6 +20,17 @@ use function microtime;
 use function sprintf;
 use function strpos;
 
+/**
+ * Target is the base class for all log target classes.
+ *
+ * A log target object will filter the messages logged by {@see \Yiisoft\Log\Logger} according to
+ * its {@see MessageCollection::$levels} and {@see MessageCategory::$include. It may also export
+ * the filtered messages to specific destination defined by the target, such as emails, files.
+ *
+ * Level filter and category filter are combinatorial, i.e., only messages
+ * satisfying both filter conditions will be handled. Additionally, you may specify
+ * {@see MessageCategory::$include} to exclude messages of certain categories.
+ */
 abstract class Target
 {
     private MessageCategory $categories;

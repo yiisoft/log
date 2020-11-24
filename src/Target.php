@@ -77,7 +77,7 @@ abstract class Target
      * Exports log messages to a specific destination.
      * Child classes must implement this method.
      */
-    abstract public function export(): void;
+    abstract protected function export(): void;
 
     /**
      * When defining a constructor in child classes, you must call `parent::__construct()`.

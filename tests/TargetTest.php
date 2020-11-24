@@ -9,6 +9,7 @@ use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Log\Logger;
+use Yiisoft\Log\LogRuntimeException;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
 use function array_column;
@@ -168,7 +169,7 @@ final class TargetTest extends TestCase
             'int' => [1],
             'float' => [1.1],
             'array' => [[]],
-            'object' => [[new stdClass()]],
+            'object' => [new stdClass()],
         ];
     }
 
@@ -181,6 +182,30 @@ final class TargetTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->target->setEnabled($value);
+    }
+
+    public function invalidCallableEnabledProvider(): array
+    {
+        return [
+            'string' => [fn () => 'a'],
+            'int' => [fn () => 1],
+            'float' => [fn () => 1.1],
+            'array' => [fn () => []],
+            'callable' => [fn () => fn () => true],
+            'object' => [fn () => new stdClass()],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidCallableEnabledProvider
+     *
+     * @param mixed $value
+     */
+    public function testIsEnabledThrowExceptionForCallableReturnNotBoolean(callable $value): void
+    {
+        $this->target->setEnabled($value);
+        $this->expectException(LogRuntimeException::class);
+        $this->target->isEnabled();
     }
 
     public function testFormatTimestamp(): void
@@ -210,9 +235,24 @@ final class TargetTest extends TestCase
         $this->assertSame($expectedWithoutMicro, $formatted);
 
         $this->target->setTimestampFormat('D d F Y');
+
         $expectedCustom = 'Mon 16 October 2017 [info][application] message';
         $formatted = $this->target->formatMessage([$level, $text, ['category' => $category, 'time' => $timestamp]]);
         $this->assertSame($expectedCustom, $formatted);
+    }
+
+    public function testFormatMessageWithTraceInContext(): void
+    {
+        $timestamp = 1508160390;
+        $this->target->setTimestampFormat('Y-m-d H:i:s');
+        $formatted = $this->target->formatMessage([
+            LogLevel::INFO,
+            'message',
+            ['time' => $timestamp, 'trace' => [['file' => '/path/to/file', 'line' => 99]]],
+        ]);
+        $expected = "2017-10-16 13:26:30 [info][application] message\n    in /path/to/file:99";
+
+        $this->assertSame($expected, $formatted);
     }
 
     public function testFormatTimestampWithoutContextParameters(): void
@@ -244,7 +284,6 @@ final class TargetTest extends TestCase
             'not-exist-index-0' => [['level' => 'info', 1 => 'message', 2 => []]],
             'not-exist-index-1' => [['level', 5 => 'message', 2 => []]],
             'not-exist-index-2' => [['level', 'message', 'context' => []]],
-            'non-string-context' => [[1, 'message', []]],
             'non-array-context' => [['level', 'message', 'context']],
         ];
     }
@@ -269,6 +308,30 @@ final class TargetTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->target->collect([$message], true);
+    }
+
+    public function testSettersAndGetters(): void
+    {
+        $this->target->setCategories($categories = ['category-1', 'category-2']);
+        $this->assertSame($categories, $this->target->getCategories());
+
+        $this->target->setExcept($categories = ['category-1', 'category-2']);
+        $this->assertSame($categories, $this->target->getExcept());
+
+        $this->target->setLevels($levels = [LogLevel::DEBUG, LogLevel::INFO]);
+        $this->assertSame($levels, $this->target->getLevels());
+
+        $this->target->setLogVars($logVars = ['_GET', '_POST']);
+        $this->assertSame($logVars, $this->target->getLogVars());
+
+        $this->target->setPrefix($prefix = fn () => 'prefix');
+        $this->assertSame($prefix, $this->target->getPrefix());
+
+        $this->target->setExportInterval($exportInterval = 500);
+        $this->assertSame($exportInterval, $this->target->getExportInterval());
+
+        $this->target->setTimestampFormat($format = 'Y-m-d H:i:s');
+        $this->assertSame($format, $this->target->getTimestampFormat());
     }
 
     public function invalidStringListProvider(): array
@@ -325,5 +388,41 @@ final class TargetTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->target->setLogVars($list);
+    }
+
+    public function invalidCallablePrefixProvider(): array
+    {
+        return [
+            'string' => [fn () => true],
+            'int' => [fn () => 1],
+            'float' => [fn () => 1.1],
+            'array' => [fn () => []],
+            'callable' => [fn () => fn () => 'a'],
+            'object' => [fn () => new stdClass()],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidCallablePrefixProvider
+     *
+     * @param mixed $value
+     */
+    public function testGetMessagePrefixThrowExceptionForCallableReturnNotBoolean(callable $value): void
+    {
+        $this->target->setPrefix($value);
+        $this->expectException(LogRuntimeException::class);
+        $this->target->getMessagePrefix([LogLevel::INFO, 'test', ['foo' => 'bar']]);
+    }
+
+    /**
+     * @dataProvider invalidMessageStructureProvider
+     *
+     * @param array $message
+     */
+    public function testGetMessagePrefixThrowExceptionForInvalidMessageStructure(array $message): void
+    {
+        $this->target->setPrefix(fn () => 'prefix');
+        $this->expectException(InvalidArgumentException::class);
+        $this->target->getMessagePrefix($message);
     }
 }

@@ -25,6 +25,11 @@ final class DummyTarget extends Target
         return parent::formatMessage($message);
     }
 
+    public function getMessagePrefix(array $message): string
+    {
+        return parent::getMessagePrefix($message);
+    }
+
     public function getContextMessage(): string
     {
         return parent::getContextMessage();

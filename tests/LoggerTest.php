@@ -8,6 +8,7 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 use stdClass;
 use Yiisoft\Log\Logger;
+use Yiisoft\Log\LogRuntimeException;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
 use function array_pop;
@@ -27,7 +28,9 @@ final class LoggerTest extends LoggerTestCase
     public function testLogWithTraceLevel(): void
     {
         $memory = memory_get_usage();
-        $this->logger->setTraceLevel(3);
+        $this->logger->setTraceLevel($traceLevel = 3);
+        $this->assertSame($traceLevel, $this->logger->getTraceLevel());
+
         $this->logger->log(LogLevel::INFO, 'test3');
 
         $messages = $this->getInaccessibleMessages($this->logger);
@@ -37,7 +40,7 @@ final class LoggerTest extends LoggerTestCase
         $this->assertEquals('application', $messages[0][2]['category']);
         $this->assertEquals([
             'file' => __FILE__,
-            'line' => 31,
+            'line' => 34,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',
@@ -68,6 +71,16 @@ final class LoggerTest extends LoggerTestCase
         $this->assertEquals('category', $messages[1][2]['category']);
         $this->assertEquals([], $messages[1][2]['trace']);
         $this->assertGreaterThanOrEqual($memory, $messages[1][2]['memory']);
+    }
+
+    public function testLogWithThrowableMessage(): void
+    {
+        $message = new LogRuntimeException('some error');
+        $this->logger->log(LogLevel::ERROR, $message);
+
+        $messages = $this->getInaccessibleMessages($this->logger);
+        $this->assertInstanceOf(LogRuntimeException::class, $messages[0][2]['exception']);
+        $this->assertSame($message, $messages[0][2]['exception']);
     }
 
     public function messageProvider(): array
@@ -172,7 +185,9 @@ final class LoggerTest extends LoggerTestCase
 
     public function testLogWithFlush(): void
     {
-        $this->logger->setFlushInterval(1);
+        $this->logger->setFlushInterval($flushInterval = 1);
+        $this->assertSame($flushInterval, $this->logger->getFlushInterval());
+
         $this->logger->log(LogLevel::INFO, 'test');
 
         $this->assertSame(0, $this->target->getExportCount());
@@ -238,8 +253,9 @@ final class LoggerTest extends LoggerTestCase
         $logger = new Logger();
         $target = new DummyTarget();
         $logger->setTargets([$target]);
-        $this->assertEquals([$target], $logger->getTargets());
+        $this->assertSame([$target], $logger->getTargets());
         $this->assertSame($target, $logger->getTargets()[0]);
+        $this->assertSame($target, $logger->getTarget(0));
     }
 
     public function invalidTargetProvider(): array

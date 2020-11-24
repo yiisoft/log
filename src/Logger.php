@@ -113,7 +113,7 @@ final class Logger implements LoggerInterface
     {
         if (!is_string($level)) {
             throw new InvalidArgumentException(sprintf(
-                "The log message level must be a string, %s received.",
+                'The log message level must be a string, %s received.',
                 gettype($level)
             ));
         }
@@ -278,7 +278,7 @@ final class Logger implements LoggerInterface
         foreach ($excludedTracePaths as $excludedTracePath) {
             if (!is_string($excludedTracePath)) {
                 throw new InvalidArgumentException(sprintf(
-                    "The PHP predefined variable must be a string, %s received.",
+                    'The PHP predefined variable must be a string, %s received.',
                     gettype($excludedTracePath)
                 ));
             }

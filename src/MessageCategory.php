@@ -136,7 +136,7 @@ final class MessageCategory
         foreach ($categories as $category) {
             if (!is_string($category)) {
                 throw new InvalidArgumentException(sprintf(
-                    "The log message category must be a string, %s received.",
+                    'The log message category must be a string, %s received.',
                     gettype($category)
                 ));
             }

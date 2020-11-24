@@ -24,7 +24,6 @@ namespace Yiisoft\Log\Tests {
     use Yiisoft\Log\Target;
 
     /**
-     * @group log
      * @method static int|float microtime($getAsFloat)
      */
     final class LoggerDispatchingLoggerTest extends LoggerTestCase
@@ -48,7 +47,7 @@ namespace Yiisoft\Log\Tests {
 
         protected function setUp(): void
         {
-            static::$microtimeIsMocked = false;
+            self::$microtimeIsMocked = false;
             $this->logger = new Logger();
         }
 
@@ -83,7 +82,7 @@ namespace Yiisoft\Log\Tests {
                 ->method('collect')
                 ->with(
                     $this->equalTo([
-                        [LogLevel::INFO, 'test', []]
+                        [LogLevel::INFO, 'test', []],
                     ]),
                     $this->equalTo(true)
                 );
@@ -99,7 +98,7 @@ namespace Yiisoft\Log\Tests {
          */
         public function testDispatchWithFakeTarget2ThrowExceptionWhenCollect(): void
         {
-            static::$microtimeIsMocked = true;
+            self::$microtimeIsMocked = true;
             $exception = new Exception('some error');
 
             $target1 = $this->getMockBuilder(Target::class)
@@ -136,7 +135,7 @@ namespace Yiisoft\Log\Tests {
                 'fakeTarget2' => $target2,
             ]);
 
-            static::$functions['microtime'] = function ($arguments) {
+            self::$functions['microtime'] = function ($arguments) {
                 $this->assertEquals([true], $arguments);
                 return 'time data';
             };
@@ -152,11 +151,11 @@ namespace Yiisoft\Log\Tests {
          */
         public static function __callStatic($name, $arguments)
         {
-            if (isset(static::$functions[$name]) && is_callable(static::$functions[$name])) {
+            if (isset(self::$functions[$name]) && is_callable(self::$functions[$name])) {
                 $arguments = $arguments[0] ?? $arguments;
-                return forward_static_call(static::$functions[$name], $arguments);
+                return forward_static_call(self::$functions[$name], $arguments);
             }
-            static::fail("Function '$name' has not implemented yet!");
+            self::fail("Function '$name' has not implemented yet!");
         }
     }
 }

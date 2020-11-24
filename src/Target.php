@@ -118,7 +118,7 @@ abstract class Target
             if (($contextMessage = $this->getContextMessage()) !== '') {
                 $this->messages->add(LogLevel::INFO, $contextMessage, [
                     'category' => MessageCategory::DEFAULT,
-                    'time' => $_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true)
+                    'time' => $_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true),
                 ]);
             }
             // set exportInterval to 0 to avoid triggering export again while exporting
@@ -243,7 +243,7 @@ abstract class Target
         foreach ($logVars as $logVar) {
             if (!is_string($logVar)) {
                 throw new InvalidArgumentException(sprintf(
-                    "The PHP predefined variable must be a string, %s received.",
+                    'The PHP predefined variable must be a string, %s received.',
                     gettype($logVar)
                 ));
             }
@@ -350,7 +350,7 @@ abstract class Target
     {
         if (!is_bool($value) && !is_callable($value)) {
             throw new InvalidArgumentException(sprintf(
-                "The value indicating whether this log target is enabled must be a boolean or callable, %s received.",
+                'The value indicating whether this log target is enabled must be a boolean or callable, %s received.',
                 gettype($value)
             ));
         }

@@ -97,10 +97,7 @@ final class MessageCategory
         foreach ($this->exclude as $exclude) {
             $prefix = rtrim($exclude, '*');
 
-            if (
-                (($category && $category === $exclude) || $prefix !== $exclude)
-                && (strpos($category, $prefix) === 0)
-            ) {
+            if ($category === $exclude || ($prefix !== $exclude && strpos($category, $prefix) === 0)) {
                 return true;
             }
         }
@@ -111,7 +108,7 @@ final class MessageCategory
 
         foreach ($this->include as $include) {
             if (
-                ($category && $category === $include)
+                $category === $include
                 || (
                     !empty($include)
                     && substr_compare($include, '*', -1, 1) === 0

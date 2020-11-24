@@ -390,6 +390,12 @@ final class TargetTest extends TestCase
         $this->target->setLogVars($list);
     }
 
+    public function testGetMessagePrefix(): void
+    {
+        $this->target->setPrefix(fn () => 'prefix');
+        $this->assertSame('prefix', $this->target->getMessagePrefix([LogLevel::INFO, 'test', ['foo' => 'bar']]));
+    }
+
     public function invalidCallablePrefixProvider(): array
     {
         return [

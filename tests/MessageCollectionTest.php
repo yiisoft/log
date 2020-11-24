@@ -10,6 +10,8 @@ use stdClass;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Log\MessageCollection;
 
+use function array_map;
+
 final class MessageCollectionTest extends TestCase
 {
     private MessageCollection $messages;

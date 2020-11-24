@@ -25,7 +25,7 @@ final class TargetTest extends TestCase
         $this->target = new DummyTarget();
     }
 
-    public function filters(): array
+    public function filterProvider(): array
     {
         return [
             [[], ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']],
@@ -63,7 +63,7 @@ final class TargetTest extends TestCase
     }
 
     /**
-     * @dataProvider filters
+     * @dataProvider filterProvider
      *
      * @param array $filter
      * @param array $expected

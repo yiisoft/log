@@ -174,10 +174,10 @@ final class LoggerTest extends LoggerTestCase
     {
         $this->logger->setFlushInterval(1);
         $this->logger->log(LogLevel::INFO, 'test');
-        $messages = $this->target->getMessages();
 
-        $this->assertEquals('info', $messages[0][0]);
-        $this->assertEquals('test', $messages[0][1]);
+        $this->assertSame(0, $this->target->getExportCount());
+        $this->assertSame('info', $this->target->getMessages()[0][0]);
+        $this->assertSame('test', $this->target->getMessages()[0][1]);
     }
 
     public function testFlushWithDispatch(): void

@@ -80,7 +80,7 @@ final class LoggerTest extends LoggerTestCase
             'callable' => [fn () => null, 'fn () => null'],
             'object' => [new stdClass(), 'unserialize(\'O:8:"stdClass":0:{}\')'],
             'stringable-object' => [
-                $stringableObject = new class () {
+                $stringableObject = new class() {
                     public function __toString(): string
                     {
                         return 'Stringable object';

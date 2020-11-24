@@ -19,7 +19,7 @@ class PsrTargetTest extends TestCase
 
     public function setUp(): void
     {
-        $this->target = new PsrTarget(new class () implements LoggerInterface {
+        $this->target = new PsrTarget(new class() implements LoggerInterface {
             use LoggerTrait;
 
             public function log($level, $message, array $context = []): void

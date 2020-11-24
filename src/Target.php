@@ -16,6 +16,7 @@ use function in_array;
 use function is_array;
 use function is_bool;
 use function is_callable;
+use function is_string;
 use function microtime;
 use function sprintf;
 use function strpos;
@@ -385,15 +386,23 @@ abstract class Target
      * Check whether the log target is enabled.
      *
      * @return bool The value indicating whether this log target is enabled.
+     * @throws LogRuntimeException for a callable "enabled" that does not return a boolean.
      * @see Target::$enabled
      */
     public function isEnabled(): bool
     {
-        if (is_callable($this->enabled)) {
-            return ($this->enabled)($this);
+        if (is_bool($this->enabled)) {
+            return $this->enabled;
         }
 
-        return $this->enabled;
+        if (!is_bool($enabled = ($this->enabled)($this))) {
+            throw new LogRuntimeException(sprintf(
+                'The PHP callable "enabled" must returns a boolean, %s received.',
+                gettype($enabled)
+            ));
+        }
+
+        return $enabled;
     }
 
     /**
@@ -455,6 +464,7 @@ abstract class Target
     {
         $this->messages->checkStructure($message);
         [$level, $text, $context] = $message;
+
         $level = Logger::getLevelName($level);
         $timestamp = $context['time'] ?? microtime(true);
         $category = $context['category'] ?? MessageCategory::DEFAULT;
@@ -483,14 +493,25 @@ abstract class Target
      *
      * @param array $message The log message being exported.
      * @return string The log  prefix string.
+     * @throws LogRuntimeException for a callable "prefix" that does not return a string.
      */
     protected function getMessagePrefix(array $message): string
     {
-        if ($this->prefix !== null) {
-            return ($this->prefix)($message);
+        if ($this->prefix === null) {
+            return '';
         }
 
-        return '';
+        $this->messages->checkStructure($message);
+        $prefix = ($this->prefix)($message);
+
+        if (!is_string($prefix)) {
+            throw new LogRuntimeException(sprintf(
+                'The PHP callable "prefix" must returns a string, %s received.',
+                gettype($prefix)
+            ));
+        }
+
+        return $prefix;
     }
 
     /**

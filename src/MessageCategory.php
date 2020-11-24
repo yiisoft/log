@@ -99,7 +99,7 @@ final class MessageCategory
 
             if (
                 (($category && $category === $exclude) || $prefix !== $exclude)
-                && strpos($category, $prefix) === 0
+                && (strpos($category, $prefix) === 0)
             ) {
                 return true;
             }

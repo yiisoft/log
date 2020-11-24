@@ -70,6 +70,66 @@ final class LoggerTest extends LoggerTestCase
         $this->assertGreaterThanOrEqual($memory, $messages[1][2]['memory']);
     }
 
+    public function messageProvider(): array
+    {
+        return [
+            'string' => ['test', 'test'],
+            'int' => [1, '1'],
+            'float' => [1.1, '1.1'],
+            'bool' => [true, '1'],
+            'callable' => [fn () => null, 'fn () => null'],
+            'object' => [new stdClass(), 'unserialize(\'O:8:"stdClass":0:{}\')'],
+            'stringable-object' => [
+                $stringableObject = new class () {
+                    public function __toString(): string
+                    {
+                        return 'Stringable object';
+                    }
+                },
+                $stringableObject->__toString(),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider messageProvider
+     *
+     * @param $message
+     * @param string $expected
+     */
+    public function testPsrLogInterfaceMethods($message, string $expected): void
+    {
+        $levels = [
+            LogLevel::EMERGENCY,
+            LogLevel::ALERT,
+            LogLevel::CRITICAL,
+            LogLevel::ERROR,
+            LogLevel::WARNING,
+            LogLevel::NOTICE,
+            LogLevel::INFO,
+            LogLevel::DEBUG,
+        ];
+        $this->logger->emergency($message);
+        $this->logger->alert($message);
+        $this->logger->critical($message);
+        $this->logger->error($message);
+        $this->logger->warning($message);
+        $this->logger->notice($message);
+        $this->logger->info($message);
+        $this->logger->debug($message);
+        $this->logger->log('InFo', $message);
+
+        $messages = $this->getInaccessibleMessages($this->logger);
+
+        for ($i = 0; $i < count($levels); $i++) {
+            $this->assertSame($levels[$i], $messages[$i][0]);
+            $this->assertSame($expected, $messages[$i][1]);
+        }
+
+        $this->assertSame(LogLevel::INFO, $messages[8][0]);
+        $this->assertSame($expected, $messages[8][1]);
+    }
+
     public function testSetExcludedTracePaths(): void
     {
         $this->logger->setTraceLevel(20);

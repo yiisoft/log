@@ -127,7 +127,7 @@ final class MessageCollection
      */
     public function checkStructure($message): void
     {
-        if (!isset($message[0], $message[1], $message[2]) || !is_array($message[2])) {
+        if (!is_array($message) || !isset($message[0], $message[1], $message[2]) || !is_array($message[2])) {
             throw new InvalidArgumentException('The message structure is not valid.');
         }
     }

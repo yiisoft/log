@@ -190,7 +190,7 @@ final class Logger implements LoggerInterface
         $context['time'] ??= \microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         $context['memory'] ??= memory_get_usage();
-        $context['category'] ??= MessageCategory::DEFAULT;
+        $context['category'] ??= MessageCategoryFilter::DEFAULT;
 
         $this->messages->add($level, $message, $context);
 

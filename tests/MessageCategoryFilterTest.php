@@ -7,15 +7,15 @@ namespace Yiisoft\Log\Tests;
 use Psr\Log\InvalidArgumentException;
 use stdClass;
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Log\MessageCategory;
+use Yiisoft\Log\MessageCategoryFilter;
 
-final class MessageCategoryTest extends TestCase
+final class MessageCategoryFilterTest extends TestCase
 {
-    private MessageCategory $categories;
+    private MessageCategoryFilter $categories;
 
     public function setUp(): void
     {
-        $this->categories = new MessageCategory();
+        $this->categories = new MessageCategoryFilter();
     }
 
     public function testIncludeAndGetIncluded(): void

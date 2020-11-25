@@ -16,7 +16,7 @@ use function strpos;
 /**
  * Category is a data object that stores and matches the included and excluded categories of log messages.
  */
-final class MessageCategory
+final class MessageCategoryFilter
 {
     public const DEFAULT = 'application';
 

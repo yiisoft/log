@@ -25,16 +25,16 @@ use function strpos;
  * Target is the base class for all log target classes.
  *
  * A log target object will filter the messages logged by {@see \Yiisoft\Log\Logger} according to
- * its {@see MessageCollection::$levels} and {@see MessageCategory::$include. It may also export
+ * its {@see MessageCollection::$levels} and {@see MessageCategoryFilter::$include. It may also export
  * the filtered messages to specific destination defined by the target, such as emails, files.
  *
  * Level filter and category filter are combinatorial, i.e., only messages
  * satisfying both filter conditions will be handled. Additionally, you may specify
- * {@see MessageCategory::$include} to exclude messages of certain categories.
+ * {@see MessageCategoryFilter::$exclude} to exclude messages of certain categories.
  */
 abstract class Target
 {
-    private MessageCategory $categories;
+    private MessageCategoryFilter $categories;
     private MessageCollection $messages;
 
     /**
@@ -96,7 +96,7 @@ abstract class Target
      */
     public function __construct()
     {
-        $this->categories = new MessageCategory();
+        $this->categories = new MessageCategoryFilter();
         $this->messages = new MessageCollection();
     }
 
@@ -118,7 +118,7 @@ abstract class Target
         if ($count > 0 && ($final || ($this->exportInterval > 0 && $count >= $this->exportInterval))) {
             if (($contextMessage = $this->getContextMessage()) !== '') {
                 $this->messages->add(LogLevel::INFO, $contextMessage, [
-                    'category' => MessageCategory::DEFAULT,
+                    'category' => MessageCategoryFilter::DEFAULT,
                     'time' => $_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true),
                 ]);
             }
@@ -137,7 +137,7 @@ abstract class Target
      * @param array $categories The list of log message categories.
      * @return self
      * @throws InvalidArgumentException for invalid log message categories structure.
-     * @see MessageCategory::$include
+     * @see MessageCategoryFilter::$include
      */
     public function setCategories(array $categories): self
     {
@@ -149,7 +149,7 @@ abstract class Target
      * Gets a list of log message categories that this target is interested in.
      *
      * @return string[] The list of log message categories.
-     * @see MessageCategory::$include
+     * @see MessageCategoryFilter::$include
      */
     public function getCategories(): array
     {
@@ -162,7 +162,7 @@ abstract class Target
      * @param array $except The list of log message categories.
      * @return self
      * @throws InvalidArgumentException for invalid log message categories structure.
-     * @see MessageCategory::$exclude
+     * @see MessageCategoryFilter::$exclude
      */
     public function setExcept(array $except): self
     {
@@ -174,7 +174,7 @@ abstract class Target
      * Gets a list of log message categories that this target is NOT interested in.
      *
      * @return string[] The list of excluded categories of log messages.
-     * @see MessageCategory::$exclude
+     * @see MessageCategoryFilter::$exclude
      */
     public function getExcept(): array
     {
@@ -467,7 +467,7 @@ abstract class Target
 
         $level = Logger::getLevelName($level);
         $timestamp = $context['time'] ?? microtime(true);
-        $category = $context['category'] ?? MessageCategory::DEFAULT;
+        $category = $context['category'] ?? MessageCategoryFilter::DEFAULT;
 
         $traces = [];
         if (isset($context['trace']) && is_array($context['trace'])) {

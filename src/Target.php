@@ -4,84 +4,42 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
-use function array_merge;
-use function count;
-use function implode;
-use function in_array;
-use function is_array;
-use function is_callable;
-use function is_string;
-use function rtrim;
-use function strpos;
-use function substr_compare;
-
 use DateTime;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\VarDumper\VarDumper;
 
+use function gettype;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_bool;
+use function is_callable;
+use function is_string;
+use function microtime;
+use function sprintf;
+use function strpos;
+
 /**
  * Target is the base class for all log target classes.
  *
  * A log target object will filter the messages logged by {@see \Yiisoft\Log\Logger} according
- * to its {@see Target::$levels} and {@see Target::$categories}. It may also export the filtered
- * messages to specific destination defined by the target, such as emails, files.
+ * to its {@see Target::setLevels()} and {@see Target::setCategories()}. It may also export
+ * the filtered messages to specific destination defined by the target, such as emails, files.
  *
  * Level filter and category filter are combinatorial, i.e., only messages
- * satisfying both filter conditions will be handled. Additionally, you
- * may specify {@see Target::$except} to exclude messages of certain categories.
- *
- * For more details and usage information on Target, see the
- * [guide article on logging & targets](guide:runtime-logging).
+ * satisfying both filter conditions will be handled. Additionally, you may
+ * specify {@see Target::setExcept()} to exclude messages of certain categories.
  */
 abstract class Target
 {
-    /**
-     * The default category will be used if the category was not passed in the message context {@see Target::$messages}.
-     */
-    public const DEFAULT_CATEGORY = 'application';
+    private MessageCategoryFilter $categories;
+    private MessageCollection $messages;
 
     /**
-     * @var array list of message categories that this target is interested in.
-     * Defaults to empty, meaning all categories.
-     * You can use an asterisk at the end of a category so that the category may be used to
-     * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
-     * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
-     */
-    private array $categories = [];
-
-    /**
-     * @var array list of message categories that this target is NOT interested in.
-     * Defaults to empty, meaning no uninteresting messages.
-     * If this property is not empty, then any category listed here will be excluded from {@see Target::$categories}.
-     * You can use an asterisk at the end of a category so that the category can be used to
-     * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
-     * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
+     * @var string[] list of the PHP predefined variables that should be logged in a message.
      *
-     * @see categories
-     */
-    private array $except = [];
-
-    /**
-     * @var array the message levels that this target is interested in.
-     *
-     * The parameter should be an array of interested level names. See {@see LogLevel} constants for valid level names.
-     *
-     * For example:
-     *
-     * ```php
-     * ['error', 'warning'],
-     * // or
-     * [LogLevel::ERROR, LogLevel::WARNING]
-     * ```
-     *
-     * Defaults is empty array, meaning all available levels.
-     */
-    private array $levels = [];
-
-    /**
-     * @var array list of the PHP predefined variables that should be logged in a message.
      * Note that a variable must be accessible via `$GLOBALS`. Otherwise it won't be logged.
      *
      * Defaults to `['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER']`.
@@ -92,103 +50,373 @@ abstract class Target
      * - `var.key` - only `var[key]` key will be logged.
      * - `!var.key` - `var[key]` key will be excluded.
      *
-     * Note that if you need $_SESSION to logged regardless if session was used you have to open it right at
-     * the start of your request.
+     * Note that if you need $_SESSION to logged regardless if session
+     * was used you have to open it right at he start of your request.
      *
      * @see \Yiisoft\Arrays\ArrayHelper::filter()
      */
     private array $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
 
     /**
-     * @var callable|null a PHP callable that returns a string to be prefixed to every exported message.
+     * @var callable|null PHP callable that returns a string to be prefixed to every exported message.
      *
-     * If not set, {@see Target::getMessagePrefix()} will be used, which prefixes the message with context information
-     * such as user IP, user ID and session ID.
+     * If not set, {@see Target::getMessagePrefix()} will be used, which prefixes
+     * the message with context information such as user IP, user ID and session ID.
      *
      * The signature of the callable should be `function ($message)`.
      */
     private $prefix;
 
     /**
-     * @var int how many messages should be accumulated before they are exported.
+     * @var int How many log messages should be accumulated before they are exported.
+     *
      * Defaults to 1000. Note that messages will always be exported when the application terminates.
      * Set this property to be 0 if you don't want to export messages until the application terminates.
      */
     private int $exportInterval = 1000;
 
     /**
-     * @var array the messages that are retrieved from the logger so far by this log target.
-     * Please refer to {@see Logger::$messages} for the details about the message structure.
-     */
-    private array $messages = [];
-
-    /**
-     * @var string The date format for the log timestamp.
-     * Defaults to Y-m-d H:i:s.u
+     * @var string The date format for the log timestamp. Defaults to `Y-m-d H:i:s.u`.
      */
     private string $timestampFormat = 'Y-m-d H:i:s.u';
 
-
     /**
-     * @var bool|callable
+     * @var bool|callable Enables or disables the current target to export.
      */
     private $enabled = true;
 
     /**
-     * Exports log {@see Target::$messages} to a specific destination.
+     * Exports log messages to a specific destination.
      * Child classes must implement this method.
      */
-    abstract public function export(): void;
+    abstract protected function export(): void;
+
+    /**
+     * When defining a constructor in child classes, you must call `parent::__construct()`.
+     */
+    public function __construct()
+    {
+        $this->categories = new MessageCategoryFilter();
+        $this->messages = new MessageCollection();
+    }
 
     /**
      * Processes the given log messages.
-     * This method will filter the given messages with {@see Target::$levels} and {@see Target::$categories}.
+     *
+     * This method will filter the given messages with levels and categories.
+     * The message structure follows that in {@see MessageCollection::$messages}.
      * And if requested, it will also export the filtering result to specific medium (e.g. email).
      *
-     * @param array $messages log messages to be processed. See {@see Logger::$messages} for the structure
-     * of each message.
-     * @param bool $final whether this method is called at the end of the current application
+     * @param array $messages Log messages to be processed.
+     * @param bool $final Whether this method is called at the end of the current application.
      */
     public function collect(array $messages, bool $final): void
     {
-        $this->messages = array_merge(
-            $this->messages,
-            $this->filterMessages($messages, $this->levels, $this->categories, $this->except)
-        );
+        $this->messages->addMultiple($this->filterMessages($messages));
+        $count = $this->messages->count();
 
-        $count = count($this->messages);
         if ($count > 0 && ($final || ($this->exportInterval > 0 && $count >= $this->exportInterval))) {
-            if (($context = $this->getContextMessage()) !== '') {
-                $this->messages[] = [
-                    LogLevel::INFO,
-                    $context,
-                    [
-                        'category' => static::DEFAULT_CATEGORY,
-                        'time' => $_SERVER['REQUEST_TIME_FLOAT'] ?? \microtime(true),
-                    ],
-                ];
+            if (($contextMessage = $this->getContextMessage()) !== '') {
+                $this->messages->add(LogLevel::INFO, $contextMessage, [
+                    'category' => MessageCategoryFilter::DEFAULT,
+                    'time' => microtime(true),
+                ]);
             }
             // set exportInterval to 0 to avoid triggering export again while exporting
             $oldExportInterval = $this->exportInterval;
             $this->exportInterval = 0;
             $this->export();
             $this->exportInterval = $oldExportInterval;
-
-            $this->messages = [];
+            $this->messages->clear();
         }
     }
 
     /**
+     * Sets a list of log message categories that this target is interested in.
+     *
+     * @param array $categories The list of log message categories.
+     * @return self
+     * @throws InvalidArgumentException for invalid log message categories structure.
+     * @see MessageCategoryFilter::$include
+     */
+    public function setCategories(array $categories): self
+    {
+        $this->categories->include($categories);
+        return $this;
+    }
+
+    /**
+     * Gets a list of log message categories that this target is interested in.
+     *
+     * @return string[] The list of log message categories.
+     * @see MessageCategoryFilter::$include
+     */
+    public function getCategories(): array
+    {
+        return $this->categories->getIncluded();
+    }
+
+    /**
+     * Sets a list of log message categories that this target is NOT interested in.
+     *
+     * @param array $except The list of log message categories.
+     * @return self
+     * @throws InvalidArgumentException for invalid log message categories structure.
+     * @see MessageCategoryFilter::$exclude
+     */
+    public function setExcept(array $except): self
+    {
+        $this->categories->exclude($except);
+        return $this;
+    }
+
+    /**
+     * Gets a list of log message categories that this target is NOT interested in.
+     *
+     * @return string[] The list of excluded categories of log messages.
+     * @see MessageCategoryFilter::$exclude
+     */
+    public function getExcept(): array
+    {
+        return $this->categories->getExcluded();
+    }
+
+    /**
+     * Sets a list of log messages that are retrieved from the logger so far by this log target.
+     *
+     * @param array[] $messages The list of log messages.
+     * @return self
+     * @throws InvalidArgumentException for invalid message structure.
+     * @see MessageCollection::$messages
+     */
+    public function setMessages(array $messages): self
+    {
+        $this->messages->addMultiple($messages);
+        return $this;
+    }
+
+    /**
+     * Gets a list of log messages that are retrieved from the logger so far by this log target.
+     *
+     * @return array[] The list of log messages.
+     * @see MessageCollection::$messages
+     */
+    public function getMessages(): array
+    {
+        return $this->messages->all();
+    }
+
+    /**
+     * Sets a list of log message levels that current target is interested in.
+     *
+     * @param array $levels The list of log message levels.
+     * @return self
+     * @throws InvalidArgumentException for invalid log message level.
+     * @see MessageCollection::$levels
+     */
+    public function setLevels(array $levels): self
+    {
+        $this->messages->setLevels($levels);
+        return $this;
+    }
+
+    /**
+     * Gets a list of log message levels that current target is interested in.
+     *
+     * @return string[] The list of log message levels.
+     * @see MessageCollection::$levels
+     */
+    public function getLevels(): array
+    {
+        return $this->messages->getLevels();
+    }
+
+    /**
+     * Sets a list of the PHP predefined variables that should be logged in a message.
+     *
+     * @param array $logVars The list of PHP predefined variables.
+     * @return self
+     * @throws InvalidArgumentException for non-string values.
+     * @see Target::$logVars
+     */
+    public function setLogVars(array $logVars): self
+    {
+        foreach ($logVars as $logVar) {
+            if (!is_string($logVar)) {
+                throw new InvalidArgumentException(sprintf(
+                    'The PHP predefined variable must be a string, %s received.',
+                    gettype($logVar)
+                ));
+            }
+        }
+
+        $this->logVars = $logVars;
+        return $this;
+    }
+
+    /**
+     * Gets a list of the PHP predefined variables that should be logged in a message.
+     *
+     * @return string[] The list of the PHP predefined variables.
+     * @see Target::$logVars
+     */
+    public function getLogVars(): array
+    {
+        return $this->logVars;
+    }
+
+    /**
+     * Sets a PHP callable that returns a string to be prefixed to every exported message.
+     *
+     * @param callable $prefix The PHP callable to get a string value from.
+     * @return self
+     * @see Target::$prefix
+     */
+    public function setPrefix(callable $prefix): self
+    {
+        $this->prefix = $prefix;
+        return $this;
+    }
+
+    /**
+     * Gets a PHP callable that returns a string to be prefixed to every exported message.
+     *
+     * @return callable|null The PHP callable to get a string value from or null.
+     * @see Target::$prefix
+     */
+    public function getPrefix(): ?callable
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * Sets how many messages should be accumulated before they are exported.
+     *
+     * @param int $exportInterval The number of log messages to accumulate before exporting.
+     * @return self
+     * @see Target::$exportInterval
+     */
+    public function setExportInterval(int $exportInterval): self
+    {
+        $this->exportInterval = $exportInterval;
+        return $this;
+    }
+
+    /**
+     * Gets how many messages should be accumulated before they are exported.
+     *
+     * @return int The number of messages to accumulate before exporting.
+     * @see Target::$exportInterval
+     */
+    public function getExportInterval(): int
+    {
+        return $this->exportInterval;
+    }
+
+    /**
+     * Sets a date format for the log timestamp.
+     *
+     * @param string $format The date format for the log timestamp.
+     * @return self
+     * @see Target::$timestampFormat
+     */
+    public function setTimestampFormat(string $format): self
+    {
+        $this->timestampFormat = $format;
+        return $this;
+    }
+
+    /**
+     * Gets a date format for the log timestamp.
+     *
+     * @return string The date format for the log timestamp.
+     * @see Target::$timestampFormat
+     */
+    public function getTimestampFormat(): string
+    {
+        return $this->timestampFormat;
+    }
+
+    /**
+     * Sets a value indicating whether this log target is enabled.
+     *
+     * A callable may be used to determine whether the log target should be enabled in a dynamic way.
+     *
+     * @param bool|callable $value The boolean value or a callable to get a boolean value from.
+     * @return self
+     * @throws InvalidArgumentException for non-boolean or non-callable value.
+     * @see Target::$enabled
+     */
+    public function setEnabled($value): self
+    {
+        if (!is_bool($value) && !is_callable($value)) {
+            throw new InvalidArgumentException(sprintf(
+                'The value indicating whether this log target is enabled must be a boolean or callable, %s received.',
+                gettype($value)
+            ));
+        }
+
+        $this->enabled = $value;
+        return $this;
+    }
+
+    /**
+     * Enables the log target.
+     *
+     * @return self
+     * @see Target::setEnabled()
+     */
+    public function enable(): self
+    {
+        return $this->setEnabled(true);
+    }
+
+    /**
+     * Disables the log target.
+     *
+     * @return self
+     * @see Target::setEnabled()
+     */
+    public function disable(): self
+    {
+        return $this->setEnabled(false);
+    }
+
+    /**
+     * Check whether the log target is enabled.
+     *
+     * @return bool The value indicating whether this log target is enabled.
+     * @throws LogRuntimeException for a callable "enabled" that does not return a boolean.
+     * @see Target::$enabled
+     */
+    public function isEnabled(): bool
+    {
+        if (is_bool($this->enabled)) {
+            return $this->enabled;
+        }
+
+        if (!is_bool($enabled = ($this->enabled)($this))) {
+            throw new LogRuntimeException(sprintf(
+                'The PHP callable "enabled" must returns a boolean, %s received.',
+                gettype($enabled)
+            ));
+        }
+
+        return $enabled;
+    }
+
+    /**
      * Generates the context information to be logged.
+     *
      * The default implementation will dump user information, system variables, etc.
      *
-     * @return string the context information. If an empty string, it means no context information.
+     * @return string The context information. If an empty string, it means no context information.
      */
     protected function getContextMessage(): string
     {
-        $context = ArrayHelper::filter($GLOBALS, $this->logVars);
         $result = [];
-        foreach ($context as $key => $value) {
+
+        foreach (ArrayHelper::filter($GLOBALS, $this->logVars) as $key => $value) {
             $result[] = "\${$key} = " . VarDumper::create($value)->asString();
         }
 
@@ -198,60 +426,24 @@ abstract class Target
     /**
      * Filters the given messages according to their categories and levels.
      *
-     * @param array $messages messages to be filtered. The message structure follows that in {@see Logger::$messages}.
-     * @param array $levels the message levels to filter by. Empty value means allowing all levels.
-     * @param array $categories the message categories to filter by. If empty, it means all categories are allowed.
-     * @param array $except the message categories to exclude. If empty, it means all categories are allowed.
+     * The message structure follows that in {@see MessageCollection::$messages}.
      *
-     * @throws InvalidArgumentException for invalid message structure.
-     *
-     * @return array the filtered messages.
+     * @param array[] $messages List log messages to be filtered.
+     * @return array[] The filtered log messages.
      */
-    protected function filterMessages(
-        array $messages,
-        array $levels = [],
-        array $categories = [],
-        array $except = []
-    ): array {
+    protected function filterMessages(array $messages): array
+    {
         foreach ($messages as $i => $message) {
-            $this->checkMessageStructure($message);
+            $levels = $this->messages->getLevels();
 
-            if (!empty($levels) && !in_array($message[0], $levels, true)) {
+            if ((!empty($levels) && !in_array(($message[0] ?? ''), $levels, true))) {
                 unset($messages[$i]);
                 continue;
             }
 
-            $messageCategory = $message[2]['category'] ?? '';
-            $matched = empty($categories);
+            $category = (string) ($message[2]['category'] ?? '');
 
-            foreach ($categories as $category) {
-                if (
-                    ($messageCategory && $messageCategory === $category)
-                    || (
-                        !empty($category)
-                        && substr_compare($category, '*', -1, 1) === 0
-                        && strpos($messageCategory, rtrim($category, '*')) === 0
-                    )
-                ) {
-                    $matched = true;
-                    break;
-                }
-            }
-
-            if ($matched) {
-                foreach ($except as $category) {
-                    $prefix = rtrim($category, '*');
-                    if (
-                        (($messageCategory && $messageCategory === $category) || $prefix !== $category)
-                        && strpos($messageCategory, $prefix) === 0
-                    ) {
-                        $matched = false;
-                        break;
-                    }
-                }
-            }
-
-            if (!$matched) {
+            if ($this->categories->isExcluded($category)) {
                 unset($messages[$i]);
             }
         }
@@ -260,40 +452,25 @@ abstract class Target
     }
 
     /**
-     * Checks message structure {@see Logger::$messages}.
-     *
-     * @param mixed $message the log message to be checked.
-     *
-     * @throws InvalidArgumentException for invalid message structure.
-     */
-    protected function checkMessageStructure($message): void
-    {
-        if (!isset($message[0], $message[1], $message[2]) || !is_string($message[0]) || !is_array($message[2])) {
-            throw new InvalidArgumentException('The message structure is not valid.');
-        }
-    }
-
-    /**
      * Formats a log message for display as a string.
      *
-     * @param array $message the log message to be formatted.
-     * The message structure follows that in {@see Logger::$messages}.
+     * The message structure follows that in {@see MessageCollection::$messages}.
      *
+     * @param array $message The log message to be formatted.
+     * @return string The formatted log message.
      * @throws InvalidArgumentException for invalid message structure.
-     *
-     * @return string the formatted message.
      */
     protected function formatMessage(array $message): string
     {
-        $this->checkMessageStructure($message);
+        $this->messages->checkStructure($message);
         [$level, $text, $context] = $message;
 
-        $category = $context['category'] ?? static::DEFAULT_CATEGORY;
-        $timestamp = $context['time'] ?? \microtime(true);
         $level = Logger::getLevelName($level);
+        $timestamp = $context['time'] ?? microtime(true);
+        $category = $context['category'] ?? MessageCategoryFilter::DEFAULT;
 
         $traces = [];
-        if (isset($context['trace'])) {
+        if (isset($context['trace']) && is_array($context['trace'])) {
             foreach ($context['trace'] as $trace) {
                 if (isset($trace['file'], $trace['line'])) {
                     $traces[] = "in {$trace['file']}:{$trace['line']}";
@@ -308,176 +485,45 @@ abstract class Target
     }
 
     /**
-     * Returns a string to be prefixed to the given message.
+     * Gets a string to be prefixed to the given message.
+     *
      * If {@see Target::$prefix} is configured it will return the result of the callback.
      * The default implementation will return user IP, user ID and session ID as a prefix.
+     * The message structure follows that in {@see MessageCollection::$messages}.
      *
-     * @param array $message the message being exported.
-     * The message structure follows that in {@see Logger::$messages}.
-     *
-     * @return string the prefix string
+     * @param array $message The log message being exported.
+     * @return string The log  prefix string.
+     * @throws LogRuntimeException for a callable "prefix" that does not return a string.
      */
     protected function getMessagePrefix(array $message): string
     {
-        if ($this->prefix !== null) {
-            return ($this->prefix)($message);
+        if ($this->prefix === null) {
+            return '';
         }
 
-        return '';
+        $this->messages->checkStructure($message);
+        $prefix = ($this->prefix)($message);
+
+        if (!is_string($prefix)) {
+            throw new LogRuntimeException(sprintf(
+                'The PHP callable "prefix" must returns a string, %s received.',
+                gettype($prefix)
+            ));
+        }
+
+        return $prefix;
     }
 
     /**
-     * Returns formatted timestamp for message, according to {@see Target::$timestampFormat}
+     * Gets formatted timestamp for message, according to {@see Target::$timestampFormat}.
      *
-     * @param float|int $timestamp
-     *
-     * @return string
+     * @param float|int $timestamp The timestamp to be formatted.
+     * @return string Formatted timestamp for message.
      */
     protected function getTime($timestamp): string
     {
         $timestamp = (string) $timestamp;
         $format = strpos($timestamp, '.') === false ? 'U' : 'U.u';
         return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
-    }
-
-    /**
-     * Sets a value indicating whether this log target is enabled.
-     *
-     * @param bool|callable $value a boolean value or a callable to obtain the value from.
-     *
-     * A callable may be used to determine whether the log target should be enabled in a dynamic way.
-     * For example, to only enable a log if the current user is logged in you can configure the target
-     * as follows:
-     *
-     * ```php
-     * 'enabled' => function() {
-     *     return !Yii::getApp()->user->isGuest;
-     * }
-     * ```
-     *
-     * @return $this
-     */
-    public function setEnabled($value): self
-    {
-        $this->enabled = $value;
-
-        return $this;
-    }
-
-    /**
-     * Enables the log target
-     *
-     * @return $this
-     */
-    public function enable(): self
-    {
-        return $this->setEnabled(true);
-    }
-
-    /**
-     * Disables the log target
-     *
-     * @return $this
-     */
-    public function disable(): self
-    {
-        return $this->setEnabled(false);
-    }
-
-    /**
-     * Check whether the log target is enabled.
-     *
-     * @return bool A value indicating whether this log target is enabled.
-     */
-    public function isEnabled(): bool
-    {
-        if (is_callable($this->enabled)) {
-            return ($this->enabled)($this);
-        }
-
-        return $this->enabled;
-    }
-
-    public function setLogVars(array $logVars): self
-    {
-        $this->logVars = $logVars;
-        return $this;
-    }
-
-    public function getLogVars(): array
-    {
-        return $this->logVars;
-    }
-
-    public function setTimestampFormat(string $format): self
-    {
-        $this->timestampFormat = $format;
-        return $this;
-    }
-
-    public function getCategories(): array
-    {
-        return $this->categories;
-    }
-
-    public function setCategories(array $categories): self
-    {
-        $this->categories = $categories;
-        return $this;
-    }
-
-    public function getExcept(): array
-    {
-        return $this->except;
-    }
-
-    public function setExcept(array $except): self
-    {
-        $this->except = $except;
-        return $this;
-    }
-
-    public function getLevels(): array
-    {
-        return $this->levels;
-    }
-
-    public function setLevels(array $levels): self
-    {
-        $this->levels = $levels;
-        return $this;
-    }
-
-    public function getPrefix(): ?callable
-    {
-        return $this->prefix;
-    }
-
-    public function setPrefix(callable $prefix): self
-    {
-        $this->prefix = $prefix;
-        return $this;
-    }
-
-    public function getExportInterval(): int
-    {
-        return $this->exportInterval;
-    }
-
-    public function setExportInterval(int $exportInterval): self
-    {
-        $this->exportInterval = $exportInterval;
-        return $this;
-    }
-
-    public function getMessages(): array
-    {
-        return $this->messages;
-    }
-
-    public function setMessages(array $messages): self
-    {
-        $this->messages = $messages;
-        return $this;
     }
 }

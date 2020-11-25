@@ -10,8 +10,6 @@ use stdClass;
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Log\MessageCollection;
 
-use function array_map;
-
 final class MessageCollectionTest extends TestCase
 {
     private MessageCollection $messages;
@@ -176,7 +174,7 @@ final class MessageCollectionTest extends TestCase
             LogLevel::DEBUG,
         ];
 
-        $this->messages->setLevels(array_map('strtoupper', $levels));
+        $this->messages->setLevels($levels);
         $this->assertSame($levels, $this->messages->getLevels());
     }
 

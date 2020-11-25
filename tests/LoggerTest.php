@@ -130,7 +130,7 @@ final class LoggerTest extends LoggerTestCase
         $this->logger->notice($message);
         $this->logger->info($message);
         $this->logger->debug($message);
-        $this->logger->log('InFo', $message);
+        $this->logger->log(LogLevel::INFO, $message);
 
         $messages = $this->getInaccessibleMessages($this->logger);
 
@@ -218,7 +218,6 @@ final class LoggerTest extends LoggerTestCase
         $this->assertEquals('emergency', Logger::getLevelName(LogLevel::EMERGENCY));
         $this->assertEquals('alert', Logger::getLevelName(LogLevel::ALERT));
         $this->assertEquals('critical', Logger::getLevelName(LogLevel::CRITICAL));
-        $this->assertEquals('emergency', Logger::getLevelName('EmeRgeNcy'));
     }
 
     public function invalidMessageLevelProvider(): array

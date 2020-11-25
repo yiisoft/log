@@ -21,7 +21,6 @@ use function memory_get_usage;
 use function register_shutdown_function;
 use function sprintf;
 use function strpos;
-use function strtolower;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to {@see Logger::$targets}.
@@ -117,8 +116,6 @@ final class Logger implements LoggerInterface
                 gettype($level)
             ));
         }
-
-        $level = strtolower($level);
 
         if (!in_array($level, self::LEVELS, true)) {
             throw new InvalidArgumentException(sprintf(

@@ -24,7 +24,7 @@ final class MessageCollection
      * @var string[] The log message levels that this collection is interested in.
      * @see LogLevel See constants for valid level names.
      *
-     * The value should be an array of interested level names.
+     * The value should be an array of level names.
      *
      * For example:
      *

@@ -119,7 +119,7 @@ abstract class Target
             if (($contextMessage = $this->getContextMessage()) !== '') {
                 $this->messages->add(LogLevel::INFO, $contextMessage, [
                     'category' => MessageCategoryFilter::DEFAULT,
-                    'time' => $_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true),
+                    'time' => microtime(true),
                 ]);
             }
             // set exportInterval to 0 to avoid triggering export again while exporting

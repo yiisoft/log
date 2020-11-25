@@ -24,13 +24,13 @@ use function strpos;
 /**
  * Target is the base class for all log target classes.
  *
- * A log target object will filter the messages logged by {@see \Yiisoft\Log\Logger} according to
- * its {@see MessageCollection::$levels} and {@see MessageCategoryFilter::$include. It may also export
+ * A log target object will filter the messages logged by {@see \Yiisoft\Log\Logger} according
+ * to its {@see Target::setLevels()} and {@see Target::setCategories()}. It may also export
  * the filtered messages to specific destination defined by the target, such as emails, files.
  *
  * Level filter and category filter are combinatorial, i.e., only messages
- * satisfying both filter conditions will be handled. Additionally, you may specify
- * {@see MessageCategoryFilter::$exclude} to exclude messages of certain categories.
+ * satisfying both filter conditions will be handled. Additionally, you may
+ * specify {@see Target::setExcept()} to exclude messages of certain categories.
  */
 abstract class Target
 {

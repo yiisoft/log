@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace Yiisoft\Log {
-
     use Yiisoft\Log\Tests\LoggerDispatchingLoggerTest;
 
     function microtime($getAsFloat)
@@ -17,7 +16,6 @@ namespace Yiisoft\Log {
 }
 
 namespace Yiisoft\Log\Tests {
-
     use Exception;
     use Psr\Log\LogLevel;
     use Yiisoft\Log\Logger;
@@ -147,6 +145,7 @@ namespace Yiisoft\Log\Tests {
         /**
          * @param $name
          * @param $arguments
+         *
          * @return mixed
          */
         public static function __callStatic($name, $arguments)

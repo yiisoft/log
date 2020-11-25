@@ -15,6 +15,7 @@ use function strpos;
 
 /**
  * Category is a data object that stores and matches the included and excluded categories of log messages.
+ *
  * @internal
  */
 final class MessageCategoryFilter
@@ -47,6 +48,7 @@ final class MessageCategoryFilter
      * Sets the log message categories to be included.
      *
      * @param string[] $categories List of log message categories to be included.
+     *
      * @throws InvalidArgumentException for invalid log message categories structure.
      */
     public function include(array $categories): void
@@ -69,6 +71,7 @@ final class MessageCategoryFilter
      * Sets the log message categories to be excluded.
      *
      * @param string[] $categories The list of log message categories to be excluded.
+     *
      * @throws InvalidArgumentException When log message category structure is invalid.
      */
     public function exclude(array $categories): void
@@ -91,6 +94,7 @@ final class MessageCategoryFilter
      * Checks whether the specified log message category is excluded.
      *
      * @param string $category The log message category.
+     *
      * @return bool The value indicating whether the specified category is excluded.
      */
     public function isExcluded(string $category): bool
@@ -127,6 +131,7 @@ final class MessageCategoryFilter
      * Checks message categories structure.
      *
      * @param array $categories The log message categories to be checked.
+     *
      * @throws InvalidArgumentException When log message category structure is invalid.
      */
     private function checkStructure(array $categories): void

@@ -20,6 +20,7 @@ abstract class LoggerTestCase extends TestCase
      * @param Logger $logger
      * @param array $messages
      * @param bool $revoke whether to make property inaccessible after setting.
+     *
      * @throws ReflectionException
      */
     protected function setInaccessibleMessages(Logger $logger, array $messages, bool $revoke = true): void
@@ -42,8 +43,10 @@ abstract class LoggerTestCase extends TestCase
      *
      * @param Logger $logger
      * @param bool $revoke whether to make property inaccessible after getting.
-     * @return mixed
+     *
      * @throws ReflectionException
+     *
+     * @return mixed
      */
     protected function getInaccessibleMessages(Logger $logger, bool $revoke = true)
     {

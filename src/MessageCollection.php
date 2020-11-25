@@ -16,12 +16,14 @@ use function preg_replace_callback;
 
 /**
  * MessageCollection stores log messages.
+ *
  * @internal
  */
 final class MessageCollection
 {
     /**
      * @var string[] The log message levels that this collection is interested in.
+     *
      * @see LogLevel See constants for valid level names.
      *
      * The value should be an array of level names.
@@ -66,7 +68,9 @@ final class MessageCollection
      * @param mixed $level Log message level.
      * @param mixed $message Log message.
      * @param array $context Log message context.
+     *
      * @throws InvalidArgumentException for invalid log message level.
+     *
      * @see MessageCollection::$messages
      * @see LoggerTrait::log()
      */
@@ -79,7 +83,9 @@ final class MessageCollection
      * Adds multiple log messages to the collection.
      *
      * @param array $messages The list of log messages.
+     *
      * @throws InvalidArgumentException for invalid message structure.
+     *
      * @see MessageCollection::$messages
      */
     public function addMultiple(array $messages): void
@@ -94,6 +100,7 @@ final class MessageCollection
      * Returns all log messages.
      *
      * @return array All log messages.
+     *
      * @see MessageCollection::$messages
      */
     public function all(): array
@@ -123,7 +130,9 @@ final class MessageCollection
      * Checks log message structure.
      *
      * @param mixed $message The log message to be checked.
+     *
      * @throws InvalidArgumentException for invalid message structure.
+     *
      * @see MessageCollection::$messages
      */
     public function checkStructure($message): void
@@ -137,7 +146,9 @@ final class MessageCollection
      * Sets the log message levels that current collection is interested in.
      *
      * @param string[] $levels The log message levels.
+     *
      * @throws InvalidArgumentException for invalid log message level.
+     *
      * @see MessageCollection::$levels
      */
     public function setLevels(array $levels): void
@@ -153,6 +164,7 @@ final class MessageCollection
      * Gets the log message levels of the current group.
      *
      * @return string[] The log message levels.
+     *
      * @see MessageCollection::$levels
      */
     public function getLevels(): array
@@ -164,6 +176,7 @@ final class MessageCollection
      * Prepares log message for logging.
      *
      * @param mixed $message Raw log message.
+     *
      * @return string Prepared log message.
      */
     private function prepare($message): string
@@ -181,6 +194,7 @@ final class MessageCollection
      *
      * @param string $message Log message.
      * @param array $context Message context.
+     *
      * @return string Parsed message.
      */
     private function parse(string $message, array $context): string

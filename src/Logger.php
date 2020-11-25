@@ -105,8 +105,10 @@ final class Logger implements LoggerInterface
      * Returns the text display of the specified level.
      *
      * @param mixed $level The message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
-     * @return string The text display of the level.
+     *
      * @throws InvalidArgumentException for invalid log message level.
+     *
+     * @return string The text display of the level.
      */
     public static function getLevelName($level): string
     {
@@ -138,6 +140,7 @@ final class Logger implements LoggerInterface
 
     /**
      * @param int|string $name The string name or integer index.
+     *
      * @return Target|null
      */
     public function getTarget($name): ?Target
@@ -150,6 +153,7 @@ final class Logger implements LoggerInterface
      *
      * @param array $targets The log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
      * instance or the configuration for creating the log target instance.
+     *
      * @throws InvalidArgumentException for non-instance Target.
      */
     public function setTargets(array $targets): void
@@ -218,7 +222,9 @@ final class Logger implements LoggerInterface
      * Sets how many log messages should be logged before they are flushed from memory and sent to targets.
      *
      * @param int $flushInterval The number of messages to accumulate before flushing.
+     *
      * @return self
+     *
      * @see Logger::$flushInterval
      */
     public function setFlushInterval(int $flushInterval): self
@@ -231,6 +237,7 @@ final class Logger implements LoggerInterface
      * Gets how many log messages should be logged before they are flushed from memory and sent to targets.
      *
      * @return int The number of messages to accumulate before flushing.
+     *
      * @see Logger::$flushInterval
      */
     public function getFlushInterval(): int
@@ -242,7 +249,9 @@ final class Logger implements LoggerInterface
      * Sets how much call stack information (file name and line number) should be logged for each log message.
      *
      * @param int $traceLevel The number of call stack information.
+     *
      * @return self
+     *
      * @see Logger::$traceLevel
      */
     public function setTraceLevel(int $traceLevel): self
@@ -255,6 +264,7 @@ final class Logger implements LoggerInterface
      * Gets how much call stack information (file name and line number) should be logged for each log message.
      *
      * @return int The number of call stack information.
+     *
      * @see Logger::$traceLevel
      */
     public function getTraceLevel(): int
@@ -266,8 +276,11 @@ final class Logger implements LoggerInterface
      * Sets an array of paths to exclude from tracing when tracing is enabled with {@see Logger::setTraceLevel()}.
      *
      * @param array $excludedTracePaths The paths to exclude from tracing.
-     * @return self
+     *
      * @throws InvalidArgumentException for non-string values.
+     *
+     * @return self
+     *
      * @see Logger::$excludedTracePaths
      */
     public function setExcludedTracePaths(array $excludedTracePaths): self
@@ -319,6 +332,7 @@ final class Logger implements LoggerInterface
      * Collects a trace when tracing is enabled with {@see Logger::setTraceLevel()}.
      *
      * @param array $backtrace The list of call stack information.
+     *
      * @return array Collected a list of call stack information.
      */
     private function collectTrace(array $backtrace): array

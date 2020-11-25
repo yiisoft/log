@@ -3,12 +3,13 @@
 declare(strict_types=1);
 
 namespace Yiisoft\Log {
-    use Yiisoft\Log\Tests\LoggerDispatchingTest;
+
+    use Yiisoft\Log\Tests\LoggerDispatchingLoggerTest;
 
     function microtime($getAsFloat)
     {
-        if (LoggerDispatchingTest::$microtimeIsMocked) {
-            return LoggerDispatchingTest::microtime(func_get_args());
+        if (LoggerDispatchingLoggerTest::$microtimeIsMocked) {
+            return LoggerDispatchingLoggerTest::microtime(func_get_args());
         }
 
         return \microtime($getAsFloat);
@@ -16,16 +17,16 @@ namespace Yiisoft\Log {
 }
 
 namespace Yiisoft\Log\Tests {
+
+    use Exception;
     use Psr\Log\LogLevel;
     use Yiisoft\Log\Logger;
     use Yiisoft\Log\Target;
 
     /**
-     * @group log
-     *
      * @method static int|float microtime($getAsFloat)
      */
-    class LoggerDispatchingTest extends TestCase
+    final class LoggerDispatchingLoggerTest extends LoggerTestCase
     {
         /**
          * @var Logger
@@ -46,7 +47,7 @@ namespace Yiisoft\Log\Tests {
 
         protected function setUp(): void
         {
-            static::$microtimeIsMocked = false;
+            self::$microtimeIsMocked = false;
             $this->logger = new Logger();
         }
 
@@ -64,9 +65,7 @@ namespace Yiisoft\Log\Tests {
             $target->setEnabled(false);
 
             $logger = new Logger(['fakeTarget' => $target]);
-            $this->setInaccessibleProperty($logger, 'messages', [
-                [LogLevel::INFO, 'test', []],
-            ]);
+            $this->setInaccessibleMessages($logger, [[LogLevel::INFO, 'test', []]]);
             $logger->flush(true);
         }
 
@@ -90,9 +89,7 @@ namespace Yiisoft\Log\Tests {
 
             $logger = new Logger(['fakeTarget' => $target]);
 
-            $this->setInaccessibleProperty($logger, 'messages', [
-                [LogLevel::INFO, 'test', []],
-            ]);
+            $this->setInaccessibleMessages($logger, [[LogLevel::INFO, 'test', []]]);
             $logger->flush(true);
         }
 
@@ -101,7 +98,8 @@ namespace Yiisoft\Log\Tests {
          */
         public function testDispatchWithFakeTarget2ThrowExceptionWhenCollect(): void
         {
-            static::$microtimeIsMocked = true;
+            self::$microtimeIsMocked = true;
+            $exception = new Exception('some error');
 
             $target1 = $this->getMockBuilder(Target::class)
                 ->onlyMethods(['collect'])
@@ -117,11 +115,9 @@ namespace Yiisoft\Log\Tests {
                     [$this->equalTo([]), $this->equalTo(true)],
                     [
                         [[
-                            'Unable to send log via ' . get_class($target1) . ': Exception: some error',
                             LogLevel::WARNING,
-                            'Yiisoft\Log\Logger::dispatch',
-                            'time data',
-                            [],
+                            'Unable to send log via ' . get_class($target1) . ': Exception: some error',
+                            ['time' => 'time data', 'trace' => $exception->getTrace()],
                         ]],
                         true,
                     ]
@@ -132,35 +128,34 @@ namespace Yiisoft\Log\Tests {
                 ->with(
                     $this->equalTo([]),
                     $this->equalTo(true)
-                )->will($this->throwException(new \Exception('some error')));
+                )->will($this->throwException($exception));
 
             $logger = new Logger([
                 'fakeTarget1' => $target1,
                 'fakeTarget2' => $target2,
             ]);
 
-            static::$functions['microtime'] = function ($arguments) {
+            self::$functions['microtime'] = function ($arguments) {
                 $this->assertEquals([true], $arguments);
                 return 'time data';
             };
 
-            $this->setInaccessibleProperty($logger, 'messages', []);
+            $this->setInaccessibleMessages($logger, []);
             $logger->flush(true);
         }
 
         /**
          * @param $name
          * @param $arguments
-         *
          * @return mixed
          */
         public static function __callStatic($name, $arguments)
         {
-            if (isset(static::$functions[$name]) && is_callable(static::$functions[$name])) {
+            if (isset(self::$functions[$name]) && is_callable(self::$functions[$name])) {
                 $arguments = $arguments[0] ?? $arguments;
-                return forward_static_call(static::$functions[$name], $arguments);
+                return forward_static_call(self::$functions[$name], $arguments);
             }
-            static::fail("Function '$name' has not implemented yet!");
+            self::fail("Function '$name' has not implemented yet!");
         }
     }
 }

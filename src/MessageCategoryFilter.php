@@ -15,6 +15,7 @@ use function strpos;
 
 /**
  * Category is a data object that stores and matches the included and excluded categories of log messages.
+ * @internal
  */
 final class MessageCategoryFilter
 {
@@ -26,8 +27,8 @@ final class MessageCategoryFilter
      * Defaults to empty, which means all categories are included.
      *
      * You can use an asterisk at the end of a category so that the category may be used to
-     * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
-     * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
+     * match those categories sharing the same common prefix. For example, `Yiisoft\Db\*` will match
+     * categories starting with `Yiisoft\Db\`, such as `Yiisoft\Db\Connection`.
      */
     private array $include = [];
 
@@ -37,8 +38,8 @@ final class MessageCategoryFilter
      * Defaults to empty, which means there are no excluded categories.
      *
      * You can use an asterisk at the end of a category so that the category can be used to
-     * match those categories sharing the same common prefix. For example, 'Yiisoft\Db\*' will match
-     * categories starting with 'Yiisoft\Db\', such as `Yiisoft\Db\Connection`.
+     * match those categories sharing the same common prefix. For example, `Yiisoft\Db\*` will match
+     * categories starting with `Yiisoft\Db\`, such as `Yiisoft\Db\Connection`.
      */
     private array $exclude = [];
 
@@ -68,7 +69,7 @@ final class MessageCategoryFilter
      * Sets the log message categories to be excluded.
      *
      * @param string[] $categories The list of log message categories to be excluded.
-     * @throws InvalidArgumentException for invalid log message categories structure.
+     * @throws InvalidArgumentException When log message category structure is invalid.
      */
     public function exclude(array $categories): void
     {
@@ -126,7 +127,7 @@ final class MessageCategoryFilter
      * Checks message categories structure.
      *
      * @param array $categories The log message categories to be checked.
-     * @throws InvalidArgumentException for invalid log message categories structure.
+     * @throws InvalidArgumentException When log message category structure is invalid.
      */
     private function checkStructure(array $categories): void
     {

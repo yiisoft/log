@@ -112,14 +112,14 @@ final class Logger implements LoggerInterface
     {
         if (!is_string($level)) {
             throw new InvalidArgumentException(sprintf(
-                'The log message level must be a string, %s received.',
+                'The log message level must be a string, %s provided.',
                 gettype($level)
             ));
         }
 
         if (!in_array($level, self::LEVELS, true)) {
             throw new InvalidArgumentException(sprintf(
-                'Invalid log message level "%s" provided. The following strings are supported: "%s".',
+                'Invalid log message level "%s" provided. The following values are supported: "%s".',
                 $level,
                 implode('", "', self::LEVELS)
             ));
@@ -129,7 +129,7 @@ final class Logger implements LoggerInterface
     }
 
     /**
-     * @return Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
+     * @return Target[] The log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
      */
     public function getTargets(): array
     {
@@ -275,7 +275,7 @@ final class Logger implements LoggerInterface
         foreach ($excludedTracePaths as $excludedTracePath) {
             if (!is_string($excludedTracePath)) {
                 throw new InvalidArgumentException(sprintf(
-                    'The PHP predefined variable must be a string, %s received.',
+                    'The trace path must be a string, %s received.',
                     gettype($excludedTracePath)
                 ));
             }
@@ -288,7 +288,7 @@ final class Logger implements LoggerInterface
     /**
      * Dispatches the logged messages to {@see Logger::$targets}.
      *
-     * @param array[] $messages The logg messages.
+     * @param array[] $messages The log messages.
      * @param bool $final Whether this method is called at the end of the current application.
      */
     private function dispatch(array $messages, bool $final): void

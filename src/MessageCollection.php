@@ -15,7 +15,8 @@ use function method_exists;
 use function preg_replace_callback;
 
 /**
- * MessageGroupInterface provides methods to make it easier to work with log messages.
+ * MessageCollection stores log messages.
+ * @internal
  */
 final class MessageCollection
 {

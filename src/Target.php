@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
-use DateTime;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
 use Yiisoft\Arrays\ArrayHelper;
@@ -13,13 +12,11 @@ use Yiisoft\VarDumper\VarDumper;
 use function gettype;
 use function implode;
 use function in_array;
-use function is_array;
 use function is_bool;
 use function is_callable;
 use function is_string;
 use function microtime;
 use function sprintf;
-use function strpos;
 
 /**
  * Target is the base class for all log target classes.
@@ -36,6 +33,7 @@ abstract class Target
 {
     private MessageCategoryFilter $categories;
     private MessageCollection $messages;
+    private MessageFormatter $formatter;
 
     /**
      * @var string[] list of the PHP predefined variables that should be logged in a message.
@@ -58,27 +56,12 @@ abstract class Target
     private array $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
 
     /**
-     * @var callable|null PHP callable that returns a string to be prefixed to every exported message.
-     *
-     * If not set, {@see Target::getMessagePrefix()} will be used, which prefixes
-     * the message with context information such as user IP, user ID and session ID.
-     *
-     * The signature of the callable should be `function ($message)`.
-     */
-    private $prefix;
-
-    /**
      * @var int How many log messages should be accumulated before they are exported.
      *
      * Defaults to 1000. Note that messages will always be exported when the application terminates.
      * Set this property to be 0 if you don't want to export messages until the application terminates.
      */
     private int $exportInterval = 1000;
-
-    /**
-     * @var string The date format for the log timestamp. Defaults to `Y-m-d H:i:s.u`.
-     */
-    private string $timestampFormat = 'Y-m-d H:i:s.u';
 
     /**
      * @var bool|callable Enables or disables the current target to export.
@@ -98,6 +81,7 @@ abstract class Target
     {
         $this->categories = new MessageCategoryFilter();
         $this->messages = new MessageCollection();
+        $this->formatter = new MessageFormatter();
     }
 
     /**
@@ -149,18 +133,6 @@ abstract class Target
     }
 
     /**
-     * Gets a list of log message categories that this target is interested in.
-     *
-     * @return string[] The list of log message categories.
-     *
-     * @see MessageCategoryFilter::$include
-     */
-    public function getCategories(): array
-    {
-        return $this->categories->getIncluded();
-    }
-
-    /**
      * Sets a list of log message categories that this target is NOT interested in.
      *
      * @param array $except The list of log message categories.
@@ -178,47 +150,6 @@ abstract class Target
     }
 
     /**
-     * Gets a list of log message categories that this target is NOT interested in.
-     *
-     * @return string[] The list of excluded categories of log messages.
-     *
-     * @see MessageCategoryFilter::$exclude
-     */
-    public function getExcept(): array
-    {
-        return $this->categories->getExcluded();
-    }
-
-    /**
-     * Sets a list of log messages that are retrieved from the logger so far by this log target.
-     *
-     * @param array[] $messages The list of log messages.
-     *
-     * @throws InvalidArgumentException for invalid message structure.
-     *
-     * @return self
-     *
-     * @see MessageCollection::$messages
-     */
-    public function setMessages(array $messages): self
-    {
-        $this->messages->addMultiple($messages);
-        return $this;
-    }
-
-    /**
-     * Gets a list of log messages that are retrieved from the logger so far by this log target.
-     *
-     * @return array[] The list of log messages.
-     *
-     * @see MessageCollection::$messages
-     */
-    public function getMessages(): array
-    {
-        return $this->messages->all();
-    }
-
-    /**
      * Sets a list of log message levels that current target is interested in.
      *
      * @param array $levels The list of log message levels.
@@ -233,18 +164,6 @@ abstract class Target
     {
         $this->messages->setLevels($levels);
         return $this;
-    }
-
-    /**
-     * Gets a list of log message levels that current target is interested in.
-     *
-     * @return string[] The list of log message levels.
-     *
-     * @see MessageCollection::$levels
-     */
-    public function getLevels(): array
-    {
-        return $this->messages->getLevels();
     }
 
     /**
@@ -274,42 +193,61 @@ abstract class Target
     }
 
     /**
-     * Gets a list of the PHP predefined variables that should be logged in a message.
+     * Sets a PHP callable that returns a string representation of the log message.
      *
-     * @return string[] The list of the PHP predefined variables.
+     * @param callable $format The PHP callable to get a string value from.
      *
-     * @see Target::$logVars
+     * @return self
+     *
+     * @see MessageFormatter::$format
      */
-    public function getLogVars(): array
+    public function setFormat(callable $format): self
     {
-        return $this->logVars;
+        $this->formatter->setFormat($format);
+        return $this;
+    }
+
+    /**
+     * Formats all log messages for display as a string.
+     *
+     * @return string
+     */
+    public function formatMessages(): string
+    {
+        $formatted = '';
+
+        foreach ($this->messages->all() as $message) {
+            $formatted .= $this->formatter->format($message);
+        }
+
+        return $formatted;
+    }
+
+    /**
+     * Gets a list of log messages that are retrieved from the logger so far by this log target.
+     *
+     * @return array[] The list of log messages.
+     *
+     * @see MessageCollection::$messages
+     */
+    public function getMessages(): array
+    {
+        return $this->messages->all();
     }
 
     /**
      * Sets a PHP callable that returns a string to be prefixed to every exported message.
      *
-     * @param callable $prefix The PHP callable to get a string value from.
+     * @param callable $prefix The PHP callable to get a string prefix of the log message.
      *
      * @return self
      *
-     * @see Target::$prefix
+     * @see MessageFormatter::$prefix
      */
     public function setPrefix(callable $prefix): self
     {
-        $this->prefix = $prefix;
+        $this->formatter->setPrefix($prefix);
         return $this;
-    }
-
-    /**
-     * Gets a PHP callable that returns a string to be prefixed to every exported message.
-     *
-     * @return callable|null The PHP callable to get a string value from or null.
-     *
-     * @see Target::$prefix
-     */
-    public function getPrefix(): ?callable
-    {
-        return $this->prefix;
     }
 
     /**
@@ -328,18 +266,6 @@ abstract class Target
     }
 
     /**
-     * Gets how many messages should be accumulated before they are exported.
-     *
-     * @return int The number of messages to accumulate before exporting.
-     *
-     * @see Target::$exportInterval
-     */
-    public function getExportInterval(): int
-    {
-        return $this->exportInterval;
-    }
-
-    /**
      * Sets a date format for the log timestamp.
      *
      * @param string $format The date format for the log timestamp.
@@ -350,20 +276,8 @@ abstract class Target
      */
     public function setTimestampFormat(string $format): self
     {
-        $this->timestampFormat = $format;
+        $this->formatter->setTimestampFormat($format);
         return $this;
-    }
-
-    /**
-     * Gets a date format for the log timestamp.
-     *
-     * @return string The date format for the log timestamp.
-     *
-     * @see Target::$timestampFormat
-     */
-    public function getTimestampFormat(): string
-    {
-        return $this->timestampFormat;
     }
 
     /**
@@ -448,7 +362,7 @@ abstract class Target
      *
      * @return string The context information. If an empty string, it means no context information.
      */
-    protected function getContextMessage(): string
+    private function getContextMessage(): string
     {
         $result = [];
 
@@ -468,7 +382,7 @@ abstract class Target
      *
      * @return array[] The filtered log messages.
      */
-    protected function filterMessages(array $messages): array
+    private function filterMessages(array $messages): array
     {
         foreach ($messages as $i => $message) {
             $levels = $this->messages->getLevels();
@@ -486,86 +400,5 @@ abstract class Target
         }
 
         return $messages;
-    }
-
-    /**
-     * Formats a log message for display as a string.
-     *
-     * The message structure follows that in {@see MessageCollection::$messages}.
-     *
-     * @param array $message The log message to be formatted.
-     *
-     * @throws InvalidArgumentException for invalid message structure.
-     *
-     * @return string The formatted log message.
-     */
-    protected function formatMessage(array $message): string
-    {
-        $this->messages->checkStructure($message);
-        [$level, $text, $context] = $message;
-
-        $level = Logger::getLevelName($level);
-        $timestamp = $context['time'] ?? microtime(true);
-        $category = $context['category'] ?? MessageCategoryFilter::DEFAULT;
-
-        $traces = [];
-        if (isset($context['trace']) && is_array($context['trace'])) {
-            foreach ($context['trace'] as $trace) {
-                if (isset($trace['file'], $trace['line'])) {
-                    $traces[] = "in {$trace['file']}:{$trace['line']}";
-                }
-            }
-        }
-
-        $prefix = $this->getMessagePrefix($message);
-
-        return $this->getTime($timestamp) . " {$prefix}[$level][$category] $text"
-            . (empty($traces) ? '' : "\n    " . implode("\n    ", $traces));
-    }
-
-    /**
-     * Gets a string to be prefixed to the given message.
-     *
-     * If {@see Target::$prefix} is configured it will return the result of the callback.
-     * The default implementation will return user IP, user ID and session ID as a prefix.
-     * The message structure follows that in {@see MessageCollection::$messages}.
-     *
-     * @param array $message The log message being exported.
-     *
-     * @throws LogRuntimeException for a callable "prefix" that does not return a string.
-     *
-     * @return string The log  prefix string.
-     */
-    protected function getMessagePrefix(array $message): string
-    {
-        if ($this->prefix === null) {
-            return '';
-        }
-
-        $this->messages->checkStructure($message);
-        $prefix = ($this->prefix)($message);
-
-        if (!is_string($prefix)) {
-            throw new LogRuntimeException(sprintf(
-                'The PHP callable "prefix" must returns a string, %s received.',
-                gettype($prefix)
-            ));
-        }
-
-        return $prefix;
-    }
-
-    /**
-     * Gets formatted timestamp for message, according to {@see Target::$timestampFormat}.
-     *
-     * @param float|int $timestamp The timestamp to be formatted.
-     *
-     * @return string Formatted timestamp for message.
-     */
-    protected function getTime($timestamp): string
-    {
-        $timestamp = (string) $timestamp;
-        $format = strpos($timestamp, '.') === false ? 'U' : 'U.u';
-        return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 }

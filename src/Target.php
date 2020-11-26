@@ -209,14 +209,16 @@ abstract class Target
     /**
      * Formats all log messages for display as a string.
      *
-     * @return string
+     * @param string $separator The log messages string separator.
+     *
+     * @return string The string formatted log messages.
      */
-    public function formatMessages(): string
+    public function formatMessages(string $separator = ''): string
     {
         $formatted = '';
 
         foreach ($this->messages->all() as $message) {
-            $formatted .= $this->formatter->format($message);
+            $formatted .= $this->formatter->format($message) . $separator;
         }
 
         return $formatted;

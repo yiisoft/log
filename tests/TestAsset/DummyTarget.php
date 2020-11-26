@@ -44,16 +44,16 @@ final class DummyTarget extends Target
         return $this->exportContextMessage;
     }
 
-    public function formatMessages(): string
+    public function formatMessages(string $separator = ''): string
     {
         if (empty($this->exportMessages)) {
-            return parent::formatMessages();
+            return parent::formatMessages($separator);
         }
 
         $formatted = '';
 
         foreach ($this->exportMessages as $message) {
-            $formatted .= $this->exportFormatter->format($message);
+            $formatted .= $this->exportFormatter->format($message) . $separator;
         }
 
         return $formatted;

@@ -281,27 +281,16 @@ abstract class Target
     }
 
     /**
-     * Sets a value indicating whether this log target is enabled.
+     * Sets a PHP callable that returns a boolean indicating whether this log target is enabled.
      *
-     * A callable may be used to determine whether the log target should be enabled in a dynamic way.
-     *
-     * @param bool|callable $value The boolean value or a callable to get a boolean value from.
-     *
-     * @throws InvalidArgumentException for non-boolean or non-callable value.
+     * @param callable $value The PHP callable to get a boolean value.
      *
      * @return self
      *
      * @see Target::$enabled
      */
-    public function setEnabled($value): self
+    public function setEnabled(callable $value): self
     {
-        if (!is_bool($value) && !is_callable($value)) {
-            throw new InvalidArgumentException(sprintf(
-                'The value indicating whether this log target is enabled must be a boolean or callable, %s received.',
-                gettype($value)
-            ));
-        }
-
         $this->enabled = $value;
         return $this;
     }
@@ -311,11 +300,12 @@ abstract class Target
      *
      * @return self
      *
-     * @see Target::setEnabled()
+     * @see Target::$enabled
      */
     public function enable(): self
     {
-        return $this->setEnabled(true);
+        $this->enabled = true;
+        return $this;
     }
 
     /**
@@ -323,11 +313,12 @@ abstract class Target
      *
      * @return self
      *
-     * @see Target::setEnabled()
+     * @see Target::$enabled
      */
     public function disable(): self
     {
-        return $this->setEnabled(false);
+        $this->enabled = false;
+        return $this;
     }
 
     /**

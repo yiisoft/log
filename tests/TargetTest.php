@@ -164,28 +164,6 @@ final class TargetTest extends TestCase
         $this->assertTrue($this->target->isEnabled());
     }
 
-    public function invalidEnabledProvider(): array
-    {
-        return [
-            'string' => ['a'],
-            'int' => [1],
-            'float' => [1.1],
-            'array' => [[]],
-            'object' => [new stdClass()],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidEnabledProvider
-     *
-     * @param mixed $value
-     */
-    public function testSetEnabledThrowExceptionForNonBoolOrCallable($value): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->target->setEnabled($value);
-    }
-
     public function invalidCallableEnabledProvider(): array
     {
         return [

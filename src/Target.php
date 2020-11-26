@@ -13,7 +13,6 @@ use function gettype;
 use function implode;
 use function in_array;
 use function is_bool;
-use function is_callable;
 use function is_string;
 use function microtime;
 use function sprintf;

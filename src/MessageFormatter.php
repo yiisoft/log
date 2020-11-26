@@ -22,7 +22,6 @@ final class MessageFormatter
      * If not set, {@see MessageFormatter::defaultFormat()} will be used.
      *
      * The signature of the callable should be `function (array $message): string;`.
-     *
      */
     private $format;
 

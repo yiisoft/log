@@ -400,6 +400,24 @@ final class TargetTest extends TestCase
         $this->assertSame($expected, $this->target->getFormattedMessages());
     }
 
+    public function testSetExportIntervalAndSetFormat(): void
+    {
+        $this->target->setExportInterval(3);
+        $this->target->setFormat(static function (array $message) {
+            [$level, $text, $context] = $message;
+            return "[{$level}][{$context['category']}] {$text}";
+        });
+        $this->target->collect(
+            $expected = [
+                [LogLevel::INFO, 'message-1', ['category' => 'app']],
+                [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
+            ],
+            false,
+        );
+
+        $this->assertSame(0, $this->target->getExportCount());
+    }
+
     public function invalidCallableReturnStringProvider(): array
     {
         return [

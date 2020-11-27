@@ -74,6 +74,11 @@ final class DummyTarget extends Target
         return $formatted;
     }
 
+    public function getMessages(): array
+    {
+        return parent::getMessages();
+    }
+
     public function setFormat(callable $format): self
     {
         $this->exportFormatter->setFormat($format);

@@ -383,6 +383,23 @@ final class TargetTest extends TestCase
         $this->assertSame($expected, $this->target->formatMessages("\n"));
     }
 
+    public function testGetFormattedMessagesAndSetFormatAndSetPrefix(): void
+    {
+        $this->target->setFormat(static fn (array $message) => "({$message[0]}) {$message[1]}");
+        $this->target->setPrefix(static fn (array $message) => strtoupper($message[2]['category']) . ': ');
+
+        $expected = ['APP: (info) message-1', 'APP: (debug) message-2'];
+        $this->target->collect(
+            [
+                [LogLevel::INFO, 'message-1', ['category' => 'app']],
+                [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
+            ],
+            true,
+        );
+
+        $this->assertSame($expected, $this->target->getFormattedMessages());
+    }
+
     public function invalidCallableReturnStringProvider(): array
     {
         return [

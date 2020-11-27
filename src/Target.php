@@ -225,6 +225,22 @@ abstract class Target
     }
 
     /**
+     * Gets a list of formatted log messages.
+     *
+     * @return array The list of formatted log messages.
+     */
+    public function getFormattedMessages(): array
+    {
+        $formatted = [];
+
+        foreach ($this->messages->all() as $key => $message) {
+            $formatted[$key] = $this->formatter->format($message);
+        }
+
+        return $formatted;
+    }
+
+    /**
      * Gets a list of log messages that are retrieved from the logger so far by this log target.
      *
      * @return array[] The list of log messages.

@@ -59,6 +59,21 @@ final class DummyTarget extends Target
         return $formatted;
     }
 
+    public function getFormattedMessages(): array
+    {
+        if (empty($this->exportMessages)) {
+            return parent::getFormattedMessages();
+        }
+
+        $formatted = [];
+
+        foreach ($this->exportMessages as $key => $message) {
+            $formatted[$key] = $this->exportFormatter->format($message);
+        }
+
+        return $formatted;
+    }
+
     public function setFormat(callable $format): self
     {
         $this->exportFormatter->setFormat($format);

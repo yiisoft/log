@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Log;
 
 use DateTime;
+use RuntimeException;
 
 use function gettype;
 use function implode;
@@ -83,7 +84,7 @@ final class MessageFormatter
      *
      * @param array $message The log message to be formatted.
      *
-     * @throws LogRuntimeException for a callable "format" that does not return a string.
+     * @throws RuntimeException for a callable "format" that does not return a string.
      *
      * @return string The formatted log message.
      */
@@ -96,8 +97,8 @@ final class MessageFormatter
         $formatted = ($this->format)($message);
 
         if (!is_string($formatted)) {
-            throw new LogRuntimeException(sprintf(
-                'The PHP callable "format" must returns a string, %s received.',
+            throw new RuntimeException(sprintf(
+                'The PHP callable "format" must return a string, %s received.',
                 gettype($formatted)
             ));
         }
@@ -142,7 +143,7 @@ final class MessageFormatter
      *
      * @param array $message The log message being exported.
      *
-     * @throws LogRuntimeException for a callable "prefix" that does not return a string.
+     * @throws RuntimeException for a callable "prefix" that does not return a string.
      *
      * @return string The log prefix string.
      */
@@ -155,8 +156,8 @@ final class MessageFormatter
         $prefix = ($this->prefix)($message);
 
         if (!is_string($prefix)) {
-            throw new LogRuntimeException(sprintf(
-                'The PHP callable "prefix" must returns a string, %s received.',
+            throw new RuntimeException(sprintf(
+                'The PHP callable "prefix" must return a string, %s received.',
                 gettype($prefix)
             ));
         }

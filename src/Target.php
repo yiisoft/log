@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
-use Psr\Log\InvalidArgumentException;
+use InvalidArgumentException;
 use Psr\Log\LogLevel;
+use RuntimeException;
 use Yiisoft\Arrays\ArrayHelper;
 use Yiisoft\VarDumper\VarDumper;
 
@@ -295,7 +296,7 @@ abstract class Target
     /**
      * Check whether the log target is enabled.
      *
-     * @throws LogRuntimeException for a callable "enabled" that does not return a boolean.
+     * @throws RuntimeException for a callable "enabled" that does not return a boolean.
      *
      * @return bool The value indicating whether this log target is enabled.
      *
@@ -308,7 +309,7 @@ abstract class Target
         }
 
         if (!is_bool($enabled = ($this->enabled)($this))) {
-            throw new LogRuntimeException(sprintf(
+            throw new RuntimeException(sprintf(
                 'The PHP callable "enabled" must returns a boolean, %s received.',
                 gettype($enabled)
             ));

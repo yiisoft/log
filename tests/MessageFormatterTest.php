@@ -6,8 +6,8 @@ namespace Yiisoft\Log\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
+use RuntimeException;
 use stdClass;
-use Yiisoft\Log\LogRuntimeException;
 use Yiisoft\Log\MessageFormatter;
 
 use function date;
@@ -94,7 +94,7 @@ class MessageFormatterTest extends TestCase
     public function testFormatThrowExceptionForFormatCallableReturnNotString(callable $value): void
     {
         $this->formatter->setFormat($value);
-        $this->expectException(LogRuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->formatter->format([LogLevel::INFO, 'test', ['foo' => 'bar']]);
     }
 
@@ -106,7 +106,7 @@ class MessageFormatterTest extends TestCase
     public function testFormatMessageThrowExceptionForPrefixCallableReturnNotString(callable $value): void
     {
         $this->formatter->setPrefix($value);
-        $this->expectException(LogRuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->formatter->format([LogLevel::INFO, 'test', ['foo' => 'bar']]);
     }
 }

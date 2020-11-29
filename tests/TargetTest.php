@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests;
 
-use Psr\Log\InvalidArgumentException;
+use InvalidArgumentException;
 use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 use Yiisoft\Log\Logger;
-use Yiisoft\Log\LogRuntimeException;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
 use function array_column;
@@ -184,7 +184,7 @@ final class TargetTest extends TestCase
     public function testIsEnabledThrowExceptionForCallableReturnNotBoolean(callable $value): void
     {
         $this->target->setEnabled($value);
-        $this->expectException(LogRuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->target->isEnabled();
     }
 
@@ -439,7 +439,7 @@ final class TargetTest extends TestCase
     {
         $this->target->setFormat($value);
         $this->target->collect([[LogLevel::INFO, 'test', ['foo' => 'bar']]], false);
-        $this->expectException(LogRuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->target->formatMessages();
     }
 
@@ -452,7 +452,7 @@ final class TargetTest extends TestCase
     {
         $this->target->setPrefix($value);
         $this->target->collect([[LogLevel::INFO, 'test', ['foo' => 'bar']]], false);
-        $this->expectException(LogRuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->target->formatMessages();
     }
 

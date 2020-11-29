@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests;
 
-use Psr\Log\InvalidArgumentException;
+use InvalidArgumentException;
 use Psr\Log\LogLevel;
 use stdClass;
 use PHPUnit\Framework\TestCase;

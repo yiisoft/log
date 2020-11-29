@@ -54,10 +54,10 @@ class PsrTargetTest extends TestCase
      */
     public function testPsrLogInterfaceMethods(string $level, string $message, array $context): void
     {
-        $this->target->collect([[$level, $message, $context]], false);
         $this->assertInstanceOf(LoggerInterface::class, $this->target->getLogger());
 
-        $this->target->export();
+        $this->target->setLogVars([]);
+        $this->target->collect([[$level, $message, $context]], true);
         $this->expectOutputString("{$level}: {$message}: " . json_encode($context));
     }
 }

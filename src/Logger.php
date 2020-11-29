@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
-use Psr\Log\InvalidArgumentException;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
@@ -106,21 +106,21 @@ final class Logger implements LoggerInterface
      *
      * @param mixed $level The message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
      *
-     * @throws InvalidArgumentException for invalid log message level.
+     * @throws \Psr\Log\InvalidArgumentException for invalid log message level.
      *
      * @return string The text display of the level.
      */
     public static function getLevelName($level): string
     {
         if (!is_string($level)) {
-            throw new InvalidArgumentException(sprintf(
+            throw new \Psr\Log\InvalidArgumentException(sprintf(
                 'The log message level must be a string, %s provided.',
                 gettype($level)
             ));
         }
 
         if (!in_array($level, self::LEVELS, true)) {
-            throw new InvalidArgumentException(sprintf(
+            throw new \Psr\Log\InvalidArgumentException(sprintf(
                 'Invalid log message level "%s" provided. The following values are supported: "%s".',
                 $level,
                 implode('", "', self::LEVELS)

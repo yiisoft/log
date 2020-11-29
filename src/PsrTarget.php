@@ -35,7 +35,7 @@ final class PsrTarget extends Target
         return $this->logger;
     }
 
-    public function export(): void
+    protected function export(): void
     {
         foreach ($this->getMessages() as $message) {
             [$level, $text, $context] = $message;

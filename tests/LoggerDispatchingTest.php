@@ -60,7 +60,7 @@ namespace Yiisoft\Log\Tests {
                 ->getMockForAbstractClass();
 
             $target->expects($this->never())->method($this->anything());
-            $target->setEnabled(false);
+            $target->disable();
 
             $logger = new Logger(['fakeTarget' => $target]);
             $this->setInaccessibleMessages($logger, [[LogLevel::INFO, 'test', []]]);

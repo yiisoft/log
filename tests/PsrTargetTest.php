@@ -22,6 +22,8 @@ class PsrTargetTest extends TestCase
         $this->target = new PsrTarget(new class() implements LoggerInterface {
             use LoggerTrait;
 
+            public string $message = '';
+
             public function log($level, $message, array $context = []): void
             {
                 echo "{$level}: {$message}: " . json_encode($context);
@@ -52,10 +54,10 @@ class PsrTargetTest extends TestCase
      */
     public function testPsrLogInterfaceMethods(string $level, string $message, array $context): void
     {
-        $this->target->setMessages([[$level, $message, $context]]);
         $this->assertInstanceOf(LoggerInterface::class, $this->target->getLogger());
 
-        $this->target->export();
+        $this->target->setLogVars([]);
+        $this->target->collect([[$level, $message, $context]], true);
         $this->expectOutputString("{$level}: {$message}: " . json_encode($context));
     }
 }

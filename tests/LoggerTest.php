@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests;
 
-use Psr\Log\InvalidArgumentException;
+use InvalidArgumentException;
 use Psr\Log\LogLevel;
 use stdClass;
+use RuntimeException;
 use Yiisoft\Log\Logger;
-use Yiisoft\Log\LogRuntimeException;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
 use function array_pop;
@@ -75,11 +75,11 @@ final class LoggerTest extends LoggerTestCase
 
     public function testLogWithThrowableMessage(): void
     {
-        $message = new LogRuntimeException('some error');
+        $message = new RuntimeException('some error');
         $this->logger->log(LogLevel::ERROR, $message);
 
         $messages = $this->getInaccessibleMessages($this->logger);
-        $this->assertInstanceOf(LogRuntimeException::class, $messages[0][2]['exception']);
+        $this->assertInstanceOf(RuntimeException::class, $messages[0][2]['exception']);
         $this->assertSame($message, $messages[0][2]['exception']);
     }
 
@@ -240,7 +240,7 @@ final class LoggerTest extends LoggerTestCase
      */
     public function testGetLevelNameThrowExceptionForInvalidMessageLevel($level): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\Psr\Log\InvalidArgumentException::class);
         Logger::getLevelName($level);
     }
 

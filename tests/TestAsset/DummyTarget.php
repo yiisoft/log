@@ -4,15 +4,29 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests\TestAsset;
 
+use Yiisoft\Log\MessageFormatter;
 use Yiisoft\Log\Target;
+
+use function array_pop;
 
 final class DummyTarget extends Target
 {
     private int $exportCounter = 0;
+    private array $exportMessages = [];
+    private array $exportContextMessage = [];
+    private MessageFormatter $exportFormatter;
+
+    public function __construct()
+    {
+        $this->exportFormatter = new MessageFormatter();
+        parent::__construct();
+    }
 
     public function export(): void
     {
         $this->exportCounter++;
+        $this->exportMessages = $this->getMessages();
+        $this->exportContextMessage = array_pop($this->exportMessages);
     }
 
     public function getExportCount(): int
@@ -20,18 +34,66 @@ final class DummyTarget extends Target
         return $this->exportCounter;
     }
 
-    public function formatMessage(array $message): string
+    public function getExportMessages(): array
     {
-        return parent::formatMessage($message);
+        return $this->exportMessages;
     }
 
-    public function getMessagePrefix(array $message): string
+    public function getExportContextMessage(): array
     {
-        return parent::getMessagePrefix($message);
+        return $this->exportContextMessage;
     }
 
-    public function getContextMessage(): string
+    public function formatMessages(string $separator = ''): string
     {
-        return parent::getContextMessage();
+        if (empty($this->exportMessages)) {
+            return parent::formatMessages($separator);
+        }
+
+        $formatted = '';
+
+        foreach ($this->exportMessages as $message) {
+            $formatted .= $this->exportFormatter->format($message) . $separator;
+        }
+
+        return $formatted;
+    }
+
+    public function getFormattedMessages(): array
+    {
+        if (empty($this->exportMessages)) {
+            return parent::getFormattedMessages();
+        }
+
+        $formatted = [];
+
+        foreach ($this->exportMessages as $key => $message) {
+            $formatted[$key] = $this->exportFormatter->format($message);
+        }
+
+        return $formatted;
+    }
+
+    public function getMessages(): array
+    {
+        return parent::getMessages();
+    }
+
+    public function setFormat(callable $format): self
+    {
+        $this->exportFormatter->setFormat($format);
+        return parent::setFormat($format);
+    }
+
+    public function setPrefix(callable $prefix): self
+    {
+        $this->exportFormatter->setPrefix($prefix);
+        return parent::setPrefix($prefix);
+    }
+
+    public function setTimestampFormat(string $format): self
+    {
+        $this->exportFormatter->setTimestampFormat($format);
+        return parent::setTimestampFormat($format);
     }
 }

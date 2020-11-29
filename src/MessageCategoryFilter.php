@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
-use Psr\Log\InvalidArgumentException;
+use InvalidArgumentException;
 
 use function gettype;
 use function is_string;

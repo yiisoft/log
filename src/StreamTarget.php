@@ -21,6 +21,9 @@ use function stream_get_meta_data;
 use const LOCK_EX;
 use const LOCK_UN;
 
+/**
+ * StreamTarget is the log target that writes to the specified output stream.
+ */
 final class StreamTarget extends Target
 {
     /**

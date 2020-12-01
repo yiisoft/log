@@ -56,9 +56,11 @@ final class MessageCollection
      * Message context has a following keys:
      *
      * - category: string, message category.
+     * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`.
      * - time: float, message timestamp obtained by microtime(true).
      * - trace: array, debug backtrace, contains the application code call stacks.
-     * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`.
+     * - globals: array, names of global predefined PHP variables.
+     * - params: array, user parameters in the `key => value` format.
      */
     private array $messages = [];
 
@@ -127,22 +129,6 @@ final class MessageCollection
     }
 
     /**
-     * Checks log message structure.
-     *
-     * @param mixed $message The log message to be checked.
-     *
-     * @throws InvalidArgumentException for invalid message structure.
-     *
-     * @see MessageCollection::$messages
-     */
-    public function checkStructure($message): void
-    {
-        if (!is_array($message) || !isset($message[0], $message[1], $message[2]) || !is_array($message[2])) {
-            throw new InvalidArgumentException('The message structure is not valid.');
-        }
-    }
-
-    /**
      * Sets the log message levels that current collection is interested in.
      *
      * @param string[] $levels The log message levels.
@@ -208,5 +194,21 @@ final class MessageCollection
 
             return $matches[0];
         }, $message);
+    }
+
+    /**
+     * Checks log message structure.
+     *
+     * @param mixed $message The log message to be checked.
+     *
+     * @throws InvalidArgumentException for invalid message structure.
+     *
+     * @see MessageCollection::$messages
+     */
+    private function checkStructure($message): void
+    {
+        if (!is_array($message) || !isset($message[0], $message[1], $message[2]) || !is_array($message[2])) {
+            throw new InvalidArgumentException('The message structure is not valid.');
+        }
     }
 }

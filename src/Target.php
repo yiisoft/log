@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Yiisoft\Log;
 
 use InvalidArgumentException;
-use Psr\Log\LogLevel;
 use RuntimeException;
 use Yiisoft\Arrays\ArrayHelper;
-use Yiisoft\VarDumper\VarDumper;
 
 use function gettype;
-use function implode;
 use function in_array;
+use function is_array;
 use function is_bool;
 use function is_string;
-use function microtime;
 use function sprintf;
 
 /**
@@ -36,10 +33,11 @@ abstract class Target
     private MessageFormatter $formatter;
 
     /**
-     * @var string[] list of the PHP predefined variables that should be logged in a message.
+     * @var string[] List of the PHP predefined variables that should be logged in a message.
+     *
+     * This data will be available in the context of the log message using the "globals" key.
      *
      * Note that a variable must be accessible via `$GLOBALS`. Otherwise it won't be logged.
-     *
      * Defaults to `['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER']`.
      *
      * Each element can also be specified as one of the following:
@@ -52,8 +50,18 @@ abstract class Target
      * was used you have to open it right at he start of your request.
      *
      * @see \Yiisoft\Arrays\ArrayHelper::filter()
+     * @see MessageCollection::$messages
      */
-    private array $logVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
+    private array $logGlobals = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
+
+    /**
+     * @var array The list of user parameters in the `key => value` format.
+     *
+     * This data will be available in the context of the log message using the "params" key.
+     *
+     * @see MessageCollection::$messages
+     */
+    private array $logParams = [];
 
     /**
      * @var int How many log messages should be accumulated before they are exported.
@@ -100,12 +108,6 @@ abstract class Target
         $count = $this->messages->count();
 
         if ($count > 0 && ($final || ($this->exportInterval > 0 && $count >= $this->exportInterval))) {
-            if (($contextMessage = $this->getContextMessage()) !== '') {
-                $this->messages->add(LogLevel::INFO, $contextMessage, [
-                    'category' => MessageCategoryFilter::DEFAULT,
-                    'time' => microtime(true),
-                ]);
-            }
             // set exportInterval to 0 to avoid triggering export again while exporting
             $oldExportInterval = $this->exportInterval;
             $this->exportInterval = 0;
@@ -167,28 +169,35 @@ abstract class Target
     }
 
     /**
-     * Sets a list of the PHP predefined variables that should be logged in a message.
+     * Sets a list of the predefined PHP global variables that should be logged in a message.
      *
-     * @param array $logVars The list of PHP predefined variables.
+     * @param array $logGlobals The list of PHP global variables.
      *
      * @throws InvalidArgumentException for non-string values.
      *
      * @return self
      *
-     * @see Target::$logVars
+     * @see Target::$logGlobals
      */
-    public function setLogVars(array $logVars): self
+    public function setLogGlobals(array $logGlobals): self
     {
-        foreach ($logVars as $logVar) {
-            if (!is_string($logVar)) {
-                throw new InvalidArgumentException(sprintf(
-                    'The PHP predefined variable must be a string, %s received.',
-                    gettype($logVar)
-                ));
-            }
-        }
+        $this->checkGlobalNames($logGlobals);
+        $this->logGlobals = $logGlobals;
+        return $this;
+    }
 
-        $this->logVars = $logVars;
+    /**
+     * Sets a list of user parameters in the `key => value` format.
+     *
+     * @param array $logParams The list of user parameters.
+     *
+     * @return self
+     *
+     * @see Target::$logParams
+     */
+    public function setLogParams(array $logParams): self
+    {
+        $this->logParams = $logParams;
         return $this;
     }
 
@@ -365,24 +374,6 @@ abstract class Target
     }
 
     /**
-     * Generates the context information to be logged.
-     *
-     * The default implementation will dump user information, system variables, etc.
-     *
-     * @return string The context information. If an empty string, it means no context information.
-     */
-    private function getContextMessage(): string
-    {
-        $result = [];
-
-        foreach (ArrayHelper::filter($GLOBALS, $this->logVars) as $key => $value) {
-            $result[] = "\${$key} = " . VarDumper::create($value)->asString();
-        }
-
-        return implode("\n\n", $result);
-    }
-
-    /**
      * Filters the given messages according to their categories and levels.
      *
      * The message structure follows that in {@see MessageCollection::$messages}.
@@ -401,13 +392,45 @@ abstract class Target
                 continue;
             }
 
-            $category = (string) ($message[2]['category'] ?? '');
-
-            if ($this->categories->isExcluded($category)) {
+            if ($this->categories->isExcluded((string) ($message[2]['category'] ?? ''))) {
                 unset($messages[$i]);
+                continue;
             }
+
+            if (!isset($message[2]['params']) || !is_array($message[2]['params'])) {
+                $message[2]['params'] = $this->logParams;
+            }
+
+            if (isset($message[2]['globals']) && is_array($message[2]['globals'])) {
+                $this->checkGlobalNames($message[2]['globals']);
+                $globals = $message[2]['globals'];
+            }
+
+            $message[2]['globals'] = ArrayHelper::filter($GLOBALS, $globals ?? $this->logGlobals);
+            $messages[$i] = $message;
         }
 
         return $messages;
+    }
+
+    /**
+     * Checks PHP global variable names.
+     *
+     * @param array $logGlobals The list of PHP global variable names to be checked.
+     *
+     * @throws InvalidArgumentException for non-string values or empty string.
+     *
+     * @see Target::$logGlobals
+     */
+    private function checkGlobalNames(array $logGlobals): void
+    {
+        foreach ($logGlobals as $logGlobal) {
+            if (!is_string($logGlobal) || $logGlobal === '') {
+                throw new InvalidArgumentException(sprintf(
+                    'The PHP global variable name must be a not empty string, %s received.',
+                    gettype($logGlobal)
+                ));
+            }
+        }
     }
 }

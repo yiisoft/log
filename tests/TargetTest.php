@@ -14,6 +14,7 @@ use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
 use function array_column;
 use function array_merge;
+use function json_encode;
 use function implode;
 use function strtoupper;
 use function ucfirst;
@@ -72,7 +73,7 @@ final class TargetTest extends TestCase
      */
     public function testFilter(array $filter, array $expected): void
     {
-        $filter = array_merge($filter, ['logVars' => []]);
+        $filter = array_merge($filter, ['logGlobals' => [], 'logParams' => []]);
 
         foreach ($filter as $key => $value) {
             $this->target->{'set' . ucfirst($key)}($value);
@@ -104,9 +105,9 @@ final class TargetTest extends TestCase
         }
     }
 
-    public function testGetContextMessage(): void
+    public function testSetLogGlobals(): void
     {
-        $this->target->setLogVars([
+        $this->target->setLogGlobals([
             'A', '!A.A_b', 'A.A_d',
             'B.B_a',
             'C', 'C.C_a',
@@ -132,7 +133,7 @@ final class TargetTest extends TestCase
             'C_c' => 1,
         ];
         $this->collectOneAndExport(LogLevel::INFO, 'test', ['foo' => 'bar']);
-        $contextMessage = $this->target->getExportContextMessage()[1];
+        $contextMessage = $this->target->formatMessages();
         $this->assertStringContainsString('A_a', $contextMessage);
         $this->assertStringNotContainsString('A_b', $contextMessage);
         $this->assertStringContainsString('A_c', $contextMessage);
@@ -265,7 +266,7 @@ final class TargetTest extends TestCase
             'not-exist-index-0' => [['level' => 'info', 1 => 'message', 2 => []]],
             'not-exist-index-1' => [['level', 5 => 'message', 2 => []]],
             'not-exist-index-2' => [['level', 'message', 'context' => []]],
-            'non-array-context' => [['level', 'message', 'context']],
+            'non-array-context' => [['level', 'message', null]],
         ];
     }
 
@@ -330,10 +331,10 @@ final class TargetTest extends TestCase
      *
      * @param array $list
      */
-    public function testSetLogVarsThrowExceptionForNonStringList(array $list): void
+    public function testSetLogGlobalsThrowExceptionForNonStringList(array $list): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->target->setLogVars($list);
+        $this->target->setLogGlobals($list);
     }
 
     public function testSetFormat(): void
@@ -416,6 +417,47 @@ final class TargetTest extends TestCase
         );
 
         $this->assertSame(0, $this->target->getExportCount());
+    }
+
+    public function testSetLogGlobalsAndSetLogParamsWithDefaultFormat(): void
+    {
+        $this->target->setLogGlobals(['_GET']);
+        $this->target->setLogParams(['foo' => 'bar', 'baz' => true]);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', ['time' => 1508160390.6083]);
+        $expected = '2017-10-16 13:26:30.608300 [info][application] message'
+            . "\n\nUser parameters:\n\nfoo = 'bar'\n\nbaz = true"
+            . "\n\nGlobal variables:\n\n\$_GET = []";
+
+        $this->assertSame($expected, $this->target->formatMessages());
+    }
+
+    public function testSetLogGlobalsAndSetLogParamsWithPassedContext(): void
+    {
+        $this->target->setLogGlobals(['_GET']);
+        $this->target->setLogParams(['foo' => 'bar', 'baz' => true]);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', [
+            'time' => 1508160390.6083,
+            'globals' => [],
+            'params' => ['foo' => 1],
+        ]);
+        $expected = "2017-10-16 13:26:30.608300 [info][application] message\n\nUser parameters:\n\nfoo = 1";
+
+        $this->assertSame($expected, $this->target->formatMessages());
+    }
+
+    public function testSetFormatAndSetLogGlobalsAndSetLogParams(): void
+    {
+        $this->target->setLogGlobals(['_GET']);
+        $this->target->setLogParams(['foo' => 'bar', 'baz' => true]);
+        $this->target->setFormat(static function (array $message) {
+            [$level, $text, $context] = $message;
+            $globalContext = json_encode(['globals' => $context['globals'], 'params' => $context['params']]);
+            return "[{$level}] {$text}, global context: {$globalContext}";
+        });
+        $this->collectOneAndExport(LogLevel::INFO, 'message');
+        $expected = '[info] message, global context: {"globals":{"_GET":[]},"params":{"foo":"bar","baz":true}}';
+
+        $this->assertSame($expected, $this->target->formatMessages());
     }
 
     public function invalidCallableReturnStringProvider(): array

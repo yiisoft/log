@@ -11,6 +11,7 @@ use stdClass;
 use Yiisoft\Log\MessageFormatter;
 
 use function date;
+use function json_encode;
 use function strtoupper;
 
 class MessageFormatterTest extends TestCase
@@ -70,6 +71,19 @@ class MessageFormatterTest extends TestCase
         });
         $message = [LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390]];
         $expected = 'APP: (13:26:30)(info) message';
+
+        $this->assertSame($expected, $this->formatter->format($message));
+    }
+
+    public function testFormatWithSetFormatAndSetGlobalsAndParams(): void
+    {
+        $this->formatter->setFormat(static function (array $message) {
+            [$level, $text, $context] = $message;
+            $globalContext = json_encode(['globals' => $context['globals'], 'params' => $context['params']]);
+            return "({$level}) {$text}, global context: {$globalContext}";
+        });
+        $message = [LogLevel::INFO, 'message', ['globals' => ['foo' => 'bar'], 'params' => ['baz' => true]]];
+        $expected = '(info) message, global context: {"globals":{"foo":"bar"},"params":{"baz":true}}';
 
         $this->assertSame($expected, $this->formatter->format($message));
     }

@@ -7,26 +7,23 @@ namespace Yiisoft\Log\Tests\TestAsset;
 use Yiisoft\Log\MessageFormatter;
 use Yiisoft\Log\Target;
 
-use function array_pop;
-
 final class DummyTarget extends Target
 {
     private int $exportCounter = 0;
     private array $exportMessages = [];
-    private array $exportContextMessage = [];
     private MessageFormatter $exportFormatter;
 
     public function __construct()
     {
-        $this->exportFormatter = new MessageFormatter();
         parent::__construct();
+        $this->setLogGlobals([]);
+        $this->exportFormatter = new MessageFormatter();
     }
 
     public function export(): void
     {
         $this->exportCounter++;
         $this->exportMessages = $this->getMessages();
-        $this->exportContextMessage = array_pop($this->exportMessages);
     }
 
     public function getExportCount(): int
@@ -39,9 +36,9 @@ final class DummyTarget extends Target
         return $this->exportMessages;
     }
 
-    public function getExportContextMessage(): array
+    public function getMessages(): array
     {
-        return $this->exportContextMessage;
+        return parent::getMessages();
     }
 
     public function formatMessages(string $separator = ''): string
@@ -72,11 +69,6 @@ final class DummyTarget extends Target
         }
 
         return $formatted;
-    }
-
-    public function getMessages(): array
-    {
-        return parent::getMessages();
     }
 
     public function setFormat(callable $format): self

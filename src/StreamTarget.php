@@ -76,7 +76,7 @@ final class StreamTarget extends Target
             if (($stream = @fopen($stream, 'ab')) === false) {
                 throw new RuntimeException(sprintf(
                     'The "%s" stream cannot be opened.',
-                    $this->stream,
+                    (string) $this->stream,
                 ));
             }
         }

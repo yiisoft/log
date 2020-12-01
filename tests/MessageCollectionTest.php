@@ -124,17 +124,6 @@ final class MessageCollectionTest extends TestCase
         $this->messages->addMultiple([$message]);
     }
 
-    /**
-     * @dataProvider invalidMessageStructureProvider
-     *
-     * @param mixed $message
-     */
-    public function testCheckStructureThrowExceptionForInvalidMessageStructure($message): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->messages->checkStructure($message);
-    }
-
     public function testCount(): void
     {
         $messages = [

@@ -27,14 +27,14 @@ use const LOCK_UN;
 final class StreamTarget extends Target
 {
     /**
-     * @var resource|string The string stream identifier or stream resource.
+     * @var resource|string A string stream identifier or a stream resource.
      *
      * @psalm-var mixed
      */
     private $stream;
 
     /**
-     * @param resource|string $stream The string stream identifier or stream resource.
+     * @param resource|string $stream A string stream identifier or a stream resource.
      */
     public function __construct($stream = 'php://stdout')
     {
@@ -61,7 +61,7 @@ final class StreamTarget extends Target
     }
 
     /**
-     * Checks and creates the stream resource.
+     * Check and create a stream resource.
      *
      * @throws RuntimeException if the stream cannot be opened.
      * @throws InvalidArgumentException if the stream is invalid.
@@ -73,7 +73,8 @@ final class StreamTarget extends Target
         $stream = $this->stream;
 
         if (is_string($stream)) {
-            if (($stream = @fopen($stream, 'ab')) === false) {
+            $stream = @fopen($stream, 'ab');
+            if ($stream === false) {
                 throw new RuntimeException(sprintf(
                     'The "%s" stream cannot be opened.',
                     (string) $this->stream,
@@ -83,7 +84,7 @@ final class StreamTarget extends Target
 
         if (!is_resource($stream) || get_resource_type($stream) !== 'stream') {
             throw new InvalidArgumentException(sprintf(
-                'Invalid stream provided. It must be a string stream identifier or stream resource, "%s" received.',
+                'Invalid stream provided. It must be a string stream identifier or a stream resource, "%s" received.',
                 gettype($stream),
             ));
         }

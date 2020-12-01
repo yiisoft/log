@@ -48,6 +48,7 @@ final class StreamTarget extends Target
         flock($stream, LOCK_EX);
 
         if (fwrite($stream, $this->formatMessages("\n")) === false) {
+            flock($stream, LOCK_UN);
             fclose($stream);
             throw new RuntimeException(sprintf(
                 'Unable to export the log because of an error writing to the stream: %s',

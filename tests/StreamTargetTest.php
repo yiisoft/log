@@ -80,6 +80,7 @@ final class StreamTargetTest extends TestCase
 
     /**
      * @param resource|string $stream
+     *
      * @return StreamTarget
      */
     private function createStreamTarget($stream): StreamTarget

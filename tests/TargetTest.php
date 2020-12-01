@@ -458,7 +458,7 @@ final class TargetTest extends TestCase
         $this->target->collect([[
             LogLevel::INFO,
             'message',
-            ['time' => 1508160390.6083, 'globals' => [], 'params' => ['foo' => 1]]
+            ['time' => 1508160390.6083, 'globals' => [], 'params' => ['foo' => 1]],
         ]], false);
         $expected = "2017-10-16 13:26:30.608300 [info][application] message\n\nUser parameters:\n\nfoo = 1";
 

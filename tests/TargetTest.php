@@ -367,56 +367,76 @@ final class TargetTest extends TestCase
         $this->assertSame($expected, $this->target->formatMessages());
     }
 
-    public function testFormatMessagesWithSeparatorAndSetFormatAndSetPrefix(): void
+    public function collectMessageProvider(): array
+    {
+        return [
+            'export' => [
+                [
+                    [LogLevel::INFO, 'message-1', ['category' => 'app']],
+                    [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
+                ],
+                true,
+            ],
+            'not-export' => [
+                [
+                    [LogLevel::INFO, 'message-1', ['category' => 'app']],
+                    [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
+                ],
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider collectMessageProvider
+     *
+     * @param array $messages
+     * @param bool $export
+     */
+    public function testFormatMessagesWithSeparatorAndSetFormatAndSetPrefix(array $messages, bool $export): void
     {
         $this->target->setFormat(static fn (array $message) => "({$message[0]}) {$message[1]}");
         $this->target->setPrefix(static fn (array $message) => strtoupper($message[2]['category']) . ': ');
 
         $expected = "APP: (info) message-1\nAPP: (debug) message-2\n";
-        $this->target->collect(
-            [
-                [LogLevel::INFO, 'message-1', ['category' => 'app']],
-                [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
-            ],
-            true,
-        );
+        $this->target->collect($messages, $export);
 
         $this->assertSame($expected, $this->target->formatMessages("\n"));
     }
 
-    public function testGetFormattedMessagesAndSetFormatAndSetPrefix(): void
+    /**
+     * @dataProvider collectMessageProvider
+     *
+     * @param array $messages
+     * @param bool $export
+     */
+    public function testGetFormattedMessagesAndSetFormatAndSetPrefix(array $messages, bool $export): void
     {
         $this->target->setFormat(static fn (array $message) => "({$message[0]}) {$message[1]}");
         $this->target->setPrefix(static fn (array $message) => strtoupper($message[2]['category']) . ': ');
 
         $expected = ['APP: (info) message-1', 'APP: (debug) message-2'];
-        $this->target->collect(
-            [
-                [LogLevel::INFO, 'message-1', ['category' => 'app']],
-                [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
-            ],
-            true,
-        );
+        $this->target->collect($messages, $export);
 
         $this->assertSame($expected, $this->target->getFormattedMessages());
     }
 
-    public function testSetExportIntervalAndSetFormat(): void
+    /**
+     * @dataProvider collectMessageProvider
+     *
+     * @param array $messages
+     * @param bool $export
+     */
+    public function testSetExportIntervalAndSetFormat(array $messages, bool $export): void
     {
         $this->target->setExportInterval(3);
         $this->target->setFormat(static function (array $message) {
             [$level, $text, $context] = $message;
             return "[{$level}][{$context['category']}] {$text}";
         });
-        $this->target->collect(
-            $expected = [
-                [LogLevel::INFO, 'message-1', ['category' => 'app']],
-                [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
-            ],
-            false,
-        );
+        $this->target->collect($messages, $export);
 
-        $this->assertSame(0, $this->target->getExportCount());
+        $this->assertSame((int) $export, $this->target->getExportCount());
     }
 
     public function testSetLogGlobalsAndSetLogParamsWithDefaultFormat(): void
@@ -435,11 +455,11 @@ final class TargetTest extends TestCase
     {
         $this->target->setLogGlobals(['_GET']);
         $this->target->setLogParams(['foo' => 'bar', 'baz' => true]);
-        $this->collectOneAndExport(LogLevel::INFO, 'message', [
-            'time' => 1508160390.6083,
-            'globals' => [],
-            'params' => ['foo' => 1],
-        ]);
+        $this->target->collect([[
+            LogLevel::INFO,
+            'message',
+            ['time' => 1508160390.6083, 'globals' => [], 'params' => ['foo' => 1]],
+        ]], false);
         $expected = "2017-10-16 13:26:30.608300 [info][application] message\n\nUser parameters:\n\nfoo = 1";
 
         $this->assertSame($expected, $this->target->formatMessages());

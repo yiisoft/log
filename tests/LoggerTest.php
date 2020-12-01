@@ -186,13 +186,13 @@ final class LoggerTest extends LoggerTestCase
     public function testLogWithFlush(): void
     {
         $this->logger->setFlushInterval($flushInterval = 1);
+        $this->target->setExportInterval($flushInterval);
         $this->assertSame($flushInterval, $this->logger->getFlushInterval());
 
         $this->logger->log(LogLevel::INFO, 'test');
-
-        $this->assertSame(0, $this->target->getExportCount());
-        $this->assertSame('info', $this->target->getMessages()[0][0]);
-        $this->assertSame('test', $this->target->getMessages()[0][1]);
+        $this->assertSame(1, $this->target->getExportCount());
+        $this->assertSame('info', $this->target->getExportMessages()[0][0]);
+        $this->assertSame('test', $this->target->getExportMessages()[0][1]);
     }
 
     public function testFlushWithDispatch(): void

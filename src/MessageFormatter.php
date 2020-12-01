@@ -6,15 +6,20 @@ namespace Yiisoft\Log;
 
 use DateTime;
 use RuntimeException;
+use Yiisoft\VarDumper\VarDumper;
 
 use function gettype;
 use function implode;
-use function is_array;
 use function is_string;
 use function microtime;
 use function sprintf;
 use function strpos;
 
+/**
+ * MessageFormatter formats log messages.
+ *
+ * @internal
+ */
 final class MessageFormatter
 {
     /**
@@ -118,20 +123,14 @@ final class MessageFormatter
     private function defaultFormat(array $message): string
     {
         [$level, $text, $context] = $message;
-        $timestamp = $context['time'] ?? microtime(true);
+        $prefix = $this->getPrefix($message);
         $category = $context['category'] ?? MessageCategoryFilter::DEFAULT;
 
-        $traces = [];
-        if (isset($context['trace']) && is_array($context['trace'])) {
-            foreach ($context['trace'] as $trace) {
-                if (isset($trace['file'], $trace['line'])) {
-                    $traces[] = "in {$trace['file']}:{$trace['line']}";
-                }
-            }
-        }
+        $timestamp = $this->getTime($context['time'] ?? microtime(true));
+        $trace = $this->getTrace($context['trace'] ?? []);
+        $globalContext = $this->getGlobalContext($context['globals'] ?? [], $context['params'] ?? []);
 
-        return $this->getTime($timestamp) . " {$this->getPrefix($message)}[{$level}][{$category}] {$text}"
-            . (empty($traces) ? '' : "\n    " . implode("\n    ", $traces));
+        return "{$timestamp} {$prefix}[{$level}][{$category}] {$text}{$trace}{$globalContext}";
     }
 
     /**
@@ -163,6 +162,44 @@ final class MessageFormatter
         }
 
         return $prefix;
+    }
+
+    /**
+     * @param array $traces Debug backtrace, contains the application code call stacks.
+     *
+     * @return string Debug backtrace in string representation.
+     */
+    private function getTrace(array $traces): string
+    {
+        foreach ($traces as $key => $trace) {
+            if (isset($trace['file'], $trace['line'])) {
+                $traces[$key] = "in {$trace['file']}:{$trace['line']}";
+            }
+        }
+
+        return (empty($traces) ? '' : "\n    " . implode("\n    ", $traces));
+    }
+
+    /**
+     * Generates the global context information to be logged.
+     *
+     * @param array $globals List of the predefined PHP global variables.
+     * @param array $params List of user parameters in the `key => value` format.
+     *
+     * @return string The global context information. If an empty string, it means no context information.
+     */
+    private function getGlobalContext(array $globals, array $params): string
+    {
+        foreach ($globals as $key => $value) {
+            $globals[$key] = "\${$key} = " . VarDumper::create($value)->asString();
+        }
+
+        foreach ($params as $key => $value) {
+            $params[$key] = "{$key} = " . VarDumper::create($value)->asString();
+        }
+
+        return (empty($params) ? '' : "\n\nUser parameters:\n\n" . implode("\n\n", $params))
+            . (empty($globals) ? '' : "\n\nGlobal variables:\n\n" . implode("\n\n", $globals));
     }
 
     /**

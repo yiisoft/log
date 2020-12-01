@@ -177,7 +177,7 @@ final class MessageFormatter
             }
         }
 
-        return (empty($traces) ? '' : "\n    " . implode("\n    ", $traces));
+        return empty($traces) ? '' : "\n    " . implode("\n    ", $traces);
     }
 
     /**

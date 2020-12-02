@@ -12,6 +12,7 @@ use Yiisoft\VarDumper\VarDumper;
 use function gettype;
 use function implode;
 use function is_string;
+use function is_object;
 use function method_exists;
 use function microtime;
 use function sprintf;
@@ -236,8 +237,8 @@ final class Formatter
      */
     private function convertToString($value): string
     {
-        if (method_exists($value, '__toString')) {
-            return (string) $value;
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return $value->__toString();
         }
 
         return VarDumper::create($value)->asString();

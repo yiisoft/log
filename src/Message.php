@@ -10,6 +10,7 @@ use Psr\Log\LogLevel;
 use Yiisoft\VarDumper\VarDumper;
 
 use function is_scalar;
+use function is_object;
 use function method_exists;
 use function preg_replace_callback;
 
@@ -109,7 +110,7 @@ final class Message
      */
     private function parse($message, array $context): string
     {
-        $message = (is_scalar($message) || method_exists($message, '__toString'))
+        $message = (is_scalar($message) || (is_object($message) && method_exists($message, '__toString')))
             ? (string) $message
             : VarDumper::create($message)->export()
         ;

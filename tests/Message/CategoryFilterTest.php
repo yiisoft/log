@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Log\Tests;
+namespace Yiisoft\Log\Tests\Message;
 
 use InvalidArgumentException;
 use stdClass;
 use PHPUnit\Framework\TestCase;
-use Yiisoft\Log\MessageCategoryFilter;
+use Yiisoft\Log\Message\CategoryFilter;
 
-final class MessageCategoryFilterTest extends TestCase
+final class CategoryFilterTest extends TestCase
 {
-    private MessageCategoryFilter $categories;
+    private CategoryFilter $categories;
 
     public function setUp(): void
     {
-        $this->categories = new MessageCategoryFilter();
+        $this->categories = new CategoryFilter();
     }
 
     public function testIncludeAndGetIncluded(): void

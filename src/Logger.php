@@ -9,8 +9,10 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Throwable;
+use Yiisoft\Log\Message\CategoryFilter;
 
 use function array_filter;
+use function count;
 use function debug_backtrace;
 use function gettype;
 use function get_class;
@@ -18,6 +20,7 @@ use function implode;
 use function in_array;
 use function is_string;
 use function memory_get_usage;
+use function microtime;
 use function register_shutdown_function;
 use function sprintf;
 use function strpos;
@@ -51,7 +54,10 @@ final class Logger implements LoggerInterface
         LogLevel::DEBUG,
     ];
 
-    private MessageCollection $messages;
+    /**
+     * @var Message[] The log messages.
+     */
+    private array $messages = [];
 
     /**
      * @var Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
@@ -90,7 +96,6 @@ final class Logger implements LoggerInterface
     public function __construct(array $targets = [])
     {
         $this->setTargets($targets);
-        $this->messages = new MessageCollection();
 
         register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
@@ -110,7 +115,7 @@ final class Logger implements LoggerInterface
      *
      * @return string The text display of the level.
      */
-    public static function getLevelName($level): string
+    public static function level($level): string
     {
         if (!is_string($level)) {
             throw new \Psr\Log\InvalidArgumentException(sprintf(
@@ -191,14 +196,14 @@ final class Logger implements LoggerInterface
             $context['exception'] = $message;
         }
 
-        $context['time'] ??= \microtime(true);
+        $context['time'] ??= microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         $context['memory'] ??= memory_get_usage();
-        $context['category'] ??= MessageCategoryFilter::DEFAULT;
+        $context['category'] ??= CategoryFilter::DEFAULT;
 
-        $this->messages->add($level, $message, $context);
+        $this->messages[] = new Message($level, $message, $context);
 
-        if ($this->flushInterval > 0 && $this->messages->count() >= $this->flushInterval) {
+        if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {
             $this->flush();
         }
     }
@@ -210,10 +215,10 @@ final class Logger implements LoggerInterface
      */
     public function flush(bool $final = false): void
     {
-        $messages = $this->messages->all();
+        $messages = $this->messages;
         // https://github.com/yiisoft/yii2/issues/5619
         // new messages could be logged while the existing ones are being handled by targets
-        $this->messages->clear();
+        $this->messages = [];
 
         $this->dispatch($messages, $final);
     }
@@ -301,7 +306,7 @@ final class Logger implements LoggerInterface
     /**
      * Dispatches the logged messages to {@see Logger::$targets}.
      *
-     * @param array[] $messages The log messages.
+     * @param Message[] $messages The log messages.
      * @param bool $final Whether this method is called at the end of the current application.
      */
     private function dispatch(array $messages, bool $final): void
@@ -314,11 +319,11 @@ final class Logger implements LoggerInterface
                     $target->collect($messages, $final);
                 } catch (Throwable $e) {
                     $target->disable();
-                    $targetErrors[] = [
+                    $targetErrors[] = new Message(
                         LogLevel::WARNING,
                         'Unable to send log via ' . get_class($target) . ': ' . get_class($e) . ': ' . $e->getMessage(),
                         ['time' => microtime(true), 'trace' => $e->getTrace()],
-                    ];
+                    );
                 }
             }
         }

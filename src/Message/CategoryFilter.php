@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Log;
+namespace Yiisoft\Log\Message;
 
 use InvalidArgumentException;
 
@@ -18,7 +18,7 @@ use function strpos;
  *
  * @internal
  */
-final class MessageCategoryFilter
+final class CategoryFilter
 {
     public const DEFAULT = 'application';
 

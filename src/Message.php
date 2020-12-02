@@ -86,6 +86,7 @@ final class Message
      *
      * @param string|null $name The context parameter name.
      * @param mixed $default If the context parameter does not exist, the `$default` will be returned.
+     *
      * @return mixed The context parameter value.
      */
     public function context(string $name = null, $default = null)

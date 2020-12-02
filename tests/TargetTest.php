@@ -384,7 +384,7 @@ final class TargetTest extends TestCase
                         return 'stringable-object';
                     }
                 }],
-                'foo: stringable-object'
+                'foo: stringable-object',
             ],
         ];
     }

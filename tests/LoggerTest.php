@@ -352,7 +352,7 @@ final class LoggerTest extends TestCase
      */
     public function testDispatchWithDisabledTarget(): void
     {
-        /** @var Target|MockObject $target */
+        /** @var MockObject|Target $target */
         $target = $this->getMockBuilder(Target::class)
             ->onlyMethods(['collect'])
             ->getMockForAbstractClass();
@@ -372,7 +372,7 @@ final class LoggerTest extends TestCase
     {
         $message = new Message(LogLevel::INFO, 'test', ['foo' => 'bar']);
 
-        /** @var Target|MockObject $target */
+        /** @var MockObject|Target $target */
         $target = $this->getMockBuilder(Target::class)
             ->onlyMethods(['collect'])
             ->getMockForAbstractClass();
@@ -398,12 +398,12 @@ final class LoggerTest extends TestCase
         $exception = new RuntimeException('some error');
         $message = new Message(LogLevel::INFO, 'test', ['foo' => 'bar']);
 
-        /** @var Target|MockObject $target */
+        /** @var MockObject|Target $target */
         $target1 = $this->getMockBuilder(Target::class)
             ->onlyMethods(['collect'])
             ->getMockForAbstractClass();
 
-        /** @var Target|MockObject $target */
+        /** @var MockObject|Target $target */
         $target2 = $this->getMockBuilder(Target::class)
             ->onlyMethods(['collect'])
             ->getMockForAbstractClass();

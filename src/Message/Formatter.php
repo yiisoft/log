@@ -90,9 +90,9 @@ final class Formatter
      * @param Message $message The log message to be formatted.
      * @param array $commonContext The user parameters in the `key => value` format.
      *
-     * @return string The formatted log message.
-     *@throws RuntimeException for a callable "format" that does not return a string.
+     * @throws RuntimeException for a callable "format" that does not return a string.
      *
+     * @return string The formatted log message.
      */
     public function format(Message $message, array $commonContext): string
     {
@@ -153,9 +153,9 @@ final class Formatter
      * @param Message $message The log message being exported.
      * @param array $commonContext The user parameters in the `key => value` format.
      *
-     * @return string The log prefix string.
-     *@throws RuntimeException for a callable "prefix" that does not return a string.
+     * @throws RuntimeException for a callable "prefix" that does not return a string.
      *
+     * @return string The log prefix string.
      */
     private function getPrefix(Message $message, array $commonContext): string
     {

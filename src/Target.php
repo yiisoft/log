@@ -117,9 +117,9 @@ abstract class Target
      *
      * @param array $categories The list of log message categories.
      *
-     * @return self
-     *
      * @throws InvalidArgumentException for invalid log message categories structure.
+     *
+     * @return self
      *
      * @see CategoryFilter::$include
      */
@@ -134,9 +134,9 @@ abstract class Target
      *
      * @param array $except The list of log message categories.
      *
-     * @return self
-     *
      * @throws InvalidArgumentException for invalid log message categories structure.
+     *
+     * @return self
      *
      * @see CategoryFilter::$exclude
      */
@@ -151,9 +151,9 @@ abstract class Target
      *
      * @param array $levels The list of log message levels.
      *
-     * @return self
-     *
      * @throws InvalidArgumentException for invalid log message level.
+     *
+     * @return self
      *
      * @see Target::$levels
      */

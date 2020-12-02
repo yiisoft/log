@@ -43,7 +43,7 @@ final class FormatterTest extends TestCase
                         return 'stringable-object';
                     }
                 }],
-                'foo: stringable-object'
+                'foo: stringable-object',
             ],
         ];
     }

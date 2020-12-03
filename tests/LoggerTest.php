@@ -191,13 +191,13 @@ final class LoggerTest extends TestCase
 
     public function testLevel(): void
     {
-        $this->assertSame('info', Logger::level(LogLevel::INFO));
-        $this->assertSame('error', Logger::level(LogLevel::ERROR));
-        $this->assertSame('warning', Logger::level(LogLevel::WARNING));
-        $this->assertSame('debug', Logger::level(LogLevel::DEBUG));
-        $this->assertSame('emergency', Logger::level(LogLevel::EMERGENCY));
-        $this->assertSame('alert', Logger::level(LogLevel::ALERT));
-        $this->assertSame('critical', Logger::level(LogLevel::CRITICAL));
+        $this->assertSame('info', Logger::validateLevel(LogLevel::INFO));
+        $this->assertSame('error', Logger::validateLevel(LogLevel::ERROR));
+        $this->assertSame('warning', Logger::validateLevel(LogLevel::WARNING));
+        $this->assertSame('debug', Logger::validateLevel(LogLevel::DEBUG));
+        $this->assertSame('emergency', Logger::validateLevel(LogLevel::EMERGENCY));
+        $this->assertSame('alert', Logger::validateLevel(LogLevel::ALERT));
+        $this->assertSame('critical', Logger::validateLevel(LogLevel::CRITICAL));
     }
 
     public function invalidMessageLevelProvider(): array
@@ -222,7 +222,7 @@ final class LoggerTest extends TestCase
     public function testGetLevelNameThrowExceptionForInvalidMessageLevel($level): void
     {
         $this->expectException(\Psr\Log\InvalidArgumentException::class);
-        Logger::level($level);
+        Logger::validateLevel($level);
     }
 
     public function testSetTarget(): void

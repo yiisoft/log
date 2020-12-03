@@ -115,7 +115,7 @@ final class Logger implements LoggerInterface
      *
      * @return string The text display of the level.
      */
-    public static function level($level): string
+    public static function validateLevel($level): string
     {
         if (!is_string($level)) {
             throw new \Psr\Log\InvalidArgumentException(sprintf(

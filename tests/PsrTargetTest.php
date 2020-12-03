@@ -9,12 +9,12 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use stdClass;
+use Yiisoft\Log\Message;
 use Yiisoft\Log\PsrTarget;
 
-use function array_merge;
 use function json_encode;
 
-class PsrTargetTest extends TestCase
+final class PsrTargetTest extends TestCase
 {
     private PsrTarget $target;
 
@@ -57,9 +57,7 @@ class PsrTargetTest extends TestCase
     {
         $this->assertInstanceOf(LoggerInterface::class, $this->target->getLogger());
 
-        $this->target->setLogGlobals([]);
-        $this->target->collect([[$level, $message, $context]], true);
-        $context = array_merge($context, ['params' => [], 'globals' => []]);
+        $this->target->collect([new Message($level, $message, $context)], true);
         $this->expectOutputString("{$level}: {$message}: " . json_encode($context));
     }
 }

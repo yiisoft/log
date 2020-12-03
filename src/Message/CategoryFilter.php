@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Log;
+namespace Yiisoft\Log\Message;
 
 use InvalidArgumentException;
 
@@ -18,7 +18,7 @@ use function strpos;
  *
  * @internal
  */
-final class MessageCategoryFilter
+final class CategoryFilter
 {
     public const DEFAULT = 'application';
 
@@ -58,16 +58,6 @@ final class MessageCategoryFilter
     }
 
     /**
-     * Gets the log message categories to be included.
-     *
-     * @return string[] The list of log message categories to be included.
-     */
-    public function getIncluded(): array
-    {
-        return $this->include;
-    }
-
-    /**
      * Sets the log message categories to be excluded.
      *
      * @param string[] $categories The list of log message categories to be excluded.
@@ -78,16 +68,6 @@ final class MessageCategoryFilter
     {
         $this->checkStructure($categories);
         $this->exclude = $categories;
-    }
-
-    /**
-     * Gets the log message categories to be excluded.
-     *
-     * @return string[] The list of log message categories to be excluded.
-     */
-    public function getExcluded(): array
-    {
-        return $this->exclude;
     }
 
     /**

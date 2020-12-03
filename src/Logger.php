@@ -143,51 +143,6 @@ final class Logger implements LoggerInterface
         return $this->targets;
     }
 
-    /**
-     * @param int|string $name The string name or integer index.
-     *
-     * @return Target|null
-     */
-    public function getTarget($name): ?Target
-    {
-        return $this->getTargets()[$name] ?? null;
-    }
-
-    /**
-     * Sets a target to {@see Logger::$targets}.
-     *
-     * @param array $targets The log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
-     * instance or the configuration for creating the log target instance.
-     *
-     * @throws InvalidArgumentException for non-instance Target.
-     */
-    public function setTargets(array $targets): void
-    {
-        foreach ($targets as $target) {
-            if (!($target instanceof Target)) {
-                throw new InvalidArgumentException('You must provide an instance of \Yiisoft\Log\Target.');
-            }
-        }
-
-        $this->targets = $targets;
-    }
-
-    /**
-     * Adds an extra target to {@see Logger::$targets}.
-     *
-     * @param Target $target the log target instance.
-     * @param string|null $name array key to be used to store target, if `null` is given target will be append
-     * to the end of the array by natural integer key.
-     */
-    public function addTarget(Target $target, string $name = null): void
-    {
-        if ($name === null) {
-            $this->targets[] = $target;
-        } else {
-            $this->targets[$name] = $target;
-        }
-    }
-
     public function log($level, $message, array $context = []): void
     {
         if (($message instanceof Throwable) && !isset($context['exception'])) {
@@ -239,18 +194,6 @@ final class Logger implements LoggerInterface
     }
 
     /**
-     * Gets how many log messages should be logged before they are flushed from memory and sent to targets.
-     *
-     * @return int The number of messages to accumulate before flushing.
-     *
-     * @see Logger::$flushInterval
-     */
-    public function getFlushInterval(): int
-    {
-        return $this->flushInterval;
-    }
-
-    /**
      * Sets how much call stack information (file name and line number) should be logged for each log message.
      *
      * @param int $traceLevel The number of call stack information.
@@ -263,18 +206,6 @@ final class Logger implements LoggerInterface
     {
         $this->traceLevel = $traceLevel;
         return $this;
-    }
-
-    /**
-     * Gets how much call stack information (file name and line number) should be logged for each log message.
-     *
-     * @return int The number of call stack information.
-     *
-     * @see Logger::$traceLevel
-     */
-    public function getTraceLevel(): int
-    {
-        return $this->traceLevel;
     }
 
     /**
@@ -304,6 +235,25 @@ final class Logger implements LoggerInterface
     }
 
     /**
+     * Sets a target to {@see Logger::$targets}.
+     *
+     * @param array $targets The log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
+     * instance or the configuration for creating the log target instance.
+     *
+     * @throws InvalidArgumentException for non-instance Target.
+     */
+    private function setTargets(array $targets): void
+    {
+        foreach ($targets as $target) {
+            if (!($target instanceof Target)) {
+                throw new InvalidArgumentException('You must provide an instance of \Yiisoft\Log\Target.');
+            }
+        }
+
+        $this->targets = $targets;
+    }
+
+    /**
      * Dispatches the logged messages to {@see Logger::$targets}.
      *
      * @param Message[] $messages The log messages.
@@ -313,7 +263,7 @@ final class Logger implements LoggerInterface
     {
         $targetErrors = [];
 
-        foreach ($this->getTargets() as $target) {
+        foreach ($this->targets as $target) {
             if ($target->isEnabled()) {
                 try {
                     $target->collect($messages, $final);

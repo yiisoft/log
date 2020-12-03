@@ -58,16 +58,6 @@ final class CategoryFilter
     }
 
     /**
-     * Gets the log message categories to be included.
-     *
-     * @return string[] The list of log message categories to be included.
-     */
-    public function getIncluded(): array
-    {
-        return $this->include;
-    }
-
-    /**
      * Sets the log message categories to be excluded.
      *
      * @param string[] $categories The list of log message categories to be excluded.

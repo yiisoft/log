@@ -59,7 +59,6 @@ final class LoggerTest extends TestCase
     {
         $memory = memory_get_usage();
         $this->logger->setTraceLevel($traceLevel = 3);
-        $this->assertSame($traceLevel, $this->logger->getTraceLevel());
 
         $this->logger->log(LogLevel::INFO, 'test3');
         $messages = $this->getInaccessibleMessages($this->logger);
@@ -70,7 +69,7 @@ final class LoggerTest extends TestCase
         $this->assertSame('application', $messages[0]->context('category'));
         $this->assertSame([
             'file' => __FILE__,
-            'line' => 64,
+            'line' => 63,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',
@@ -231,12 +230,10 @@ final class LoggerTest extends TestCase
         $this->assertSame([DummyTarget::class => $this->target], $this->logger->getTargets());
         $this->assertSame($this->target, $this->logger->getTargets()[DummyTarget::class]);
 
-        $logger = new Logger();
         $target = new DummyTarget();
-        $logger->setTargets([$target]);
+        $logger = new Logger([$target]);
         $this->assertSame([$target], $logger->getTargets());
         $this->assertSame($target, $logger->getTargets()[0]);
-        $this->assertSame($target, $logger->getTarget(0));
     }
 
     public function invalidTargetProvider(): array
@@ -258,32 +255,10 @@ final class LoggerTest extends TestCase
      *
      * @param mixed $target
      */
-    public function testSetTargetThrowExceptionForNonInstanceTarget($target): void
+    public function testConstructorThrowExceptionForNonInstanceTarget($target): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->logger->setTargets($target);
-    }
-
-    public function testAddTarget(): void
-    {
-        $logger = new Logger();
-
-        $target = new DummyTarget();
-        $logger->setTargets([$target]);
-
-        $namedTarget = new DummyTarget();
-        $logger->addTarget($namedTarget, 'test-target');
-
-        $targets = $logger->getTargets();
-        $this->assertCount(2, $targets);
-        $this->assertTrue(isset($targets['test-target']));
-        $this->assertSame($namedTarget, $targets['test-target']);
-
-        $namelessTarget = new DummyTarget();
-        $logger->addTarget($namelessTarget);
-        $targets = $logger->getTargets();
-        $this->assertCount(3, $targets);
-        $this->assertSame($namelessTarget, array_pop($targets));
+        new Logger($target);
     }
 
     public function parseMessageProvider(): array
@@ -325,7 +300,6 @@ final class LoggerTest extends TestCase
     {
         $this->logger->setFlushInterval($flushInterval = 1);
         $this->target->setExportInterval($flushInterval);
-        $this->assertSame($flushInterval, $this->logger->getFlushInterval());
 
         $this->logger->log(LogLevel::INFO, 'test');
         $this->assertSame(1, $this->target->getExportCount());

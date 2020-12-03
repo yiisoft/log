@@ -18,22 +18,6 @@ final class CategoryFilterTest extends TestCase
         $this->categories = new CategoryFilter();
     }
 
-    public function testIncludeAndGetIncluded(): void
-    {
-        $categories = ['category-1', 'category-2'];
-        $this->categories->include($categories);
-
-        $this->assertSame($categories, $this->categories->getIncluded());
-    }
-
-    public function testIncludeAndGetExcluded(): void
-    {
-        $categories = ['category-1', 'category-2'];
-        $this->categories->exclude($categories);
-
-        $this->assertSame($categories, $this->categories->getExcluded());
-    }
-
     public function invalidCategoryMessageStructureProvider(): array
     {
         return [

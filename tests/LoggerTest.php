@@ -9,7 +9,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use ReflectionClass;
-use ReflectionException;
 use stdClass;
 use RuntimeException;
 use Yiisoft\Log\Logger;

@@ -172,7 +172,7 @@ final class FormatterTest extends TestCase
             'float' => [fn () => 1.1],
             'array' => [fn () => []],
             'null' => [fn () => null],
-            'callable' => [fn () => fn () => 'a'],
+            'callable' => [fn () => static fn () => 'a'],
             'object' => [fn () => new stdClass()],
         ];
     }

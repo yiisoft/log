@@ -94,7 +94,7 @@ final class TargetTest extends TestCase
         $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
         $messages = $this->target->getMessages();
-        $texts = array_map(fn (Message $message): string => $message->message(), $messages);
+        $texts = array_map(static fn (Message $message): string => $message->message(), $messages);
 
         $this->assertCount(
             count($expected),
@@ -128,7 +128,7 @@ final class TargetTest extends TestCase
             'int' => [fn () => 1],
             'float' => [fn () => 1.1],
             'array' => [fn () => []],
-            'callable' => [fn () => fn () => true],
+            'callable' => [fn () => static fn () => true],
             'object' => [fn () => new stdClass()],
         ];
     }
@@ -443,7 +443,7 @@ final class TargetTest extends TestCase
             'int' => [fn () => 1],
             'float' => [fn () => 1.1],
             'array' => [fn () => []],
-            'callable' => [fn () => fn () => 'a'],
+            'callable' => [fn () => static fn () => 'a'],
             'object' => [fn () => new stdClass()],
         ];
     }

@@ -421,8 +421,6 @@ final class LoggerTest extends TestCase
      * @param Logger $logger
      * @param Message[] $messages
      * @param bool $revoke whether to make property inaccessible after setting.
-     *
-     * @throws ReflectionException
      */
     private function setInaccessibleMessages(Logger $logger, array $messages, bool $revoke = true): void
     {
@@ -442,11 +440,9 @@ final class LoggerTest extends TestCase
      * @param Logger $logger
      * @param bool $revoke whether to make property inaccessible after getting.
      *
-     * @throws ReflectionException
-     *
      * @return Message[]
      */
-    private function getInaccessibleMessages(Logger $logger, bool $revoke = true)
+    private function getInaccessibleMessages(Logger $logger, bool $revoke = true): array
     {
         $class = new ReflectionClass($logger);
         $property = $class->getProperty('messages');

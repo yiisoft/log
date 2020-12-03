@@ -393,7 +393,7 @@ final class LoggerTest extends TestCase
                             && $message->level() === LogLevel::WARNING
                             && $message->message() === $text
                             && is_float($message->context('time'))
-                            && $message->context('trace') === $exception->getTrace();
+                            && $message->context('exception') === $exception;
                     }),
                     $this->equalTo(true),
                 ]

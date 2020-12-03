@@ -272,7 +272,7 @@ final class Logger implements LoggerInterface
                     $targetErrors[] = new Message(
                         LogLevel::WARNING,
                         'Unable to send log via ' . get_class($target) . ': ' . get_class($e) . ': ' . $e->getMessage(),
-                        ['time' => microtime(true), 'trace' => $e->getTrace()],
+                        ['time' => microtime(true), 'exception' => $e],
                     );
                 }
             }

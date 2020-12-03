@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use InvalidArgumentException;
 use Psr\Log\LogLevel;
 use RuntimeException;
+use Yiisoft\Log\Message;
 use Yiisoft\Log\StreamTarget;
 
 use function fclose;
@@ -86,7 +87,7 @@ final class StreamTargetTest extends TestCase
     private function createStreamTarget($stream): StreamTarget
     {
         $target = new StreamTarget($stream);
-        $target->setFormat(static fn (array $message) => "[{$message[0]}] {$message[1]}");
+        $target->setFormat(static fn (Message $message) => "[{$message->level()}] {$message->message()}");
         return $target;
     }
 
@@ -97,9 +98,9 @@ final class StreamTargetTest extends TestCase
     {
         $target->collect(
             [
-                [LogLevel::INFO, 'message-1', ['foo' => 'bar']],
-                [LogLevel::DEBUG, 'message-2', ['foo' => true]],
-                [LogLevel::ERROR, 'message-3', ['foo' => 1]],
+                new Message(LogLevel::INFO, 'message-1', ['foo' => 'bar']),
+                new Message(LogLevel::DEBUG, 'message-2', ['foo' => true]),
+                new Message(LogLevel::ERROR, 'message-3', ['foo' => 1]),
             ],
             true
         );

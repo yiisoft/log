@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests\TestAsset;
 
-use Yiisoft\Log\MessageFormatter;
+use Yiisoft\Log\Message;
+use Yiisoft\Log\Message\Formatter;
 use Yiisoft\Log\Target;
 
 final class DummyTarget extends Target
 {
     private int $exportCounter = 0;
     private array $exportMessages = [];
-    private MessageFormatter $exportFormatter;
+    private Formatter $exportFormatter;
 
     public function __construct()
     {
         parent::__construct();
-        $this->setLogGlobals([]);
-        $this->exportFormatter = new MessageFormatter();
+        $this->exportFormatter = new Formatter();
     }
 
     public function export(): void
@@ -31,11 +31,17 @@ final class DummyTarget extends Target
         return $this->exportCounter;
     }
 
+    /**
+     * @return Message[]
+     */
     public function getExportMessages(): array
     {
         return $this->exportMessages;
     }
 
+    /**
+     * @return Message[]
+     */
     public function getMessages(): array
     {
         return parent::getMessages();
@@ -50,7 +56,7 @@ final class DummyTarget extends Target
         $formatted = '';
 
         foreach ($this->exportMessages as $message) {
-            $formatted .= $this->exportFormatter->format($message) . $separator;
+            $formatted .= $this->exportFormatter->format($message, $this->getCommonContext()) . $separator;
         }
 
         return $formatted;
@@ -65,10 +71,15 @@ final class DummyTarget extends Target
         $formatted = [];
 
         foreach ($this->exportMessages as $key => $message) {
-            $formatted[$key] = $this->exportFormatter->format($message);
+            $formatted[$key] = $this->exportFormatter->format($message, $this->getCommonContext());
         }
 
         return $formatted;
+    }
+
+    public function getCommonContext(): array
+    {
+        return parent::getCommonContext();
     }
 
     public function setFormat(callable $format): self

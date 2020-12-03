@@ -6,13 +6,13 @@ namespace Yiisoft\Log;
 
 use InvalidArgumentException;
 use RuntimeException;
-use Yiisoft\Arrays\ArrayHelper;
+use Yiisoft\Log\Message\CategoryFilter;
+use Yiisoft\Log\Message\Formatter;
 
+use function count;
 use function gettype;
 use function in_array;
-use function is_array;
 use function is_bool;
-use function is_string;
 use function sprintf;
 
 /**
@@ -28,40 +28,37 @@ use function sprintf;
  */
 abstract class Target
 {
-    private MessageCategoryFilter $categories;
-    private MessageCollection $messages;
-    private MessageFormatter $formatter;
+    private CategoryFilter $categories;
+    private Formatter $formatter;
 
     /**
-     * @var string[] List of the PHP predefined variables that should be logged in a message.
-     *
-     * This data will be available in the context of the log message using the "globals" key.
-     *
-     * Note that a variable must be accessible via `$GLOBALS`. Otherwise it won't be logged.
-     * Defaults to `['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER']`.
-     *
-     * Each element can also be specified as one of the following:
-     *
-     * - `var` - `var` will be logged.
-     * - `var.key` - only `var[key]` key will be logged.
-     * - `!var.key` - `var[key]` key will be excluded.
-     *
-     * Note that if you need $_SESSION to logged regardless if session
-     * was used you have to open it right at he start of your request.
-     *
-     * @see \Yiisoft\Arrays\ArrayHelper::filter()
-     * @see MessageCollection::$messages
+     * @var Message[] The log messages.
      */
-    private array $logGlobals = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION', '_SERVER'];
+    private array $messages = [];
 
     /**
-     * @var array The list of user parameters in the `key => value` format.
+     * @var string[] The log message levels that this target is interested in.
      *
-     * This data will be available in the context of the log message using the "params" key.
+     * @see LogLevel See constants for valid level names.
      *
-     * @see MessageCollection::$messages
+     * The value should be an array of level names.
+     *
+     * For example:
+     *
+     * ```php
+     * ['error', 'warning'],
+     * // or
+     * [LogLevel::ERROR, LogLevel::WARNING]
+     * ```
+     *
+     * Defaults is empty array, meaning all available levels.
      */
-    private array $logParams = [];
+    private array $levels = [];
+
+    /**
+     * @var array The user parameters in the `key => value` format that should be logged in a each message.
+     */
+    private array $commonContext = [];
 
     /**
      * @var int How many log messages should be accumulated before they are exported.
@@ -87,25 +84,23 @@ abstract class Target
      */
     public function __construct()
     {
-        $this->categories = new MessageCategoryFilter();
-        $this->messages = new MessageCollection();
-        $this->formatter = new MessageFormatter();
+        $this->categories = new CategoryFilter();
+        $this->formatter = new Formatter();
     }
 
     /**
      * Processes the given log messages.
      *
      * This method will filter the given messages with levels and categories.
-     * The message structure follows that in {@see MessageCollection::$messages}.
      * And if requested, it will also export the filtering result to specific medium (e.g. email).
      *
-     * @param array $messages Log messages to be processed.
+     * @param Message[] $messages Log messages to be processed.
      * @param bool $final Whether this method is called at the end of the current application.
      */
     public function collect(array $messages, bool $final): void
     {
-        $this->messages->addMultiple($this->filterMessages($messages));
-        $count = $this->messages->count();
+        $this->filterMessages($messages);
+        $count = count($this->messages);
 
         if ($count > 0 && ($final || ($this->exportInterval > 0 && $count >= $this->exportInterval))) {
             // set exportInterval to 0 to avoid triggering export again while exporting
@@ -113,7 +108,7 @@ abstract class Target
             $this->exportInterval = 0;
             $this->export();
             $this->exportInterval = $oldExportInterval;
-            $this->messages->clear();
+            $this->messages = [];
         }
     }
 
@@ -126,7 +121,7 @@ abstract class Target
      *
      * @return self
      *
-     * @see MessageCategoryFilter::$include
+     * @see CategoryFilter::$include
      */
     public function setCategories(array $categories): self
     {
@@ -143,7 +138,7 @@ abstract class Target
      *
      * @return self
      *
-     * @see MessageCategoryFilter::$exclude
+     * @see CategoryFilter::$exclude
      */
     public function setExcept(array $except): self
     {
@@ -160,44 +155,30 @@ abstract class Target
      *
      * @return self
      *
-     * @see MessageCollection::$levels
+     * @see Target::$levels
      */
     public function setLevels(array $levels): self
     {
-        $this->messages->setLevels($levels);
+        foreach ($levels as $key => $level) {
+            $levels[$key] = Logger::validateLevel($level);
+        }
+
+        $this->levels = $levels;
         return $this;
     }
 
     /**
-     * Sets a list of the predefined PHP global variables that should be logged in a message.
+     * Sets a user parameters in the `key => value` format that should be logged in a each message.
      *
-     * @param array $logGlobals The list of PHP global variables.
-     *
-     * @throws InvalidArgumentException for non-string values.
+     * @param array $commonContext The user parameters in the `key => value` format.
      *
      * @return self
      *
-     * @see Target::$logGlobals
+     * @see Target::$commonContext
      */
-    public function setLogGlobals(array $logGlobals): self
+    public function setCommonContext(array $commonContext): self
     {
-        $this->checkGlobalNames($logGlobals);
-        $this->logGlobals = $logGlobals;
-        return $this;
-    }
-
-    /**
-     * Sets a list of user parameters in the `key => value` format.
-     *
-     * @param array $logParams The list of user parameters.
-     *
-     * @return self
-     *
-     * @see Target::$logParams
-     */
-    public function setLogParams(array $logParams): self
-    {
-        $this->logParams = $logParams;
+        $this->commonContext = $commonContext;
         return $this;
     }
 
@@ -208,7 +189,7 @@ abstract class Target
      *
      * @return self
      *
-     * @see MessageFormatter::$format
+     * @see Formatter::$format
      */
     public function setFormat(callable $format): self
     {
@@ -223,7 +204,7 @@ abstract class Target
      *
      * @return self
      *
-     * @see MessageFormatter::$prefix
+     * @see Formatter::$prefix
      */
     public function setPrefix(callable $prefix): self
     {
@@ -263,6 +244,8 @@ abstract class Target
 
     /**
      * Sets a PHP callable that returns a boolean indicating whether this log target is enabled.
+     *
+     * The signature of the callable should be `function (): bool;`.
      *
      * @param callable $value The PHP callable to get a boolean value.
      *
@@ -317,7 +300,7 @@ abstract class Target
             return $this->enabled;
         }
 
-        if (!is_bool($enabled = ($this->enabled)($this))) {
+        if (!is_bool($enabled = ($this->enabled)())) {
             throw new RuntimeException(sprintf(
                 'The PHP callable "enabled" must returns a boolean, %s received.',
                 gettype($enabled)
@@ -330,26 +313,24 @@ abstract class Target
     /**
      * Gets a list of log messages that are retrieved from the logger so far by this log target.
      *
-     * @return array[] The list of log messages.
-     *
-     * @see MessageCollection::$messages
+     * @return Message[] The list of log messages.
      */
     protected function getMessages(): array
     {
-        return $this->messages->all();
+        return $this->messages;
     }
 
     /**
      * Gets a list of formatted log messages.
      *
-     * @return array The list of formatted log messages.
+     * @return string[] The list of formatted log messages.
      */
     protected function getFormattedMessages(): array
     {
         $formatted = [];
 
-        foreach ($this->messages->all() as $key => $message) {
-            $formatted[$key] = $this->formatter->format($message);
+        foreach ($this->messages as $key => $message) {
+            $formatted[$key] = $this->formatter->format($message, $this->commonContext);
         }
 
         return $formatted;
@@ -366,71 +347,52 @@ abstract class Target
     {
         $formatted = '';
 
-        foreach ($this->messages->all() as $message) {
-            $formatted .= $this->formatter->format($message) . $separator;
+        foreach ($this->messages as $message) {
+            $formatted .= $this->formatter->format($message, $this->commonContext) . $separator;
         }
 
         return $formatted;
     }
 
     /**
+     * Gets a user parameters in the `key => value` format that should be logged in a each message.
+     *
+     * @return array The user parameters in the `key => value` format.
+     */
+    protected function getCommonContext(): array
+    {
+        return $this->commonContext;
+    }
+
+    /**
      * Filters the given messages according to their categories and levels.
      *
-     * The message structure follows that in {@see MessageCollection::$messages}.
+     * @param array $messages List log messages to be filtered.
      *
-     * @param array[] $messages List log messages to be filtered.
+     * @throws InvalidArgumentException for non-instance Message.
      *
-     * @return array[] The filtered log messages.
+     * @return Message[] The filtered log messages.
      */
     private function filterMessages(array $messages): array
     {
         foreach ($messages as $i => $message) {
-            $levels = $this->messages->getLevels();
+            if (!($message instanceof Message)) {
+                throw new InvalidArgumentException('You must provide an instance of \Yiisoft\Log\Message.');
+            }
 
-            if ((!empty($levels) && !in_array(($message[0] ?? ''), $levels, true))) {
+            if ((!empty($this->levels) && !in_array(($message->level()), $this->levels, true))) {
                 unset($messages[$i]);
                 continue;
             }
 
-            if ($this->categories->isExcluded((string) ($message[2]['category'] ?? ''))) {
+            if ($this->categories->isExcluded($message->context('category', ''))) {
                 unset($messages[$i]);
                 continue;
             }
 
-            if (!isset($message[2]['params']) || !is_array($message[2]['params'])) {
-                $message[2]['params'] = $this->logParams;
-            }
-
-            if (isset($message[2]['globals']) && is_array($message[2]['globals'])) {
-                $this->checkGlobalNames($message[2]['globals']);
-                $globals = $message[2]['globals'];
-            }
-
-            $message[2]['globals'] = ArrayHelper::filter($GLOBALS, $globals ?? $this->logGlobals);
-            $messages[$i] = $message;
+            $this->messages[] = $message;
         }
 
         return $messages;
-    }
-
-    /**
-     * Checks PHP global variable names.
-     *
-     * @param array $logGlobals The list of PHP global variable names to be checked.
-     *
-     * @throws InvalidArgumentException for non-string values or empty string.
-     *
-     * @see Target::$logGlobals
-     */
-    private function checkGlobalNames(array $logGlobals): void
-    {
-        foreach ($logGlobals as $logGlobal) {
-            if (!is_string($logGlobal) || $logGlobal === '') {
-                throw new InvalidArgumentException(sprintf(
-                    'The PHP global variable name must be a not empty string, %s received.',
-                    gettype($logGlobal)
-                ));
-            }
-        }
     }
 }

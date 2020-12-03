@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests;
 
+use Exception;
 use InvalidArgumentException;
 use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 use Yiisoft\Log\Logger;
+use Yiisoft\Log\Message;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
-use function array_column;
+use function array_map;
 use function array_merge;
 use function json_encode;
 use function implode;
@@ -73,7 +75,7 @@ final class TargetTest extends TestCase
      */
     public function testFilter(array $filter, array $expected): void
     {
-        $filter = array_merge($filter, ['logGlobals' => [], 'logParams' => []]);
+        $filter = array_merge($filter, ['commonContext' => []]);
 
         foreach ($filter as $key => $value) {
             $this->target->{'set' . ucfirst($key)}($value);
@@ -92,66 +94,21 @@ final class TargetTest extends TestCase
         $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
         $messages = $this->target->getMessages();
+        $texts = array_map(static fn (Message $message): string => $message->message(), $messages);
 
         $this->assertCount(
             count($expected),
             $messages,
-            'Expected ' . implode(',', $expected) . ', got ' . implode(',', array_column($messages, 0))
+            'Expected ' . implode(',', $expected) . ', got ' . implode(',', $texts)
         );
 
         $i = 0;
         foreach ($expected as $e) {
-            $this->assertEquals('test' . $e, $messages[$i++][1]);
+            $this->assertSame('test' . $e, $messages[$i++]->message());
         }
     }
 
-    public function testSetLogGlobals(): void
-    {
-        $this->target->setLogGlobals([
-            'A', '!A.A_b', 'A.A_d',
-            'B.B_a',
-            'C', 'C.C_a',
-        ]);
-        $GLOBALS['A'] = [
-            'A_a' => 1,
-            'A_b' => 1,
-            'A_c' => 1,
-        ];
-        $GLOBALS['B'] = [
-            'B_a' => 1,
-            'B_b' => 1,
-            'B_c' => 1,
-        ];
-        $GLOBALS['C'] = [
-            'C_a' => 1,
-            'C_b' => 1,
-            'C_c' => 1,
-        ];
-        $GLOBALS['E'] = [
-            'C_a' => 1,
-            'C_b' => 1,
-            'C_c' => 1,
-        ];
-        $this->collectOneAndExport(LogLevel::INFO, 'test', ['foo' => 'bar']);
-        $contextMessage = $this->target->formatMessages();
-        $this->assertStringContainsString('A_a', $contextMessage);
-        $this->assertStringNotContainsString('A_b', $contextMessage);
-        $this->assertStringContainsString('A_c', $contextMessage);
-        $this->assertStringContainsString('B_a', $contextMessage);
-        $this->assertStringNotContainsString('B_b', $contextMessage);
-        $this->assertStringNotContainsString('B_c', $contextMessage);
-        $this->assertStringContainsString('C_a', $contextMessage);
-        $this->assertStringContainsString('C_b', $contextMessage);
-        $this->assertStringContainsString('C_c', $contextMessage);
-        $this->assertStringNotContainsString('D_a', $contextMessage);
-        $this->assertStringNotContainsString('D_b', $contextMessage);
-        $this->assertStringNotContainsString('D_c', $contextMessage);
-        $this->assertStringNotContainsString('E_a', $contextMessage);
-        $this->assertStringNotContainsString('E_b', $contextMessage);
-        $this->assertStringNotContainsString('E_c', $contextMessage);
-    }
-
-    public function testGetEnabled(): void
+    public function testEnabled(): void
     {
         $this->target->enable();
         $this->assertTrue($this->target->isEnabled());
@@ -159,9 +116,8 @@ final class TargetTest extends TestCase
         $this->target->disable();
         $this->assertFalse($this->target->isEnabled());
 
-        $this->target->setEnabled(static function ($target) {
-            return empty($target->messages);
-        });
+        $enabled = true;
+        $this->target->setEnabled(static fn () => $enabled);
         $this->assertTrue($this->target->isEnabled());
     }
 
@@ -172,7 +128,7 @@ final class TargetTest extends TestCase
             'int' => [fn () => 1],
             'float' => [fn () => 1.1],
             'array' => [fn () => []],
-            'callable' => [fn () => fn () => true],
+            'callable' => [fn () => static fn () => true],
             'object' => [fn () => new stdClass()],
         ];
     }
@@ -189,35 +145,37 @@ final class TargetTest extends TestCase
         $this->target->isEnabled();
     }
 
-    public function testFormatTimestamp(): void
+    public function testFormatAndFormatTimestamp(): void
     {
         $text = 'message';
         $level = LogLevel::INFO;
         $category = 'application';
         $timestamp = 1508160390.6083;
+        $context = "\n\nMessage context:\n\ncategory: '{$category}'\ntime: {$timestamp}\n";
 
         $this->target->setTimestampFormat('Y-m-d H:i:s');
 
-        $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
+        $expectedWithoutMicro = "2017-10-16 13:26:30 [info][application] message{$context}";
         $this->collectOneAndExport($level, $text, ['category' => $category, 'time' => $timestamp]);
         $this->assertSame($expectedWithoutMicro, $this->target->formatMessages());
 
         $this->target->setTimestampFormat('Y-m-d H:i:s.u');
 
-        $expectedWithMicro = '2017-10-16 13:26:30.608300 [info][application] message';
+        $expectedWithMicro = "2017-10-16 13:26:30.608300 [info][application] message{$context}";
         $this->collectOneAndExport($level, $text, ['category' => $category, 'time' => $timestamp]);
         $this->assertSame($expectedWithMicro, $this->target->formatMessages());
 
-        $this->target->setTimestampFormat('Y-m-d H:i:s');
         $timestamp = 1508160390;
+        $this->target->setTimestampFormat('Y-m-d H:i:s');
+        $context = "\n\nMessage context:\n\ncategory: '{$category}'\ntime: {$timestamp}\n";
 
-        $expectedWithoutMicro = '2017-10-16 13:26:30 [info][application] message';
+        $expectedWithoutMicro = "2017-10-16 13:26:30 [info][application] message{$context}";
         $this->collectOneAndExport($level, $text, ['category' => $category, 'time' => $timestamp]);
         $this->assertSame($expectedWithoutMicro, $this->target->formatMessages());
 
         $this->target->setTimestampFormat('D d F Y');
 
-        $expectedCustom = 'Mon 16 October 2017 [info][application] message';
+        $expectedCustom = "Mon 16 October 2017 [info][application] message{$context}";
         $this->collectOneAndExport($level, $text, ['category' => $category, 'time' => $timestamp]);
         $this->assertSame($expectedCustom, $this->target->formatMessages());
     }
@@ -231,12 +189,13 @@ final class TargetTest extends TestCase
 
         $this->target->setTimestampFormat('Y-m-d H:i:s.u');
 
-        $expectedWithMicro = '2017-10-16 13:26:30.608300 [info][application] message';
+        $expectedWithMicro = '2017-10-16 13:26:30.608300 [info][application] message'
+            . "\n\nMessage context:\n\ntime: {$timestamp}\n";
         $this->collectOneAndExport($level, $text, ['time' => $timestamp]);
         $this->assertSame($expectedWithMicro, $this->target->formatMessages());
 
         $this->target->setTimestampFormat('Y-m-d H:i:s');
-        $expectedPatternWithoutMicro = '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[info\]\[application\] message$/';
+        $expectedPatternWithoutMicro = '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \[info\]\[application\] message/';
 
         $this->collectOneAndExport($level, $text, ['category' => $category]);
         $this->assertMatchesRegularExpression($expectedPatternWithoutMicro, $this->target->formatMessages());
@@ -252,33 +211,14 @@ final class TargetTest extends TestCase
         $this->collectOneAndExport(
             LogLevel::INFO,
             'message',
-            ['time' => $timestamp, 'trace' => [['file' => '/path/to/file', 'line' => 99]]],
+            ['category' => 'app', 'time' => $timestamp, 'trace' => [['file' => '/path/to/file', 'line' => 99]]],
         );
 
-        $expected = "2017-10-16 13:26:30 [info][application] message\n    in /path/to/file:99";
+        $expected = "2017-10-16 13:26:30 [info][app] message\n\nMessage context:\n\n"
+            . "trace:\n    in /path/to/file:99\n"
+            . "category: 'app'\ntime: {$timestamp}\n";
 
         $this->assertSame($expected, $this->target->formatMessages());
-    }
-
-    public function invalidMessageStructureProvider(): array
-    {
-        return [
-            'not-exist-index-0' => [['level' => 'info', 1 => 'message', 2 => []]],
-            'not-exist-index-1' => [['level', 5 => 'message', 2 => []]],
-            'not-exist-index-2' => [['level', 'message', 'context' => []]],
-            'non-array-context' => [['level', 'message', null]],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidMessageStructureProvider
-     *
-     * @param array $message
-     */
-    public function testCollectThrowExceptionForInvalidMessageStructure(array $message): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->target->collect([$message], true);
     }
 
     public function invalidStringListProvider(): array
@@ -326,22 +266,10 @@ final class TargetTest extends TestCase
         $this->target->setLevels($list);
     }
 
-    /**
-     * @dataProvider invalidStringListProvider
-     *
-     * @param array $list
-     */
-    public function testSetLogGlobalsThrowExceptionForNonStringList(array $list): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->target->setLogGlobals($list);
-    }
-
     public function testSetFormat(): void
     {
-        $this->target->setFormat(static function (array $message) {
-            [$level, $text, $context] = $message;
-            return "[{$level}][{$context['category']}] {$text}";
+        $this->target->setFormat(static function (Message $message) {
+            return "[{$message->level()}][{$message->context('category')}] {$message->message()}";
         });
 
         $expected = '[info][app] message';
@@ -352,15 +280,16 @@ final class TargetTest extends TestCase
     public function testSetPrefix(): void
     {
         $this->target->setPrefix(static fn () => 'Prefix: ');
-        $expected = '2017-10-16 13:26:30.608300 Prefix: [info][app] message';
+        $expected = '2017-10-16 13:26:30.608300 Prefix: [info][app] message'
+            . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083\n";
         $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
         $this->assertSame($expected, $this->target->formatMessages());
     }
 
     public function testSetFormatAndSetPrefix(): void
     {
-        $this->target->setFormat(static fn (array $message) => "({$message[0]}) {$message[1]}");
-        $this->target->setPrefix(static fn (array $message) => strtoupper($message[2]['category']) . ': ');
+        $this->target->setFormat(static fn (Message $message) => "({$message->level()}) {$message->message()}");
+        $this->target->setPrefix(static fn (Message $message) => strtoupper($message->context('category') . ': '));
 
         $expected = 'APP: (info) message';
         $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app']);
@@ -372,15 +301,15 @@ final class TargetTest extends TestCase
         return [
             'export' => [
                 [
-                    [LogLevel::INFO, 'message-1', ['category' => 'app']],
-                    [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
+                    new Message(LogLevel::INFO, 'message-1', ['category' => 'app']),
+                    new Message(LogLevel::DEBUG, 'message-2', ['category' => 'app']),
                 ],
                 true,
             ],
             'not-export' => [
                 [
-                    [LogLevel::INFO, 'message-1', ['category' => 'app']],
-                    [LogLevel::DEBUG, 'message-2', ['category' => 'app']],
+                    new Message(LogLevel::INFO, 'message-1', ['category' => 'app']),
+                    new Message(LogLevel::DEBUG, 'message-2', ['category' => 'app']),
                 ],
                 false,
             ],
@@ -395,8 +324,8 @@ final class TargetTest extends TestCase
      */
     public function testFormatMessagesWithSeparatorAndSetFormatAndSetPrefix(array $messages, bool $export): void
     {
-        $this->target->setFormat(static fn (array $message) => "({$message[0]}) {$message[1]}");
-        $this->target->setPrefix(static fn (array $message) => strtoupper($message[2]['category']) . ': ');
+        $this->target->setFormat(static fn (Message $message) => "({$message->level()}) {$message->message()}");
+        $this->target->setPrefix(static fn (Message $message) => strtoupper($message->context('category') . ': '));
 
         $expected = "APP: (info) message-1\nAPP: (debug) message-2\n";
         $this->target->collect($messages, $export);
@@ -412,8 +341,8 @@ final class TargetTest extends TestCase
      */
     public function testGetFormattedMessagesAndSetFormatAndSetPrefix(array $messages, bool $export): void
     {
-        $this->target->setFormat(static fn (array $message) => "({$message[0]}) {$message[1]}");
-        $this->target->setPrefix(static fn (array $message) => strtoupper($message[2]['category']) . ': ');
+        $this->target->setFormat(static fn (Message $message) => "({$message->level()}) {$message->message()}");
+        $this->target->setPrefix(static fn (Message $message) => strtoupper($message->context('category') . ': '));
 
         $expected = ['APP: (info) message-1', 'APP: (debug) message-2'];
         $this->target->collect($messages, $export);
@@ -430,53 +359,80 @@ final class TargetTest extends TestCase
     public function testSetExportIntervalAndSetFormat(array $messages, bool $export): void
     {
         $this->target->setExportInterval(3);
-        $this->target->setFormat(static function (array $message) {
-            [$level, $text, $context] = $message;
-            return "[{$level}][{$context['category']}] {$text}";
+        $this->target->setFormat(static function (Message $message) {
+            return "[{$message->level()}][{$message->context('category')}] {$message->message()}";
         });
         $this->target->collect($messages, $export);
 
         $this->assertSame((int) $export, $this->target->getExportCount());
     }
 
-    public function testSetLogGlobalsAndSetLogParamsWithDefaultFormat(): void
+    public function contextProvider(): array
     {
-        $this->target->setLogGlobals(['_GET']);
-        $this->target->setLogParams(['foo' => 'bar', 'baz' => true]);
-        $this->collectOneAndExport(LogLevel::INFO, 'message', ['time' => 1508160390.6083]);
-        $expected = '2017-10-16 13:26:30.608300 [info][application] message'
-            . "\n\nUser parameters:\n\nfoo = 'bar'\n\nbaz = true"
-            . "\n\nGlobal variables:\n\n\$_GET = []";
+        return [
+            'string' => [['foo' => 'a'], "foo: 'a'"],
+            'int' => [['foo' => 1], 'foo: 1'],
+            'float' => [['foo' => 1.1], 'foo: 1.1'],
+            'array' => [['foo' => []], 'foo: []'],
+            'null' => [['foo' => null], 'foo: null'],
+            'callable' => [['foo' => fn () => null], 'foo: fn () => null'],
+            'exception' => [['foo' => $exception = new Exception('some error')], "foo: {$exception->__toString()}"],
+            'stringable-object' => [
+                ['foo' => new class() {
+                    public function __toString(): string
+                    {
+                        return 'stringable-object';
+                    }
+                }],
+                'foo: stringable-object',
+            ],
+        ];
+    }
 
+    /**
+     * @dataProvider contextProvider
+     *
+     * @param array $context
+     * @param string $expected
+     */
+    public function testMessageContext(array $context, string $expected): void
+    {
+        $context = array_merge($context, ['category' => 'app', 'time' => 1508160390.6083]);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', $context);
+        $expected = '2017-10-16 13:26:30.608300 [info][app] message'
+            . "\n\nMessage context:\n\n{$expected}\ncategory: 'app'\ntime: 1508160390.6083\n"
+        ;
         $this->assertSame($expected, $this->target->formatMessages());
     }
 
-    public function testSetLogGlobalsAndSetLogParamsWithPassedContext(): void
+    /**
+     * @dataProvider contextProvider
+     *
+     * @param array $commonContext
+     * @param string $expected
+     */
+    public function testSetCommonContext(array $commonContext, string $expected): void
     {
-        $this->target->setLogGlobals(['_GET']);
-        $this->target->setLogParams(['foo' => 'bar', 'baz' => true]);
-        $this->target->collect([[
-            LogLevel::INFO,
-            'message',
-            ['time' => 1508160390.6083, 'globals' => [], 'params' => ['foo' => 1]],
-        ]], false);
-        $expected = "2017-10-16 13:26:30.608300 [info][application] message\n\nUser parameters:\n\nfoo = 1";
-
+        $this->target->setCommonContext($commonContext);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
+        $expected = '2017-10-16 13:26:30.608300 [info][app] message'
+            . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083"
+            . "\n\nCommon context:\n\n{$expected}\n"
+        ;
+        $this->assertSame($commonContext, $this->target->getCommonContext());
         $this->assertSame($expected, $this->target->formatMessages());
     }
 
-    public function testSetFormatAndSetLogGlobalsAndSetLogParams(): void
+    public function testSetFormatWithoutMessageContextAndSetCommonContext(): void
     {
-        $this->target->setLogGlobals(['_GET']);
-        $this->target->setLogParams(['foo' => 'bar', 'baz' => true]);
-        $this->target->setFormat(static function (array $message) {
-            [$level, $text, $context] = $message;
-            $globalContext = json_encode(['globals' => $context['globals'], 'params' => $context['params']]);
-            return "[{$level}] {$text}, global context: {$globalContext}";
+        $this->target->setCommonContext($commonContext = ['foo' => 'bar', 'baz' => true]);
+        $this->target->setFormat(static function (Message $message, array $commonContext) {
+            return "[{$message->level()}] {$message->message()}, common context: " . json_encode($commonContext);
         });
         $this->collectOneAndExport(LogLevel::INFO, 'message');
-        $expected = '[info] message, global context: {"globals":{"_GET":[]},"params":{"foo":"bar","baz":true}}';
+        $expected = '[info] message, common context: {"foo":"bar","baz":true}';
 
+        $this->assertSame($commonContext, $this->target->getCommonContext());
         $this->assertSame($expected, $this->target->formatMessages());
     }
 
@@ -487,7 +443,7 @@ final class TargetTest extends TestCase
             'int' => [fn () => 1],
             'float' => [fn () => 1.1],
             'array' => [fn () => []],
-            'callable' => [fn () => fn () => 'a'],
+            'callable' => [fn () => static fn () => 'a'],
             'object' => [fn () => new stdClass()],
         ];
     }
@@ -500,9 +456,34 @@ final class TargetTest extends TestCase
     public function testFormatMessageThrowExceptionForFormatCallableReturnNotBoolean(callable $value): void
     {
         $this->target->setFormat($value);
-        $this->target->collect([[LogLevel::INFO, 'test', ['foo' => 'bar']]], false);
+        $this->target->collect([new Message(LogLevel::INFO, 'test', ['foo' => 'bar'])], false);
         $this->expectException(RuntimeException::class);
         $this->target->formatMessages();
+    }
+
+    public function invalidMessageListProvider(): array
+    {
+        return [
+            'string' => [['a']],
+            'int' => [[1]],
+            'float' => [[1.1]],
+            'bool' => [[true]],
+            'null' => [[null]],
+            'array' => [[[]]],
+            'callable' => [[fn () => null]],
+            'object' => [[new stdClass()]],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidMessageListProvider
+     *
+     * @param array $messageList
+     */
+    public function testCollectThrowExceptionForNonInstanceMessages(array $messageList): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->target->collect($messageList, true);
     }
 
     /**
@@ -513,13 +494,13 @@ final class TargetTest extends TestCase
     public function testFormatMessageThrowExceptionForPrefixCallableReturnNotBoolean(callable $value): void
     {
         $this->target->setPrefix($value);
-        $this->target->collect([[LogLevel::INFO, 'test', ['foo' => 'bar']]], false);
+        $this->target->collect([new Message(LogLevel::INFO, 'test', ['foo' => 'bar'])], false);
         $this->expectException(RuntimeException::class);
         $this->target->formatMessages();
     }
 
     private function collectOneAndExport(string $level, string $message, array $context = []): void
     {
-        $this->target->collect([[$level, $message, $context]], true);
+        $this->target->collect([new Message($level, $message, $context)], true);
     }
 }

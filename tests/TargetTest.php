@@ -461,6 +461,31 @@ final class TargetTest extends TestCase
         $this->target->formatMessages();
     }
 
+    public function invalidMessageListProvider(): array
+    {
+        return [
+            'string' => [['a']],
+            'int' => [[1]],
+            'float' => [[1.1]],
+            'bool' => [[true]],
+            'null' => [[null]],
+            'array' => [[[]]],
+            'callable' => [[fn () => null]],
+            'object' => [[new stdClass()]],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidMessageListProvider
+     *
+     * @param array $messageList
+     */
+    public function testCollectThrowExceptionForNonInstanceMessages(array $messageList): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->target->collect($messageList, true);
+    }
+
     /**
      * @dataProvider invalidCallableReturnStringProvider
      *

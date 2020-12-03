@@ -367,13 +367,19 @@ abstract class Target
     /**
      * Filters the given messages according to their categories and levels.
      *
-     * @param Message[] $messages List log messages to be filtered.
+     * @param array $messages List log messages to be filtered.
+     *
+     * @throws InvalidArgumentException for non-instance Message.
      *
      * @return Message[] The filtered log messages.
      */
     private function filterMessages(array $messages): array
     {
         foreach ($messages as $i => $message) {
+            if (!($message instanceof Message)) {
+                throw new InvalidArgumentException('You must provide an instance of \Yiisoft\Log\Message.');
+            }
+
             if ((!empty($this->levels) && !in_array(($message->level()), $this->levels, true))) {
                 unset($messages[$i]);
                 continue;

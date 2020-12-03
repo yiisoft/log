@@ -236,7 +236,7 @@ final class LoggerTest extends TestCase
         $this->assertSame($target, $logger->getTargets()[0]);
     }
 
-    public function invalidTargetProvider(): array
+    public function invalidListTargetProvider(): array
     {
         return [
             'string' => [['a']],
@@ -251,14 +251,14 @@ final class LoggerTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidTargetProvider
+     * @dataProvider invalidListTargetProvider
      *
-     * @param mixed $target
+     * @param array $targetList
      */
-    public function testConstructorThrowExceptionForNonInstanceTarget($target): void
+    public function testConstructorThrowExceptionForNonInstanceTarget(array $targetList): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new Logger($target);
+        new Logger($targetList);
     }
 
     public function parseMessageProvider(): array

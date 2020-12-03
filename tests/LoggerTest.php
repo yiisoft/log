@@ -17,7 +17,6 @@ use Yiisoft\Log\Message;
 use Yiisoft\Log\Target;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
-use function array_pop;
 use function memory_get_usage;
 
 final class LoggerTest extends TestCase

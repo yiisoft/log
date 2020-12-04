@@ -67,7 +67,7 @@ final class LoggerTest extends TestCase
         $this->assertSame('application', $messages[0]->context('category'));
         $this->assertSame([
             'file' => __FILE__,
-            'line' => 62,
+            'line' => 61,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',

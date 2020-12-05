@@ -16,8 +16,9 @@
 [![type-coverage](https://shepherd.dev/github/yiisoft/log/coverage.svg)](https://shepherd.dev/github/yiisoft/log)
 
 This package provides [PSR-3](https://www.php-fig.org/psr/psr-3/) compatible logging library. It is used in
-[Yii Framework](http://www.yiiframework.com/) but is supposed to be usable separately. The work of the logger is based
-on the targets that filters the log messages by their severity levels and categories and then exports them to some medium.
+[Yii Framework](http://www.yiiframework.com/) but is usable separately.
+
+The logger sends passes messages to multiple targets. Each target may filter messages by their severity levels and categories and then export them to some medium such as file, email or syslog.
 
 ## Installation
 
@@ -41,7 +42,7 @@ Creating a logger:
 $logger = new \Yiisoft\Log\Logger($targets);
 ```
 
-Writing a logs:
+Writing logs:
 
 ```php
 $logger->emergency('Emergency message', ['key' => 'value']);
@@ -55,7 +56,7 @@ $logger->debug('Debug message', ['key' => 'value']);
 
 ## Message Flushing and Exporting
 
-Log messages are collected and stored in memory. To limit memory consumption,the logger will flush
+Log messages are collected and stored in memory. To limit memory consumption, the logger will flush
 the recorded messages to the log targets each time a certain number of log messages accumulate.
 You can customize this number by calling the `\Yiisoft\Log\Logger::setFlushInterval()` method:
 
@@ -63,8 +64,9 @@ You can customize this number by calling the `\Yiisoft\Log\Logger::setFlushInter
 $logger->setFlushInterval(100); // default is 1000
 ```
 
-Each log target also collects and stores messages in memory, and exporting messages follows the same principle as
-described above. To change the number of stored messages, call the `\Yiisoft\Log\Target::setExportInterval()` method:
+Each log target also collects and stores messages in memory.
+Message exporting in a target follows the same principle as in the logger.
+To change the number of stored messages, call the `\Yiisoft\Log\Target::setExportInterval()` method:
 
 ```php
 $target->setExportInterval(100); // default is 1000
@@ -77,16 +79,16 @@ $target->setExportInterval(100); // default is 1000
 This package contains two targets:
 
 - `Yiisoft\Log\PsrTarget` - passes log messages to another [PSR-3](https://www.php-fig.org/psr/psr-3/) compatible logger.
-- `Yiisoft\Log\StreamTarget` - writes log messages in specified output stream.
+- `Yiisoft\Log\StreamTarget` - writes log messages to the specified output stream.
 
-Other logging targets are implemented as separate packages:
+Extra logging targets are implemented as separate packages:
 
 - [Database](https://github.com/yiisoft/log-target-db)
 - [Email](https://github.com/yiisoft/log-target-email)
 - [File](https://github.com/yiisoft/log-target-file)
 - [Syslog](https://github.com/yiisoft/log-target-syslog)
 
-See [Yii guide](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md) to logging for more info.
+See [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md) for more info.
 
 ### Unit testing
 

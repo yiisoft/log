@@ -370,10 +370,8 @@ abstract class Target
      * @param array $messages List log messages to be filtered.
      *
      * @throws InvalidArgumentException for non-instance Message.
-     *
-     * @return Message[] The filtered log messages.
      */
-    private function filterMessages(array $messages): array
+    private function filterMessages(array $messages): void
     {
         foreach ($messages as $i => $message) {
             if (!($message instanceof Message)) {
@@ -392,7 +390,5 @@ abstract class Target
 
             $this->messages[] = $message;
         }
-
-        return $messages;
     }
 }

@@ -34,10 +34,10 @@
         "psr/log-implementation": "1.0.0"
     },
     "suggest": {
-        "yiisoft/log-target-db": "version ^3.0 for saving logs to the database",
-        "yiisoft/log-target-email": "version ^3.0 for sending logs by email",
-        "yiisoft/log-target-file": "version ^3.0 for saving logs to filesystem",
-        "yiisoft/log-target-syslog": "version ^3.0 for saving logs to Syslog"
+        "yiisoft/log-target-db": "Allows writing log messages to the database",
+        "yiisoft/log-target-email": "Allows sending log messages by email",
+        "yiisoft/log-target-file": "Allows writing log messages to the files",
+        "yiisoft/log-target-syslog": "Allows writing log messages to the Syslog"
     },
     "autoload": {
         "psr-4": {

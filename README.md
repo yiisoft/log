@@ -25,7 +25,7 @@ The logger sends passes messages to multiple targets. Each target may filter mes
 The package could be installed with composer:
 
 ```
-composer install yiisoft/log
+composer require yiisoft/log
 ```
 
 ## General usage

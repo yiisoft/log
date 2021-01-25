@@ -6,7 +6,8 @@
         "yii",
         "framework",
         "log",
-        "logger"
+        "logger",
+        "psr-3"
     ],
     "homepage": "http://www.yiiframework.com/",
     "license": "BSD-3-Clause",

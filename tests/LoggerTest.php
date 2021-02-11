@@ -137,7 +137,7 @@ final class LoggerTest extends TestCase
 
         $messages = $this->getInaccessibleMessages($this->logger);
 
-        for ($i = 0; $i < count($levels); $i++) {
+        for ($i = 0, $levelsCount = count($levels); $i < $levelsCount; $i++) {
             $this->assertSame($levels[$i], $messages[$i]->level());
             $this->assertSame($expected, $messages[$i]->message());
         }

@@ -49,8 +49,11 @@
         }
     },
     "extra": {
+        "config-plugin-options": {
+            "source-directory": "config"
+        },
         "config-plugin": {
-            "events-web": "config/events-web.php"
+            "events-web": "events-web.php"
         }
     },
     "config": {

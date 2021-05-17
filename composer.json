@@ -53,6 +53,7 @@
             "source-directory": "config"
         },
         "config-plugin": {
+            "events-console": "events-console.php",
             "events-web": "events-web.php"
         }
     },

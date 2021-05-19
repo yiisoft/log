@@ -1,6 +1,11 @@
 # Log Change Log
 
 
+## 1.0.3 under development
+
+- no changes in this release.
+
+
 ## 1.0.2 May 19, 2021
 
 - Bug #67: Flush logger on the console is terminated (rustamwin)

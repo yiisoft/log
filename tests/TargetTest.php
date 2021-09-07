@@ -378,7 +378,7 @@ final class TargetTest extends TestCase
             'callable' => [['foo' => fn () => null], 'foo: fn () => null'],
             'exception' => [['foo' => $exception = new Exception('some error')], "foo: {$exception->__toString()}"],
             'stringable-object' => [
-                ['foo' => new class() {
+                ['foo' => new class () {
                     public function __toString(): string
                     {
                         return 'stringable-object';

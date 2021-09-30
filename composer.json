@@ -20,7 +20,7 @@
     },
     "require": {
         "php": "^7.4|^8.0",
-        "psr/log": "^3.0",
+        "psr/log": "^1.4|^",
         "yiisoft/var-dumper": "^1.0"
     },
     "require-dev": {

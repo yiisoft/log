@@ -76,16 +76,6 @@ final class LoggerTest extends TestCase
         $this->assertGreaterThanOrEqual($memory, $messages[0]->context('memory'));
     }
 
-    public function testLogWithThrowableMessage(): void
-    {
-        $message = new RuntimeException('some error');
-        $this->logger->log(LogLevel::ERROR, $message);
-        $messages = $this->getInaccessibleMessages($this->logger);
-
-        $this->assertInstanceOf(RuntimeException::class, $messages[0]->context('exception'));
-        $this->assertSame($message, $messages[0]->context('exception'));
-    }
-
     public function messageProvider(): array
     {
         return [

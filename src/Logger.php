@@ -143,14 +143,8 @@ final class Logger implements LoggerInterface
         return $this->targets;
     }
 
-    public function log($level, $message, array $context = []): void
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
-        if (($message instanceof Throwable) && !isset($context['exception'])) {
-            // exceptions are string-convertible, thus should be passed as it is to the logger
-            // if exception instance is given to produce a stack trace, it MUST be in a key named "exception".
-            $context['exception'] = $message;
-        }
-
         $context['time'] ??= microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         $context['memory'] ??= memory_get_usage();

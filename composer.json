@@ -21,6 +21,7 @@
     "require": {
         "php": "^7.4|^8.0",
         "psr/log": "^2.0",
+        "symfony/polyfill-php80": "^1.23",
         "yiisoft/var-dumper": "^1.0"
     },
     "require-dev": {

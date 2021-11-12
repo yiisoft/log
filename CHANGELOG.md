@@ -1,6 +1,6 @@
 # Log Change Log
 
-## 1.0.3 under development
+## 1.0.3 November 12, 2021
 
 - Chg #74: Replace usage of `yiisoft/yii-web` to `yiisoft/yii-http` in event config (devanych)
 

@@ -20,12 +20,16 @@ This package provides [PSR-3](https://www.php-fig.org/psr/psr-3/) compatible log
 
 The logger sends passes messages to multiple targets. Each target may filter messages by their severity levels and categories and then export them to some medium such as file, email or syslog.
 
+## Requirements
+
+- PHP 7.4 or higher.
+
 ## Installation
 
 The package could be installed with composer:
 
 ```
-composer require yiisoft/log
+composer require yiisoft/log --prefer-dist
 ```
 
 ## General usage
@@ -89,6 +93,8 @@ Extra logging targets are implemented as separate packages:
 - [Syslog](https://github.com/yiisoft/log-target-syslog)
 
 See [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md) for more info.
+
+## Testing
 
 ### Unit testing
 

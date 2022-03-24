@@ -1,9 +1,8 @@
 # Log Change Log
 
-
 ## 1.0.4 under development
 
-- no changes in this release.
+- Fix #76: Fix time formatter when locale uses comma as a decimal point separator (terabytesoftw)
 
 ## 1.0.3 November 12, 2021
 

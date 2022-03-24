@@ -141,17 +141,14 @@ final class Formatter
     private function getTime(Message $message): string
     {
         $timestamp = (string) $message->context('time', microtime(true));
+        $format = 'U';
 
-        switch (true) {
-            case strpos($timestamp, '.') !== false:
-                $format = 'U.u';
-                break;
-            case strpos($timestamp, ',') !== false:
-                $format = 'U,u';
-                break;
-            default:
-                $format = 'U';
-                break;
+        if (strpos($timestamp, '.') !== false) {
+            $format = 'U.u';
+        }
+
+        if (strpos($timestamp, ',') !== false) {
+            $format = 'U,u';
         }
 
         return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);

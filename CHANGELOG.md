@@ -1,9 +1,8 @@
 # Log Change Log
 
-
 ## 1.0.4 under development
 
--  Fix #76: Fix time formatter when locale define a comma as decimal point (terabytesoftw)
+- Fix #76: Fix time formatter when locale define a comma as decimal point (terabytesoftw)
 
 ## 1.0.3 November 12, 2021
 

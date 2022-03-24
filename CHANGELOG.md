@@ -3,7 +3,7 @@
 
 ## 1.0.4 under development
 
-- no changes in this release.
+- Chg #77: Fix formatter `getTime()` method when locale returns a comma as decimal point (terabytesoftw)
 
 ## 1.0.3 November 12, 2021
 

@@ -123,7 +123,7 @@ final class FormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($message, []));
     }
 
-    public function testFormatWithSetTimestampFormatWithCommaSeparator(): void
+    public function testFormatWithTimeCommaSeparated(): void
     {
         $this->formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => '1508160390,6083']);

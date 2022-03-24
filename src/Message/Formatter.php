@@ -140,8 +140,14 @@ final class Formatter
      */
     private function getTime(Message $message): string
     {
+        $currentLocale = \setlocale(LC_NUMERIC, '0');
+        \setlocale(LC_NUMERIC, 'C');
+
         $timestamp = (string) $message->context('time', microtime(true));
         $format = strpos($timestamp, '.') === false ? 'U' : 'U.u';
+
+        \setlocale(LC_NUMERIC, $currentLocale);
+
         return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 

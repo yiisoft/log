@@ -67,6 +67,22 @@ final class FormatterTest extends TestCase
     /**
      * @dataProvider contextProvider
      *
+     * @param array $context
+     * @param string $expected
+     */
+    public function testDefaultFormatWithOtherLocal(array $context, string $expected): void
+    {
+        $currentLocale = \setlocale(LC_NUMERIC, '0');
+        $this->assertNotFalse(\setlocale(LC_NUMERIC, 'ru_RU'));
+
+        $this->testDefaultFormat($context, $expected);
+
+        \setlocale(LC_NUMERIC, $currentLocale);
+    }
+
+    /**
+     * @dataProvider contextProvider
+     *
      * @param array $commonContext
      * @param string $expected
      */

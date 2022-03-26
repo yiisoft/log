@@ -2,7 +2,7 @@
 
 ## 1.0.4 under development
 
-- Fix #76: Fix time formatter when locale uses comma as a decimal point separator (terabytesoftw)
+- Bug #76: Fix time formatter when locale uses comma as a decimal point separator (terabytesoftw)
 
 ## 1.0.3 November 12, 2021
 

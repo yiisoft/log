@@ -136,14 +136,21 @@ final class FormatterTest extends TestCase
     public function testFormatWithSetFormatAndSetPrefix(): void
     {
         $this->formatter->setFormat(static fn (Message $message) => "({$message->level()}) {$message->message()}");
-        $this->formatter->setPrefix(static function (Message $message) {
-            $category = strtoupper($message->context('category'));
-            $time = date('H:i:s', $message->context('time'));
-            return "{$category}: ({$time})";
-        });
-        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390]);
-        $expected = 'APP: (13:26:30)(info) message';
-        $this->assertSame($expected, $this->formatter->format($message, []));
+        $this->formatter->setPrefix(
+            static function (Message $message) {
+                $category = strtoupper($message->context('category'));
+                $time = date('H:i:s', $message->context('time'));
+                return "{$category}: ({$time})";
+            }
+        );
+
+        $time = 1508160390;
+        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => $time]);
+
+        $this->assertSame(
+            'APP: (' . date('H:i:s', $time) . ')(info) message',
+            $this->formatter->format($message, [])
+        );
     }
 
     public function testFormatWithContextAndSetFormat(): void

@@ -1,8 +1,8 @@
 # Log Change Log
 
-## 1.0.5 under development
+## 1.1.0 under development
 
-- no changes in this release.
+- Chg #68: Support `psr/log` ^2.0 and raise the minimum PHP version to 8.0 (xepozz, rustamwin)
 
 ## 1.0.4 March 29, 2022
 

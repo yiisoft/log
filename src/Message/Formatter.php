@@ -16,7 +16,6 @@ use function is_object;
 use function method_exists;
 use function microtime;
 use function sprintf;
-use function strpos;
 
 /**
  * Formatter formats log messages.

@@ -53,7 +53,7 @@ final class Message
      * @see LoggerTrait::log()
      * @see LogLevel
      */
-    public function __construct($level, $message, array $context = [])
+    public function __construct(mixed $level, mixed $message, array $context = [])
     {
         $this->level = Logger::validateLevel($level);
         $this->message = $this->parse($message, $context);
@@ -90,7 +90,7 @@ final class Message
      *
      * @return mixed The context parameter value.
      */
-    public function context(string $name = null, $default = null)
+    public function context(string $name = null, mixed $default = null): mixed
     {
         if ($name === null) {
             return $this->context;
@@ -108,7 +108,7 @@ final class Message
      *
      * @return string Parsed message.
      */
-    private function parse($message, array $context): string
+    private function parse(mixed $message, array $context): string
     {
         $message = (is_scalar($message) || (is_object($message) && method_exists($message, '__toString')))
             ? (string) $message

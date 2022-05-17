@@ -141,7 +141,7 @@ final class Formatter
     private function getTime(Message $message): string
     {
         $timestamp = (string) $message->context('time', microtime(true));
-        $format = strpos($timestamp, '.') === false ? 'U' : 'U.u';
+        $format = !str_contains($timestamp, '.') ? 'U' : 'U.u';
         return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 
@@ -235,7 +235,7 @@ final class Formatter
      *
      * @return string Converted string.
      */
-    private function convertToString($value): string
+    private function convertToString(mixed $value): string
     {
         if (is_object($value) && method_exists($value, '__toString')) {
             return $value->__toString();

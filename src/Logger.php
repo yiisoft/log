@@ -23,7 +23,6 @@ use function memory_get_usage;
 use function microtime;
 use function register_shutdown_function;
 use function sprintf;
-use function strpos;
 
 /**
  * Logger records logged messages in memory and sends them to different targets according to {@see Logger::$targets}.
@@ -115,7 +114,7 @@ final class Logger implements LoggerInterface
      *
      * @return string The text display of the level.
      */
-    public static function validateLevel($level): string
+    public static function validateLevel(mixed $level): string
     {
         if (!is_string($level)) {
             throw new \Psr\Log\InvalidArgumentException(sprintf(
@@ -143,7 +142,7 @@ final class Logger implements LoggerInterface
         return $this->targets;
     }
 
-    public function log($level, string|\Stringable $message, array $context = []): void
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
         $context['time'] ??= microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
@@ -294,7 +293,7 @@ final class Logger implements LoggerInterface
             foreach ($backtrace as $trace) {
                 if (isset($trace['file'], $trace['line'])) {
                     $excludedMatch = array_filter($this->excludedTracePaths, static function ($path) use ($trace) {
-                        return strpos($trace['file'], $path) !== false;
+                        return str_contains($trace['file'], $path);
                     });
 
                     if (empty($excludedMatch)) {

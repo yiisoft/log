@@ -22,7 +22,7 @@ The logger sends passes messages to multiple targets. Each target may filter mes
 
 ## Requirements
 
-- PHP 7.4 or higher.
+- PHP 8.0 or higher.
 
 ## Installation
 

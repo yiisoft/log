@@ -1,6 +1,6 @@
 # Log Change Log
 
-## 1.1.0 under development
+## 2.0.0 under development
 
 - Chg #68: Raise the minimum `psr/log` version to `^2.0|^3.0` and the minimum PHP version to 8.0 (xepozz, rustamwin)
 

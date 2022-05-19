@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
+use Stringable;
 use Throwable;
 use Yiisoft\Log\Message\CategoryFilter;
 
@@ -142,7 +143,7 @@ final class Logger implements LoggerInterface
         return $this->targets;
     }
 
-    public function log(mixed $level, string|\Stringable $message, array $context = []): void
+    public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
         $context['time'] ??= microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));

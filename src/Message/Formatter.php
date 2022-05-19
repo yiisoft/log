@@ -141,17 +141,11 @@ final class Formatter
     {
         $timestamp = (string) $message->context('time', microtime(true));
 
-        switch (true) {
-            case str_contains($timestamp, '.'):
-                $format = 'U.u';
-                break;
-            case str_contains($timestamp, ','):
-                $format = 'U,u';
-                break;
-            default:
-                $format = 'U';
-                break;
-        }
+        $format = match (true) {
+            str_contains($timestamp, '.') => 'U.u',
+            str_contains($timestamp, ',') => 'U,u',
+            default => 'U',
+        };
 
         return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }

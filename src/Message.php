@@ -7,11 +7,8 @@ namespace Yiisoft\Log;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
-use Yiisoft\VarDumper\VarDumper;
+use Stringable;
 
-use function is_scalar;
-use function is_object;
-use function method_exists;
 use function preg_replace_callback;
 
 /**
@@ -45,7 +42,7 @@ final class Message
 
     /**
      * @param mixed $level Log message level.
-     * @param mixed $message Log message.
+     * @param string|Stringable $message Log message.
      * @param array $context Log message context.
      *
      * @throws InvalidArgumentException for invalid log message level.
@@ -53,7 +50,7 @@ final class Message
      * @see LoggerTrait::log()
      * @see LogLevel
      */
-    public function __construct(mixed $level, mixed $message, array $context = [])
+    public function __construct(mixed $level, string|Stringable $message, array $context = [])
     {
         $this->level = Logger::validateLevel($level);
         $this->message = $this->parse($message, $context);
@@ -103,17 +100,14 @@ final class Message
      * Parses log message resolving placeholders in the form: "{foo}",
      * where foo will be replaced by the context data in key "foo".
      *
-     * @param mixed $message Raw log message.
+     * @param string|Stringable $message Raw log message.
      * @param array $context Message context.
      *
      * @return string Parsed message.
      */
-    private function parse(mixed $message, array $context): string
+    private function parse(string|Stringable $message, array $context): string
     {
-        $message = (is_scalar($message) || (is_object($message) && method_exists($message, '__toString')))
-            ? (string) $message
-            : VarDumper::create($message)->export()
-        ;
+        $message = (string)$message;
 
         return preg_replace_callback('/{([\w.]+)}/', static function (array $matches) use ($context) {
             $placeholderName = $matches[1];

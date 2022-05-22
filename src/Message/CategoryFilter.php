@@ -11,7 +11,6 @@ use function is_string;
 use function rtrim;
 use function substr_compare;
 use function sprintf;
-use function strpos;
 
 /**
  * Category is a data object that stores and matches the included and excluded categories of log messages.
@@ -82,7 +81,7 @@ final class CategoryFilter
         foreach ($this->exclude as $exclude) {
             $prefix = rtrim($exclude, '*');
 
-            if ($category === $exclude || ($prefix !== $exclude && strpos($category, $prefix) === 0)) {
+            if ($category === $exclude || ($prefix !== $exclude && str_starts_with($category, $prefix))) {
                 return true;
             }
         }
@@ -97,7 +96,7 @@ final class CategoryFilter
                 || (
                     !empty($include)
                     && substr_compare($include, '*', -1, 1) === 0
-                    && strpos($category, rtrim($include, '*')) === 0
+                    && str_starts_with($category, rtrim($include, '*'))
                 )
             ) {
                 return false;

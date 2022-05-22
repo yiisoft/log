@@ -16,7 +16,6 @@ use function is_object;
 use function method_exists;
 use function microtime;
 use function sprintf;
-use function strpos;
 
 /**
  * Formatter formats log messages.
@@ -142,17 +141,11 @@ final class Formatter
     {
         $timestamp = (string) $message->context('time', microtime(true));
 
-        switch (true) {
-            case strpos($timestamp, '.') !== false:
-                $format = 'U.u';
-                break;
-            case strpos($timestamp, ',') !== false:
-                $format = 'U,u';
-                break;
-            default:
-                $format = 'U';
-                break;
-        }
+        $format = match (true) {
+            str_contains($timestamp, '.') => 'U.u',
+            str_contains($timestamp, ',') => 'U,u',
+            default => 'U',
+        };
 
         return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
@@ -247,7 +240,7 @@ final class Formatter
      *
      * @return string Converted string.
      */
-    private function convertToString($value): string
+    private function convertToString(mixed $value): string
     {
         if (is_object($value) && method_exists($value, '__toString')) {
             return $value->__toString();

@@ -310,11 +310,14 @@ final class LoggerTest extends TestCase
     public function testDispatchWithDisabledTarget(): void
     {
         /** @var MockObject|Target $target */
-        $target = $this->getMockBuilder(Target::class)
+        $target = $this
+            ->getMockBuilder(Target::class)
             ->onlyMethods(['collect'])
             ->getMockForAbstractClass();
 
-        $target->expects($this->never())->method($this->anything());
+        $target
+            ->expects($this->never())
+            ->method($this->anything());
         $target->disable();
 
         $logger = new Logger(['fakeTarget' => $target]);
@@ -330,11 +333,13 @@ final class LoggerTest extends TestCase
         $message = new Message(LogLevel::INFO, 'test', ['foo' => 'bar']);
 
         /** @var MockObject|Target $target */
-        $target = $this->getMockBuilder(Target::class)
+        $target = $this
+            ->getMockBuilder(Target::class)
             ->onlyMethods(['collect'])
             ->getMockForAbstractClass();
 
-        $target->expects($this->once())
+        $target
+            ->expects($this->once())
             ->method('collect')
             ->with(
                 $this->equalTo([$message]),
@@ -356,16 +361,19 @@ final class LoggerTest extends TestCase
         $message = new Message(LogLevel::INFO, 'test', ['foo' => 'bar']);
 
         /** @var MockObject|Target $target */
-        $target1 = $this->getMockBuilder(Target::class)
+        $target1 = $this
+            ->getMockBuilder(Target::class)
             ->onlyMethods(['collect'])
             ->getMockForAbstractClass();
 
         /** @var MockObject|Target $target */
-        $target2 = $this->getMockBuilder(Target::class)
+        $target2 = $this
+            ->getMockBuilder(Target::class)
             ->onlyMethods(['collect'])
             ->getMockForAbstractClass();
 
-        $target1->expects($this->exactly(2))
+        $target1
+            ->expects($this->exactly(2))
             ->method('collect')
             ->withConsecutive(
                 [$this->equalTo([$message]), $this->equalTo(true)],
@@ -383,12 +391,14 @@ final class LoggerTest extends TestCase
                 ]
             );
 
-        $target2->expects($this->once())
+        $target2
+            ->expects($this->once())
             ->method('collect')
             ->with(
                 $this->equalTo([$message]),
                 $this->equalTo(true)
-            )->will($this->throwException($exception));
+            )
+            ->will($this->throwException($exception));
 
         $logger = new Logger([
             'fakeTarget1' => $target1,

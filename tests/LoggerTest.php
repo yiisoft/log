@@ -286,8 +286,12 @@ final class LoggerTest extends TestCase
 
         $this->logger->log(LogLevel::INFO, 'test');
         $this->assertSame(1, $this->target->getExportCount());
-        $this->assertSame('info', $this->target->getExportMessages()[0]->level());
-        $this->assertSame('test', $this->target->getExportMessages()[0]->message());
+        $this->assertSame('info', $this->target
+            ->getExportMessages()[0]
+            ->level());
+        $this->assertSame('test', $this->target
+            ->getExportMessages()[0]
+            ->message());
     }
 
     public function testFlushWithDispatch(): void

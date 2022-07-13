@@ -115,7 +115,7 @@ abstract class Target
     /**
      * Sets a list of log message categories that this target is interested in.
      *
-     * @param array $categories The list of log message categories.
+     * @param string[] $categories The list of log message categories.
      *
      * @throws InvalidArgumentException for invalid log message categories structure.
      *
@@ -132,7 +132,7 @@ abstract class Target
     /**
      * Sets a list of log message categories that this target is NOT interested in.
      *
-     * @param array $except The list of log message categories.
+     * @param string[] $except The list of log message categories.
      *
      * @throws InvalidArgumentException for invalid log message categories structure.
      *
@@ -149,7 +149,7 @@ abstract class Target
     /**
      * Sets a list of log message levels that current target is interested in.
      *
-     * @param array $levels The list of log message levels.
+     * @param string[] $levels The list of log message levels.
      *
      * @throws InvalidArgumentException for invalid log message level.
      *
@@ -383,7 +383,10 @@ abstract class Target
                 continue;
             }
 
-            if ($this->categories->isExcluded($message->context('category', ''))) {
+            /** @var string $category */
+            $category = $message->context('category', '');
+
+            if ($this->categories->isExcluded($category)) {
                 unset($messages[$i]);
                 continue;
             }

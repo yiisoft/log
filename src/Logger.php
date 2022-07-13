@@ -35,6 +35,9 @@ use function sprintf;
  *
  * When the application ends or {@see Logger::$flushInterval} is reached, Logger will call {@see Logger::flush()}
  * to send logged messages to different log targets, such as file or email according to the {@see Logger::$targets}.
+ *
+ * @psalm-import-type Backtrace from Message
+ * @psalm-import-type LogMessageContext from Message
  */
 final class Logger implements LoggerInterface
 {
@@ -143,6 +146,15 @@ final class Logger implements LoggerInterface
         return $this->targets;
     }
 
+    /**
+     * @param string $level
+     * @param string|Stringable $message
+     * @param array $context
+     * @psalm-param LogMessageContext $context
+     * @psalm-suppress MoreSpecificImplementedParamType
+     *
+     * @return void
+     */
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
         $context['time'] ??= microtime(true);
@@ -205,7 +217,7 @@ final class Logger implements LoggerInterface
     /**
      * Sets an array of paths to exclude from tracing when tracing is enabled with {@see Logger::setTraceLevel()}.
      *
-     * @param array $excludedTracePaths The paths to exclude from tracing.
+     * @param string[] $excludedTracePaths The paths to exclude from tracing.
      *
      * @throws InvalidArgumentException for non-string values.
      *
@@ -216,6 +228,7 @@ final class Logger implements LoggerInterface
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {
         foreach ($excludedTracePaths as $excludedTracePath) {
+            /** @psalm-suppress DocblockTypeContradiction */
             if (!is_string($excludedTracePath)) {
                 throw new InvalidArgumentException(sprintf(
                     'The trace path must be a string, %s received.',
@@ -231,7 +244,7 @@ final class Logger implements LoggerInterface
     /**
      * Sets a target to {@see Logger::$targets}.
      *
-     * @param array $targets The log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
+     * @param Target[] $targets The log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
      * instance or the configuration for creating the log target instance.
      *
      * @throws InvalidArgumentException for non-instance Target.
@@ -281,8 +294,10 @@ final class Logger implements LoggerInterface
      * Collects a trace when tracing is enabled with {@see Logger::setTraceLevel()}.
      *
      * @param array $backtrace The list of call stack information.
+     * @psalm-param Backtrace $backtrace
      *
      * @return array Collected a list of call stack information.
+     * @psalm-return Backtrace
      */
     private function collectTrace(array $backtrace): array
     {

@@ -152,8 +152,6 @@ final class Logger implements LoggerInterface
      * @param array $context
      * @psalm-param LogMessageContext $context
      * @psalm-suppress MoreSpecificImplementedParamType
-     *
-     * @return void
      */
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {

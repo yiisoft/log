@@ -20,8 +20,6 @@ use function preg_replace_callback;
  *     function?:string,
  *     class?:string,
  *     type?:string,
- *     args?:array,
- *     object?:object,
  * }>
  * @psalm-type LogMessageContext = array{
  *     category?:string,

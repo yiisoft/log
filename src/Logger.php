@@ -294,7 +294,7 @@ final class Logger implements LoggerInterface
      * Collects a trace when tracing is enabled with {@see Logger::setTraceLevel()}.
      *
      * @param array $backtrace The list of call stack information.
-     * @psalm-param Backtrace $backtrace
+     * @psalm-param Backtrace|list<array{object?:object,args?:array}> $backtrace
      *
      * @return array Collected a list of call stack information.
      * @psalm-return Backtrace

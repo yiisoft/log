@@ -2,7 +2,7 @@
 
 ## 2.0.1 under development
 
-- no changes in this release.
+- Bug #84: Change the type of the `$level` parameter in the `Message` constructor to `string` (dood-)
 
 ## 2.0.0 May 22, 2022
 

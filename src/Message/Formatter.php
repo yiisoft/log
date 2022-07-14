@@ -21,6 +21,8 @@ use function sprintf;
  * Formatter formats log messages.
  *
  * @internal
+ *
+ * @psalm-import-type Backtrace from Message
  */
 final class Formatter
 {
@@ -125,6 +127,7 @@ final class Formatter
         $time = $this->getTime($message);
         $prefix = $this->getPrefix($message, $commonContext);
         $context = $this->getContext($message, $commonContext);
+        /** @var string $category */
         $category = $message->context('category', CategoryFilter::DEFAULT);
 
         return "{$time} {$prefix}[{$message->level()}][{$category}] {$message->message()}{$context}";
@@ -139,6 +142,7 @@ final class Formatter
      */
     private function getTime(Message $message): string
     {
+        /** @psalm-suppress PossiblyInvalidCast */
         $timestamp = (string) $message->context('time', microtime(true));
 
         $format = match (true) {
@@ -199,12 +203,19 @@ final class Formatter
             $context[] = $trace;
         }
 
+        /**
+         * @var array-key $name
+         * @var mixed $value
+         */
         foreach ($message->context() as $name => $value) {
             if ($name !== 'trace') {
                 $context[] = "{$name}: " . $this->convertToString($value);
             }
         }
 
+        /**
+         * @var mixed $value
+         */
         foreach ($commonContext as $name => $value) {
             $common[] = "{$name}: " . $this->convertToString($value);
         }
@@ -222,7 +233,8 @@ final class Formatter
      */
     private function getTrace(Message $message): string
     {
-        $traces = (array) $message->context('trace', []);
+        /** @psalm-var Backtrace $traces */
+        $traces = $message->context('trace', []);
 
         foreach ($traces as $key => $trace) {
             if (isset($trace['file'], $trace['line'])) {
@@ -230,6 +242,7 @@ final class Formatter
             }
         }
 
+        /** @var string[] $traces */
         return empty($traces) ? '' : "trace:\n    " . implode("\n    ", $traces);
     }
 
@@ -243,7 +256,7 @@ final class Formatter
     private function convertToString(mixed $value): string
     {
         if (is_object($value) && method_exists($value, '__toString')) {
-            return $value->__toString();
+            return (string) $value;
         }
 
         return VarDumper::create($value)->asString();

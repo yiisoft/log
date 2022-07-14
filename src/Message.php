@@ -13,6 +13,20 @@ use function preg_replace_callback;
 
 /**
  * Message is a data object that stores log message data.
+ *
+ * @psalm-type Backtrace = list<array{
+ *     file:string,
+ *     line:int,
+ *     function?:string,
+ *     class?:string,
+ *     type?:string,
+ * }>
+ * @psalm-type LogMessageContext = array{
+ *     category?:string,
+ *     memory?:int,
+ *     time?:float,
+ *     trace?:Backtrace,
+ * }&array
  */
 final class Message
 {
@@ -29,7 +43,8 @@ final class Message
     private string $message;
 
     /**
-     * @var array Log message context.
+     * @var array<string, mixed> Log message context.
+     * @psalm-var LogMessageContext
      *
      * Message context has a following keys:
      *
@@ -41,16 +56,17 @@ final class Message
     private array $context;
 
     /**
-     * @param mixed $level Log message level.
+     * @param string $level Log message level.
      * @param string|Stringable $message Log message.
-     * @param array $context Log message context.
+     * @param array<string, mixed> $context Log message context.
+     * @psalm-param LogMessageContext $context
      *
      * @throws InvalidArgumentException for invalid log message level.
      *
      * @see LoggerTrait::log()
      * @see LogLevel
      */
-    public function __construct(mixed $level, string|Stringable $message, array $context = [])
+    public function __construct(string $level, string|Stringable $message, array $context = [])
     {
         $this->level = Logger::validateLevel($level);
         $this->message = $this->parse($message, $context);
@@ -86,6 +102,7 @@ final class Message
      * @param mixed $default If the context parameter does not exist, the `$default` will be returned.
      *
      * @return mixed The context parameter value.
+     * @psalm-return LogMessageContext|mixed
      */
     public function context(string $name = null, mixed $default = null): mixed
     {
@@ -101,7 +118,8 @@ final class Message
      * where foo will be replaced by the context data in key "foo".
      *
      * @param string|Stringable $message Raw log message.
-     * @param array $context Message context.
+     * @param array<string, mixed> $context Message context.
+     * @psalm-param LogMessageContext $context
      *
      * @return string Parsed message.
      */
@@ -113,6 +131,7 @@ final class Message
             $placeholderName = $matches[1];
 
             if (isset($context[$placeholderName])) {
+                /** @psalm-suppress PossiblyInvalidCast */
                 return (string) $context[$placeholderName];
             }
 

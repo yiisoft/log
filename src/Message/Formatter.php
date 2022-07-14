@@ -142,16 +142,16 @@ final class Formatter
      */
     private function getTime(Message $message): string
     {
-        /** @var float $timestamp */
-        $timestamp = $message->context('time', microtime(true));
+        /** @psalm-suppress PossiblyInvalidCast */
+        $timestamp = (string) $message->context('time', microtime(true));
 
         $format = match (true) {
-            str_contains((string) $timestamp, '.') => 'U.u',
-            str_contains((string) $timestamp, ',') => 'U,u',
+            str_contains($timestamp, '.') => 'U.u',
+            str_contains($timestamp, ',') => 'U,u',
             default => 'U',
         };
 
-        return DateTime::createFromFormat($format, (string) $timestamp)->format($this->timestampFormat);
+        return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
     }
 
     /**

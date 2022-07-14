@@ -256,8 +256,7 @@ final class Formatter
     private function convertToString(mixed $value): string
     {
         if (is_object($value) && method_exists($value, '__toString')) {
-            /** @var string */
-            return $value->__toString();
+            return (string) $value;
         }
 
         return VarDumper::create($value)->asString();

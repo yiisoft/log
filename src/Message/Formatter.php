@@ -240,7 +240,7 @@ final class Formatter
         }
 
         $lines = array_map(
-            static fn(array $trace): string => "in {$trace['file']}:{$trace['line']}",
+            static fn (array $trace): string => "in {$trace['file']}:{$trace['line']}",
             $traces,
         );
 

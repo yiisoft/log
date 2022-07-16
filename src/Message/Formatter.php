@@ -235,15 +235,16 @@ final class Formatter
     {
         /** @psalm-var Backtrace $traces */
         $traces = $message->context('trace', []);
-
-        foreach ($traces as $key => $trace) {
-            if (isset($trace['file'], $trace['line'])) {
-                $traces[$key] = "in {$trace['file']}:{$trace['line']}";
-            }
+        if (empty($traces)) {
+            return '';
         }
 
-        /** @var string[] $traces */
-        return empty($traces) ? '' : "trace:\n    " . implode("\n    ", $traces);
+        $lines = array_map(
+            static fn (array $trace): string => "in {$trace['file']}:{$trace['line']}",
+            $traces,
+        );
+
+        return "trace:\n    " . implode("\n    ", $lines);
     }
 
     /**

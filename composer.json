@@ -25,7 +25,6 @@
         "yiisoft/var-dumper": "^1.0"
     },
     "require-dev": {
-        "ext-json": "*",
         "phpunit/phpunit": "^9.5",
         "roave/infection-static-analysis-plugin": "^1.18",
         "spatie/phpunit-watcher": "^1.23",

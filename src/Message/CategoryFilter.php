@@ -9,7 +9,6 @@ use InvalidArgumentException;
 use function gettype;
 use function is_string;
 use function rtrim;
-use function substr_compare;
 use function sprintf;
 
 /**

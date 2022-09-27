@@ -259,7 +259,7 @@ final class TargetTest extends TestCase
 
     public function testSetFormat(): void
     {
-        $this->target->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
+        $this->target->setFormat(static fn (Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
 
         $expected = '[info][app] message';
         $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app']);
@@ -339,7 +339,7 @@ final class TargetTest extends TestCase
     public function testSetExportIntervalAndSetFormat(array $messages, bool $export): void
     {
         $this->target->setExportInterval(3);
-        $this->target->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
+        $this->target->setFormat(static fn (Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
         $this->target->collect($messages, $export);
 
         $this->assertSame((int) $export, $this->target->getExportCount());
@@ -398,7 +398,7 @@ final class TargetTest extends TestCase
     public function testSetFormatWithoutMessageContextAndSetCommonContext(): void
     {
         $this->target->setCommonContext($commonContext = ['foo' => 'bar', 'baz' => true]);
-        $this->target->setFormat(static fn(Message $message, array $commonContext) => "[{$message->level()}] {$message->message()}, common context: " . json_encode($commonContext, JSON_THROW_ON_ERROR));
+        $this->target->setFormat(static fn (Message $message, array $commonContext) => "[{$message->level()}] {$message->message()}, common context: " . json_encode($commonContext, JSON_THROW_ON_ERROR));
         $this->collectOneAndExport(LogLevel::INFO, 'message');
         $expected = '[info] message, common context: {"foo":"bar","baz":true}';
 

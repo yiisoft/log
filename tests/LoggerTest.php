@@ -424,6 +424,7 @@ final class LoggerTest extends TestCase
      * Gets an inaccessible object property.
      *
      * @param bool $revoke whether to make property inaccessible after getting.
+     *
      * @return Message[]
      */
     private function getInaccessibleMessages(Logger $logger, bool $revoke = true): array

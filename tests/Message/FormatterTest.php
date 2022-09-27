@@ -88,7 +88,7 @@ final class FormatterTest extends TestCase
 
     public function testFormatWithSetFormatNotIncludingCommonContext(): void
     {
-        $this->formatter->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
+        $this->formatter->setFormat(static fn (Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
         $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = '[info][app] message';
 

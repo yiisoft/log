@@ -27,18 +27,10 @@ use const LOCK_UN;
 final class StreamTarget extends Target
 {
     /**
-     * @var resource|string A string stream identifier or a stream resource.
-     *
-     * @psalm-var mixed
-     */
-    private $stream;
-
-    /**
      * @param resource|string $stream A string stream identifier or a stream resource.
      */
-    public function __construct($stream = 'php://stdout')
+    public function __construct(private $stream = 'php://stdout')
     {
-        $this->stream = $stream;
         parent::__construct();
     }
 

@@ -69,9 +69,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider filterProvider
-     *
-     * @param array $filter
-     * @param array $expected
      */
     public function testFilter(array $filter, array $expected): void
     {
@@ -150,7 +147,7 @@ final class TargetTest extends TestCase
         $text = 'message';
         $level = LogLevel::INFO;
         $category = 'application';
-        $timestamp = 1508160390.6083;
+        $timestamp = 1_508_160_390.6083;
         $context = "\n\nMessage context:\n\ncategory: '{$category}'\ntime: {$timestamp}\n";
 
         $this->target->setTimestampFormat('Y-m-d H:i:s');
@@ -165,7 +162,7 @@ final class TargetTest extends TestCase
         $this->collectOneAndExport($level, $text, ['category' => $category, 'time' => $timestamp]);
         $this->assertSame($expectedWithMicro, $this->target->formatMessages());
 
-        $timestamp = 1508160390;
+        $timestamp = 1_508_160_390;
         $this->target->setTimestampFormat('Y-m-d H:i:s');
         $context = "\n\nMessage context:\n\ncategory: '{$category}'\ntime: {$timestamp}\n";
 
@@ -185,7 +182,7 @@ final class TargetTest extends TestCase
         $text = 'message';
         $level = LogLevel::INFO;
         $category = 'application';
-        $timestamp = 1508160390.6083;
+        $timestamp = 1_508_160_390.6083;
 
         $this->target->setTimestampFormat('Y-m-d H:i:s.u');
 
@@ -206,7 +203,7 @@ final class TargetTest extends TestCase
 
     public function testFormatMessagesWithTraceInContext(): void
     {
-        $timestamp = 1508160390;
+        $timestamp = 1_508_160_390;
         $this->target->setTimestampFormat('Y-m-d H:i:s');
         $this->collectOneAndExport(
             LogLevel::INFO,
@@ -235,8 +232,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidStringListProvider
-     *
-     * @param array $list
      */
     public function testSetCategoriesThrowExceptionForNonStringList(array $list): void
     {
@@ -246,8 +241,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidStringListProvider
-     *
-     * @param array $list
      */
     public function testSetExceptThrowExceptionForNonStringList(array $list): void
     {
@@ -257,8 +250,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidStringListProvider
-     *
-     * @param array $list
      */
     public function testSetLevelsThrowExceptionForNonStringList(array $list): void
     {
@@ -268,9 +259,7 @@ final class TargetTest extends TestCase
 
     public function testSetFormat(): void
     {
-        $this->target->setFormat(static function (Message $message) {
-            return "[{$message->level()}][{$message->context('category')}] {$message->message()}";
-        });
+        $this->target->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
 
         $expected = '[info][app] message';
         $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app']);
@@ -282,7 +271,7 @@ final class TargetTest extends TestCase
         $this->target->setPrefix(static fn () => 'Prefix: ');
         $expected = '2017-10-16 13:26:30.608300 Prefix: [info][app] message'
             . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083\n";
-        $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $this->assertSame($expected, $this->target->formatMessages());
     }
 
@@ -318,9 +307,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider collectMessageProvider
-     *
-     * @param array $messages
-     * @param bool $export
      */
     public function testFormatMessagesWithSeparatorAndSetFormatAndSetPrefix(array $messages, bool $export): void
     {
@@ -335,9 +321,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider collectMessageProvider
-     *
-     * @param array $messages
-     * @param bool $export
      */
     public function testGetFormattedMessagesAndSetFormatAndSetPrefix(array $messages, bool $export): void
     {
@@ -352,16 +335,11 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider collectMessageProvider
-     *
-     * @param array $messages
-     * @param bool $export
      */
     public function testSetExportIntervalAndSetFormat(array $messages, bool $export): void
     {
         $this->target->setExportInterval(3);
-        $this->target->setFormat(static function (Message $message) {
-            return "[{$message->level()}][{$message->context('category')}] {$message->message()}";
-        });
+        $this->target->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
         $this->target->collect($messages, $export);
 
         $this->assertSame((int) $export, $this->target->getExportCount());
@@ -391,13 +369,10 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider contextProvider
-     *
-     * @param array $context
-     * @param string $expected
      */
     public function testMessageContext(array $context, string $expected): void
     {
-        $context = array_merge($context, ['category' => 'app', 'time' => 1508160390.6083]);
+        $context = array_merge($context, ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $this->collectOneAndExport(LogLevel::INFO, 'message', $context);
         $expected = '2017-10-16 13:26:30.608300 [info][app] message'
             . "\n\nMessage context:\n\n{$expected}\ncategory: 'app'\ntime: 1508160390.6083\n"
@@ -407,14 +382,11 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider contextProvider
-     *
-     * @param array $commonContext
-     * @param string $expected
      */
     public function testSetCommonContext(array $commonContext, string $expected): void
     {
         $this->target->setCommonContext($commonContext);
-        $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = '2017-10-16 13:26:30.608300 [info][app] message'
             . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083"
             . "\n\nCommon context:\n\n{$expected}\n"
@@ -426,9 +398,7 @@ final class TargetTest extends TestCase
     public function testSetFormatWithoutMessageContextAndSetCommonContext(): void
     {
         $this->target->setCommonContext($commonContext = ['foo' => 'bar', 'baz' => true]);
-        $this->target->setFormat(static function (Message $message, array $commonContext) {
-            return "[{$message->level()}] {$message->message()}, common context: " . json_encode($commonContext);
-        });
+        $this->target->setFormat(static fn(Message $message, array $commonContext) => "[{$message->level()}] {$message->message()}, common context: " . json_encode($commonContext, JSON_THROW_ON_ERROR));
         $this->collectOneAndExport(LogLevel::INFO, 'message');
         $expected = '[info] message, common context: {"foo":"bar","baz":true}';
 
@@ -450,8 +420,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidCallableReturnStringProvider
-     *
-     * @param callable $value
      */
     public function testFormatMessageThrowExceptionForFormatCallableReturnNotBoolean(callable $value): void
     {
@@ -477,8 +445,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidMessageListProvider
-     *
-     * @param array $messageList
      */
     public function testCollectThrowExceptionForNonInstanceMessages(array $messageList): void
     {
@@ -488,8 +454,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidCallableReturnStringProvider
-     *
-     * @param callable $value
      */
     public function testFormatMessageThrowExceptionForPrefixCallableReturnNotBoolean(callable $value): void
     {

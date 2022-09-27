@@ -27,7 +27,7 @@ final class PsrTargetTest extends TestCase
 
             public function log($level, $message, array $context = []): void
             {
-                echo "{$level}: {$message}: " . json_encode($context);
+                echo "{$level}: {$message}: " . json_encode($context, JSON_THROW_ON_ERROR);
             }
         });
     }
@@ -48,16 +48,12 @@ final class PsrTargetTest extends TestCase
 
     /**
      * @dataProvider messageProvider
-     *
-     * @param string $level
-     * @param string $message
-     * @param array $context
      */
     public function testPsrLogInterfaceMethods(string $level, string $message, array $context): void
     {
         $this->assertInstanceOf(LoggerInterface::class, $this->target->getLogger());
 
         $this->target->collect([new Message($level, $message, $context)], true);
-        $this->expectOutputString("{$level}: {$message}: " . json_encode($context));
+        $this->expectOutputString("{$level}: {$message}: " . json_encode($context, JSON_THROW_ON_ERROR));
     }
 }

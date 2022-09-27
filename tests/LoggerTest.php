@@ -96,7 +96,6 @@ final class LoggerTest extends TestCase
      * @dataProvider messageProvider
      *
      * @param $message
-     * @param string $expected
      */
     public function testPsrLogInterfaceMethods($message, string $expected): void
     {
@@ -163,10 +162,8 @@ final class LoggerTest extends TestCase
 
     /**
      * @dataProvider invalidExcludedTracePathsProvider
-     *
-     * @param mixed $list
      */
-    public function testSetExcludedTracePathsThrowExceptionForNonStringList($list): void
+    public function testSetExcludedTracePathsThrowExceptionForNonStringList(mixed $list): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->logger->setExcludedTracePaths($list);
@@ -199,10 +196,8 @@ final class LoggerTest extends TestCase
 
     /**
      * @dataProvider invalidMessageLevelProvider
-     *
-     * @param mixed $level
      */
-    public function testGetLevelNameThrowExceptionForInvalidMessageLevel($level): void
+    public function testGetLevelNameThrowExceptionForInvalidMessageLevel(mixed $level): void
     {
         $this->expectException(\Psr\Log\InvalidArgumentException::class);
         Logger::validateLevel($level);
@@ -235,8 +230,6 @@ final class LoggerTest extends TestCase
 
     /**
      * @dataProvider invalidListTargetProvider
-     *
-     * @param array $targetList
      */
     public function testConstructorThrowExceptionForNonInstanceTarget(array $targetList): void
     {
@@ -267,10 +260,6 @@ final class LoggerTest extends TestCase
 
     /**
      * @dataProvider parseMessageProvider
-     *
-     * @param string $message
-     * @param array $context
-     * @param string $expected
      */
     public function testParseMessage(string $message, array $context, string $expected): void
     {
@@ -384,8 +373,8 @@ final class LoggerTest extends TestCase
                 [
                     $this->callback(function ($messages) use ($target1, $exception) {
                         $message = $messages[0] ?? null;
-                        $text = 'Unable to send log via ' . get_class($target1) . ': RuntimeException: some error';
-                        return (count($messages) === 1 && $message instanceof Message)
+                        $text = 'Unable to send log via ' . $target1::class . ': RuntimeException: some error';
+                        return ((is_countable($messages) ? count($messages) : 0) === 1 && $message instanceof Message)
                             && $message->level() === LogLevel::WARNING
                             && $message->message() === $text
                             && is_float($message->context('time'))
@@ -416,7 +405,6 @@ final class LoggerTest extends TestCase
     /**
      * Sets an inaccessible object property to a designated value.
      *
-     * @param Logger $logger
      * @param Message[] $messages
      * @param bool $revoke whether to make property inaccessible after setting.
      */
@@ -435,9 +423,7 @@ final class LoggerTest extends TestCase
     /**
      * Gets an inaccessible object property.
      *
-     * @param Logger $logger
      * @param bool $revoke whether to make property inaccessible after getting.
-     *
      * @return Message[]
      */
     private function getInaccessibleMessages(Logger $logger, bool $revoke = true): array

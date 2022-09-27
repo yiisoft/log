@@ -16,7 +16,6 @@ use function array_filter;
 use function count;
 use function debug_backtrace;
 use function gettype;
-use function get_class;
 use function implode;
 use function in_array;
 use function is_string;
@@ -148,8 +147,6 @@ final class Logger implements LoggerInterface
 
     /**
      * @param string $level
-     * @param string|Stringable $message
-     * @param array $context
      * @psalm-param LogMessageContext $context
      * @psalm-suppress MoreSpecificImplementedParamType
      */
@@ -187,8 +184,6 @@ final class Logger implements LoggerInterface
      *
      * @param int $flushInterval The number of messages to accumulate before flushing.
      *
-     * @return self
-     *
      * @see Logger::$flushInterval
      */
     public function setFlushInterval(int $flushInterval): self
@@ -201,8 +196,6 @@ final class Logger implements LoggerInterface
      * Sets how much call stack information (file name and line number) should be logged for each log message.
      *
      * @param int $traceLevel The number of call stack information.
-     *
-     * @return self
      *
      * @see Logger::$traceLevel
      */
@@ -218,8 +211,6 @@ final class Logger implements LoggerInterface
      * @param string[] $excludedTracePaths The paths to exclude from tracing.
      *
      * @throws InvalidArgumentException for non-string values.
-     *
-     * @return self
      *
      * @see Logger::$excludedTracePaths
      */
@@ -276,7 +267,7 @@ final class Logger implements LoggerInterface
                     $target->disable();
                     $targetErrors[] = new Message(
                         LogLevel::WARNING,
-                        'Unable to send log via ' . get_class($target) . ': ' . get_class($e) . ': ' . $e->getMessage(),
+                        'Unable to send log via ' . $target::class . ': ' . $e::class . ': ' . $e->getMessage(),
                         ['time' => microtime(true), 'exception' => $e],
                     );
                 }
@@ -306,9 +297,7 @@ final class Logger implements LoggerInterface
 
             foreach ($backtrace as $trace) {
                 if (isset($trace['file'], $trace['line'])) {
-                    $excludedMatch = array_filter($this->excludedTracePaths, static function ($path) use ($trace) {
-                        return str_contains($trace['file'], $path);
-                    });
+                    $excludedMatch = array_filter($this->excludedTracePaths, static fn ($path) => str_contains($trace['file'], $path));
 
                     if (empty($excludedMatch)) {
                         unset($trace['object'], $trace['args']);

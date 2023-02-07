@@ -75,6 +75,7 @@ final class StreamTarget extends Target
             }
         }
 
+        /** @psalm-suppress DocblockTypeContradiction */
         if (!is_resource($stream) || get_resource_type($stream) !== 'stream') {
             throw new InvalidArgumentException(sprintf(
                 'Invalid stream provided. It must be a string stream identifier or a stream resource, "%s" received.',

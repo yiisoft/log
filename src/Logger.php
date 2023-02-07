@@ -297,7 +297,10 @@ final class Logger implements LoggerInterface
 
             foreach ($backtrace as $trace) {
                 if (isset($trace['file'], $trace['line'])) {
-                    $excludedMatch = array_filter($this->excludedTracePaths, static fn ($path) => str_contains($trace['file'], $path));
+                    $excludedMatch = array_filter(
+                        $this->excludedTracePaths,
+                        static fn ($path) => str_contains($trace['file'], $path)
+                    );
 
                     if (empty($excludedMatch)) {
                         unset($trace['object'], $trace['args']);

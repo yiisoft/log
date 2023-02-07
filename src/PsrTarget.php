@@ -14,7 +14,7 @@ final class PsrTarget extends Target
     /**
      * Sets the PSR-3 logger used to save messages of this target.
      *
-     * @param LoggerInterface $logger The logger instance.
+     * @param LoggerInterface $logger The logger instance to be used for messages processing.
      */
     public function __construct(private LoggerInterface $logger)
     {

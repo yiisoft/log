@@ -2,7 +2,6 @@
 
 ## 2.0.1 under development
 
-- Enh: Add composer require checker into CI
 - Bug #84: Change the type of the `$level` parameter in the `Message` constructor to `string` (@dood-)
 
 ## 2.0.0 May 22, 2022

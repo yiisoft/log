@@ -12,18 +12,12 @@ use Psr\Log\LoggerInterface;
 final class PsrTarget extends Target
 {
     /**
-     * @var LoggerInterface The logger instance to be used for messages processing.
-     */
-    private LoggerInterface $logger;
-
-    /**
      * Sets the PSR-3 logger used to save messages of this target.
      *
-     * @param LoggerInterface $logger The logger instance.
+     * @param LoggerInterface $logger The logger instance to be used for messages processing.
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger)
     {
-        $this->logger = $logger;
         parent::__construct();
     }
 

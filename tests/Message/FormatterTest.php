@@ -50,13 +50,10 @@ final class FormatterTest extends TestCase
 
     /**
      * @dataProvider contextProvider
-     *
-     * @param array $context
-     * @param string $expected
      */
     public function testDefaultFormat(array $context, string $expected): void
     {
-        $context = array_merge($context, ['category' => 'app', 'time' => 1508160390.6083]);
+        $context = array_merge($context, ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $message = new Message(LogLevel::INFO, 'message', $context);
         $expected = '2017-10-16 13:26:30.608300 [info][app] message'
             . "\n\nMessage context:\n\n{$expected}\ncategory: 'app'\ntime: 1508160390.6083\n"
@@ -66,13 +63,10 @@ final class FormatterTest extends TestCase
 
     /**
      * @dataProvider contextProvider
-     *
-     * @param array $commonContext
-     * @param string $expected
      */
     public function testDefaultFormatWithCommonContext(array $commonContext, string $expected): void
     {
-        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
+        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = '2017-10-16 13:26:30.608300 [info][app] message'
             . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083"
             . "\n\nCommon context:\n\n{$expected}\n"
@@ -83,10 +77,10 @@ final class FormatterTest extends TestCase
     public function testFormatWithSetFormat(): void
     {
         $this->formatter->setFormat(static function (Message $message, array $commonContext) {
-            $context = json_encode($commonContext);
+            $context = json_encode($commonContext, JSON_THROW_ON_ERROR);
             return "[{$message->level()}][{$message->context('category')}] {$message->message()}\n{$context}\n";
         });
-        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
+        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = "[info][app] message\n{\"foo\":\"bar\"}\n";
 
         $this->assertSame($expected, $this->formatter->format($message, ['foo' => 'bar']));
@@ -94,10 +88,8 @@ final class FormatterTest extends TestCase
 
     public function testFormatWithSetFormatNotIncludingCommonContext(): void
     {
-        $this->formatter->setFormat(static function (Message $message) {
-            return "[{$message->level()}][{$message->context('category')}] {$message->message()}";
-        });
-        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
+        $this->formatter->setFormat(static fn (Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
+        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = '[info][app] message';
 
         $this->assertSame($expected, $this->formatter->format($message, ['foo' => 'bar']));
@@ -106,7 +98,7 @@ final class FormatterTest extends TestCase
     public function testFormatWithSetPrefix(): void
     {
         $this->formatter->setPrefix(static fn () => 'Prefix: ');
-        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
+        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = '2017-10-16 13:26:30.608300 Prefix: [info][app] message'
             . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083\n"
         ;
@@ -116,7 +108,7 @@ final class FormatterTest extends TestCase
     public function testFormatWithSetTimestampFormat(): void
     {
         $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1508160390.6083]);
+        $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = '2017-10-16 13:26:30 [info][app] message'
             . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083\n"
         ;
@@ -144,7 +136,7 @@ final class FormatterTest extends TestCase
             }
         );
 
-        $time = 1508160390;
+        $time = 1_508_160_390;
         $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => $time]);
 
         $this->assertSame(
@@ -156,7 +148,7 @@ final class FormatterTest extends TestCase
     public function testFormatWithContextAndSetFormat(): void
     {
         $this->formatter->setFormat(static function (Message $message) {
-            $context = json_encode($message->context());
+            $context = json_encode($message->context(), JSON_THROW_ON_ERROR);
             return "({$message->level()}) {$message->message()}, context: {$context}";
         });
         $message = new Message(LogLevel::INFO, 'message', ['foo' => 'bar', 'params' => ['baz' => true]]);
@@ -166,7 +158,7 @@ final class FormatterTest extends TestCase
 
     public function testFormatWithTraceInContext(): void
     {
-        $timestamp = 1508160390;
+        $timestamp = 1_508_160_390;
         $this->formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(
             LogLevel::INFO,
@@ -196,8 +188,6 @@ final class FormatterTest extends TestCase
 
     /**
      * @dataProvider invalidCallableReturnStringProvider
-     *
-     * @param callable $value
      */
     public function testFormatThrowExceptionForFormatCallableReturnNotString(callable $value): void
     {
@@ -208,8 +198,6 @@ final class FormatterTest extends TestCase
 
     /**
      * @dataProvider invalidCallableReturnStringProvider
-     *
-     * @param callable $value
      */
     public function testFormatMessageThrowExceptionForPrefixCallableReturnNotString(callable $value): void
     {

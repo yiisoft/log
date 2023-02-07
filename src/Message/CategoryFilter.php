@@ -9,7 +9,6 @@ use InvalidArgumentException;
 use function gettype;
 use function is_string;
 use function rtrim;
-use function substr_compare;
 use function sprintf;
 
 /**
@@ -95,7 +94,7 @@ final class CategoryFilter
                 $category === $include
                 || (
                     !empty($include)
-                    && substr_compare($include, '*', -1, 1) === 0
+                    && str_ends_with($include, '*')
                     && str_starts_with($category, rtrim($include, '*'))
                 )
             ) {

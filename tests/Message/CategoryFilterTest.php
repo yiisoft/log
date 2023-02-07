@@ -32,8 +32,6 @@ final class CategoryFilterTest extends TestCase
 
     /**
      * @dataProvider invalidCategoryMessageStructureProvider
-     *
-     * @param array $categories
      */
     public function testIncludeThrowExceptionForInvalidCategoryMessageStructure(array $categories): void
     {
@@ -43,8 +41,6 @@ final class CategoryFilterTest extends TestCase
 
     /**
      * @dataProvider invalidCategoryMessageStructureProvider
-     *
-     * @param array $categories
      */
     public function testExcludeThrowExceptionForInvalidCategoryMessageStructure(array $categories): void
     {

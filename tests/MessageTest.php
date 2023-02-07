@@ -39,8 +39,6 @@ final class MessageTest extends TestCase
 
     /**
      * @dataProvider levelProvider
-     *
-     * @param string $level
      */
     public function testConstructorAndLevel(string $level): void
     {
@@ -77,10 +75,6 @@ final class MessageTest extends TestCase
 
     /**
      * @dataProvider parseMessageProvider
-     *
-     * @param string $message
-     * @param array $context
-     * @param string $expected
      */
     public function testParseMessage(string $message, array $context, string $expected): void
     {

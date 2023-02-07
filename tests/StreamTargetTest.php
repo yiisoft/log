@@ -81,8 +81,6 @@ final class StreamTargetTest extends TestCase
 
     /**
      * @param resource|string $stream
-     *
-     * @return StreamTarget
      */
     private function createStreamTarget($stream): StreamTarget
     {
@@ -91,9 +89,6 @@ final class StreamTargetTest extends TestCase
         return $target;
     }
 
-    /**
-     * @param StreamTarget $target
-     */
     private function exportStreamTarget(StreamTarget $target): void
     {
         $target->collect(

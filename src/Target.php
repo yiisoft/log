@@ -378,7 +378,7 @@ abstract class Target
                 throw new InvalidArgumentException('You must provide an instance of \Yiisoft\Log\Message.');
             }
 
-            if ((!empty($this->levels) && !in_array(($message->level()), $this->levels, true))) {
+            if (!empty($this->levels) && !in_array($message->level(), $this->levels, true)) {
                 unset($messages[$i]);
                 continue;
             }

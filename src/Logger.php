@@ -157,6 +157,7 @@ final class Logger implements LoggerInterface
         $context['memory'] ??= memory_get_usage();
         $context['category'] ??= CategoryFilter::DEFAULT;
 
+        /** @psalm-suppress MixedArgumentTypeCoercion Psalm bug. {@see https://github.com/vimeo/psalm/issues/10200} */
         $this->messages[] = new Message($level, $message, $context);
 
         if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {

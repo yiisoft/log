@@ -16,7 +16,7 @@
 [![type-coverage](https://shepherd.dev/github/yiisoft/log/coverage.svg)](https://shepherd.dev/github/yiisoft/log)
 
 This package provides [PSR-3](https://www.php-fig.org/psr/psr-3/) compatible logging library. It is used in
-[Yii Framework](http://www.yiiframework.com/) but is usable separately.
+[Yii Framework](https://www.yiiframework.com/) but is usable separately.
 
 The logger sends passes messages to multiple targets. Each target may filter messages by their severity levels and categories and then export them to some medium such as file, email or syslog.
 

@@ -98,7 +98,7 @@ Extra logging targets are implemented as separate packages:
 
 Testing:
 
-- More information can be found in the [Internals.](docs/internals.md)
+- [Internals](docs/internals.md)
 
 ## Support
 

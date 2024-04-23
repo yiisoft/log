@@ -16,7 +16,7 @@
 [![type-coverage](https://shepherd.dev/github/yiisoft/log/coverage.svg)](https://shepherd.dev/github/yiisoft/log)
 
 This package provides [PSR-3](https://www.php-fig.org/psr/psr-3/) compatible logging library. It is used in
-[Yii Framework](http://www.yiiframework.com/) but is usable separately.
+[Yii Framework](https://www.yiiframework.com/) but is usable separately.
 
 The logger sends passes messages to multiple targets. Each target may filter messages by their severity levels and categories and then export them to some medium such as file, email or syslog.
 
@@ -37,7 +37,6 @@ composer require yiisoft/log --prefer-dist
 Creating a logger:
 
 ```php
-
 /**
  * List of class instances that extend the \Yiisoft\Log\Target abstract class.
  * 
@@ -92,41 +91,19 @@ Extra logging targets are implemented as separate packages:
 - [File](https://github.com/yiisoft/log-target-file)
 - [Syslog](https://github.com/yiisoft/log-target-syslog)
 
-See [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md) for more info.
+## Documentation
 
-## Testing
+- See [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md) for more info.
+- Leia [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/pt-BR/runtime/logging.md) para mais informações.
 
-### Unit testing
+Testing:
 
-The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
+- [Internals](docs/internals.md)
 
-```shell
-./vendor/bin/phpunit
-```
+## Support
 
-### Mutation testing
-
-The package tests are checked with [Infection](https://infection.github.io/) mutation framework with
-[Infection Static Analysis Plugin](https://github.com/Roave/infection-static-analysis-plugin). To run it:
-
-```shell
-./vendor/bin/roave-infection-static-analysis-plugin
-```
-
-### Static analysis
-
-The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
-
-```shell
-./vendor/bin/psalm
-```
-
-## License
-
-The Yii Logging Library is free software. It is released under the terms of the BSD License.
-Please see [`LICENSE`](./LICENSE.md) for more information.
-
-Maintained by [Yii Software](https://www.yiiframework.com/).
+If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
+You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
 
 ## Support the project
 
@@ -139,3 +116,10 @@ Maintained by [Yii Software](https://www.yiiframework.com/).
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
+
+## License
+
+The Yii Logging Library is free software. It is released under the terms of the BSD License.
+Please see [`LICENSE`](./LICENSE.md) for more information.
+
+Maintained by [Yii Software](https://www.yiiframework.com/).

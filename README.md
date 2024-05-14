@@ -93,7 +93,7 @@ Extra logging targets are implemented as separate packages:
 
 ## Documentation
 
-- Guide: [English](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md)
+- [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md)
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.

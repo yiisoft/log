@@ -148,7 +148,7 @@ final class Logger implements LoggerInterface
 
     /**
      * @psalm-param LogMessageContext $context
-     * @psalm-suppress MoreSpecificImplementedParamType
+     * @psalm-suppress MoreSpecificImplementedParamType,MixedArgumentTypeCoercion
      */
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
@@ -232,6 +232,13 @@ final class Logger implements LoggerInterface
         return $this;
     }
 
+    /**
+     * Asserts that the log message level is valid.
+     *
+     * @param mixed $level The message level.
+     *
+     * @throws \Psr\Log\InvalidArgumentException When the log message level is not a string or is not supported.
+     */
     public static function assertLevelIsValid(mixed $level): void
     {
         self::assertLevelIsString($level);
@@ -239,6 +246,12 @@ final class Logger implements LoggerInterface
     }
 
     /**
+     * Asserts that the log message level is a string.
+     *
+     * @param mixed $level The message level.
+     *
+     * @throws \Psr\Log\InvalidArgumentException When the log message level is not a string.
+     *
      * @psalm-assert string $level
      */
     public static function assertLevelIsString(mixed $level): void
@@ -252,6 +265,13 @@ final class Logger implements LoggerInterface
         );
     }
 
+    /**
+     * Asserts that the log message level is supported.
+     *
+     * @param string $level The message level.
+     *
+     * @throws \Psr\Log\InvalidArgumentException When the log message level is not supported.
+     */
     public static function assertLevelIsSupported(string $level): void
     {
         if (in_array($level, self::LEVELS, true)) {

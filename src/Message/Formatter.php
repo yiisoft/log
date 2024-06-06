@@ -250,7 +250,6 @@ final class Formatter
     /**
      * Converts a value to a string.
      *
-     * @param mixed $value The value to convert
      *
      * @return string Converted string.
      */

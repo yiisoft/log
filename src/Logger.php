@@ -111,12 +111,10 @@ final class Logger implements LoggerInterface
     /**
      * Returns the text display of the specified level.
      *
-     * @param mixed $level The message level, e.g. {@see LogLevel::ERROR}, {@see LogLevel::WARNING}.
      *
      * @throws \Psr\Log\InvalidArgumentException for invalid log message level.
      *
      * @return string The text display of the level.
-     *
      * @deprecated since 2.1, to be removed in 3.0. Use {@see LogLevel::assertLevelIsValid()} instead.
      */
     public static function validateLevel(mixed $level): string

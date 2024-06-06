@@ -132,8 +132,6 @@ final class TargetTest extends TestCase
 
     /**
      * @dataProvider invalidCallableEnabledProvider
-     *
-     * @param mixed $value
      */
     public function testIsEnabledThrowExceptionForCallableReturnNotBoolean(callable $value): void
     {

@@ -250,7 +250,6 @@ final class Formatter
     /**
      * Converts a value to a string.
      *
-     *
      * @return string Converted string.
      */
     private function convertToString(mixed $value): string

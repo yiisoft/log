@@ -111,7 +111,6 @@ final class Logger implements LoggerInterface
     /**
      * Returns the text display of the specified level.
      *
-     *
      * @throws \Psr\Log\InvalidArgumentException for invalid log message level.
      *
      * @return string The text display of the level.

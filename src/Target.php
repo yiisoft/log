@@ -160,7 +160,8 @@ abstract class Target
     public function setLevels(array $levels): self
     {
         foreach ($levels as $key => $level) {
-            $levels[$key] = Logger::validateLevel($level);
+            Logger::assertLevelIsValid($level);
+            $levels[$key] = $level;
         }
 
         $this->levels = $levels;

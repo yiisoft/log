@@ -116,6 +116,7 @@ final class Logger implements LoggerInterface
      * @throws \Psr\Log\InvalidArgumentException for invalid log message level.
      *
      * @return string The text display of the level.
+     * @deprecated since 2.1, to be removed in 3.0. Use {@see LogLevel::assertLevelIsValid()} instead.
      */
     public static function validateLevel(mixed $level): string
     {
@@ -146,12 +147,13 @@ final class Logger implements LoggerInterface
     }
 
     /**
-     * @param string $level
      * @psalm-param LogMessageContext $context
-     * @psalm-suppress MoreSpecificImplementedParamType
+     * @psalm-suppress MoreSpecificImplementedParamType,MixedArgumentTypeCoercion
      */
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
+        self::assertLevelIsString($level);
+
         $context['time'] ??= microtime(true);
         $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         $context['memory'] ??= memory_get_usage();
@@ -228,6 +230,61 @@ final class Logger implements LoggerInterface
 
         $this->excludedTracePaths = $excludedTracePaths;
         return $this;
+    }
+
+    /**
+     * Asserts that the log message level is valid.
+     *
+     * @param mixed $level The message level.
+     *
+     * @throws \Psr\Log\InvalidArgumentException When the log message level is not a string or is not supported.
+     */
+    public static function assertLevelIsValid(mixed $level): void
+    {
+        self::assertLevelIsString($level);
+        self::assertLevelIsSupported($level);
+    }
+
+    /**
+     * Asserts that the log message level is a string.
+     *
+     * @param mixed $level The message level.
+     *
+     * @throws \Psr\Log\InvalidArgumentException When the log message level is not a string.
+     *
+     * @psalm-assert string $level
+     */
+    public static function assertLevelIsString(mixed $level): void
+    {
+        if (is_string($level)) {
+            return;
+        }
+
+        throw new \Psr\Log\InvalidArgumentException(
+            sprintf('The log message level must be a string, %s provided.', gettype($level))
+        );
+    }
+
+    /**
+     * Asserts that the log message level is supported.
+     *
+     * @param string $level The message level.
+     *
+     * @throws \Psr\Log\InvalidArgumentException When the log message level is not supported.
+     */
+    public static function assertLevelIsSupported(string $level): void
+    {
+        if (in_array($level, self::LEVELS, true)) {
+            return;
+        }
+
+        throw new \Psr\Log\InvalidArgumentException(
+            sprintf(
+                'Invalid log message level "%s" provided. The following values are supported: "%s".',
+                $level,
+                implode('", "', self::LEVELS)
+            )
+        );
     }
 
     /**

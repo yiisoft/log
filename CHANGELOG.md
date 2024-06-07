@@ -3,6 +3,9 @@
 ## 2.0.1 under development
 
 - Bug #84: Change the type of the `$level` parameter in the `Message` constructor to `string` (@dood-)
+- New #104: Add new static methods `Logger::assertLevelIsValid()`, `Logger::assertLevelIsString()` and
+  `Logger::assertLevelIsSupported()` (@vjik)
+- Chg #104: Deprecate method `Logger::validateLevel()` (@vjik)
 
 ## 2.0.0 May 22, 2022
 

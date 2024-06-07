@@ -68,7 +68,8 @@ final class Message
      */
     public function __construct(string $level, string|Stringable $message, array $context = [])
     {
-        $this->level = Logger::validateLevel($level);
+        Logger::assertLevelIsSupported($level);
+        $this->level = $level;
         $this->message = $this->parse($message, $context);
         $this->context = $context;
     }

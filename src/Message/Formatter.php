@@ -240,7 +240,23 @@ final class Formatter
         }
 
         $lines = array_map(
-            static fn (array $trace): string => "in {$trace['file']}:{$trace['line']}",
+            static function (array $trace): string {
+                $file = $trace['file'] ?? null;
+                $line = $trace['line'] ?? null;
+                if (is_string($file) && is_int($line)) {
+                    return 'in ' . $file . ':' . $line;
+                }
+
+                $class = $trace['class'] ?? null;
+                $function = $trace['function'] ?? null;
+                if (is_string($function)) {
+                    return is_string($class)
+                        ? ($class . ':' . $function)
+                        : $function;
+                }
+
+                return '???';
+            },
             $traces,
         );
 

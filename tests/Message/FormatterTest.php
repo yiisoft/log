@@ -156,19 +156,59 @@ final class FormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($message, []));
     }
 
-    public function testFormatWithTraceInContext(): void
+    public static function dataFormatWithTraceInContext(): array
+    {
+        return [
+            'file-and-line' => [
+                'in /path/to/file:99',
+                [
+                    'file' => '/path/to/file',
+                    'line' => 99,
+                ],
+            ],
+            'function-and-class' => [
+                'App\HomePageAction:App\{closure}',
+                [
+                    'function' => 'App\{closure}',
+                    'class' => 'App\HomePageAction',
+                    'object' => new stdClass(),
+                    'type' => '->',
+                    'args' => [],
+                ],
+            ],
+            'function' => [
+                'App\{closure}',
+                [
+                    'function' => 'App\{closure}',
+                    'type' => '->',
+                    'args' => [],
+                ],
+            ],
+            'unsupported' => [
+                '???',
+                [
+                    'something' => 'strange',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataFormatWithTraceInContext
+     */
+    public function testFormatWithTraceInContext(string $expectedTrace, array $traceItem): void
     {
         $timestamp = 1_508_160_390;
         $this->formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(
             LogLevel::INFO,
             'message',
-            ['category' => 'app', 'time' => $timestamp, 'trace' => [['file' => '/path/to/file', 'line' => 99]]],
+            ['category' => 'app', 'time' => $timestamp, 'trace' => [$traceItem]],
         );
 
         $expected = "2017-10-16 13:26:30 [info][app] message\n\nMessage context:\n\n"
-            . "trace:\n    in /path/to/file:99\n"
-            . "category: 'app'\ntime: {$timestamp}\n";
+            . "trace:\n    $expectedTrace\n"
+            . "category: 'app'\ntime: $timestamp\n";
 
         $this->assertSame($expected, $this->formatter->format($message, []));
     }

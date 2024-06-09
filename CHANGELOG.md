@@ -6,6 +6,7 @@
 - New #104: Add new static methods `Logger::assertLevelIsValid()`, `Logger::assertLevelIsString()` and
   `Logger::assertLevelIsSupported()` (@vjik)
 - Chg #104: Deprecate method `Logger::validateLevel()` (@vjik)
+- Bug #98: Fix error on formatting trace, when it doesn't contain "file" and "line" (@vjik)
 
 ## 2.0.0 May 22, 2022
 

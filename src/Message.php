@@ -8,6 +8,7 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Stringable;
+use Yiisoft\Log\Message\ContextValueExtractor;
 
 use function preg_replace_callback;
 
@@ -129,11 +130,17 @@ final class Message
         $message = (string) $message;
 
         return preg_replace_callback(
-            '/{([\w.]+)}/',
+            '/{(.*)}/',
             static function (array $matches) use ($context) {
-                return array_key_exists($matches[1], $context)
-                    ? (string) $context[$matches[1]]
-                    : $matches[0];
+                $value = ContextValueExtractor::extract($context, $matches[1], $matches[0]);
+                if (
+                    is_scalar($value)
+                    || $value instanceof Stringable
+                    || $value === null
+                ) {
+                    return (string) $value;
+                }
+                return $matches[0];
             },
             $message
         );

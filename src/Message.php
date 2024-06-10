@@ -131,14 +131,9 @@ final class Message
         return preg_replace_callback(
             '/{([\w.]+)}/',
             static function (array $matches) use ($context) {
-                $placeholderName = $matches[1];
-
-                if (isset($context[$placeholderName])) {
-                    /** @psalm-suppress PossiblyInvalidCast */
-                    return (string) $context[$placeholderName];
-                }
-
-                return $matches[0];
+                return array_key_exists($matches[1], $context)
+                    ? (string) $context[$matches[1]]
+                    : $matches[0];
             },
             $message
         );

@@ -52,7 +52,7 @@ final class MessageTest extends TestCase
         new Message('unknown', 'message');
     }
 
-    public function parseMessageProvider(): array
+    public function dataParseMessage(): array
     {
         return [
             'no-placeholder' => [
@@ -70,11 +70,16 @@ final class MessageTest extends TestCase
                 [],
                 'has {foo} placeholder',
             ],
+            'placeholder-with-null' => [
+                'has "{foo}" placeholder',
+                ['foo' => null],
+                'has "" placeholder',
+            ],
         ];
     }
 
     /**
-     * @dataProvider parseMessageProvider
+     * @dataProvider dataParseMessage
      */
     public function testParseMessage(string $message, array $context, string $expected): void
     {

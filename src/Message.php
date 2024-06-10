@@ -9,6 +9,7 @@ use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Stringable;
 use Yiisoft\Log\Message\ContextValueExtractor;
+use Yiisoft\VarDumper\VarDumper;
 
 use function preg_replace_callback;
 
@@ -132,13 +133,16 @@ final class Message
         return preg_replace_callback(
             '/{(.*)}/',
             static function (array $matches) use ($context) {
-                $value = ContextValueExtractor::extract($context, $matches[1], $matches[0]);
-                if (
-                    is_scalar($value)
-                    || $value instanceof Stringable
-                    || $value === null
-                ) {
-                    return (string) $value;
+                [$exist, $value] = ContextValueExtractor::extract($context, $matches[1]);
+                if ($exist) {
+                    if (
+                        is_scalar($value)
+                        || $value instanceof Stringable
+                        || $value === null
+                    ) {
+                        return (string) $value;
+                    }
+                    return VarDumper::create($value)->asString();
                 }
                 return $matches[0];
             },

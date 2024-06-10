@@ -80,7 +80,11 @@ final class MessageTest extends TestCase
             'array' => [
                 'has "{foo}" placeholder',
                 ['foo' => ['bar' => 7]],
-                'has "{foo}" placeholder',
+                <<<TEXT
+                has "[
+                    'bar' => 7
+                ]" placeholder
+                TEXT,
             ],
             'nested' => [
                 'has "{foo.bar}" placeholder',

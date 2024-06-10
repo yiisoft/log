@@ -9,7 +9,10 @@ namespace Yiisoft\Log\Message;
  */
 final class ContextValueExtractor
 {
-    public static function extract(array $context, string $key, mixed $default): mixed
+    /**
+     * @psalm-return array{0:bool,1:mixed}
+     */
+    public static function extract(array $context, string $key): array
     {
         $path = self::parsePath($key);
 
@@ -18,11 +21,13 @@ final class ContextValueExtractor
         foreach ($path as $pathItem) {
             $array = array_key_exists($pathItem, $array) ? $array[$pathItem] : null;
             if (!is_array($array)) {
-                return $default;
+                return [false, null];
             }
         }
 
-        return array_key_exists($lastKey, $array) ? $array[$lastKey] : $default;
+        return array_key_exists($lastKey, $array)
+            ? [true, $array[$lastKey]]
+            : [false, null];
     }
 
     /**

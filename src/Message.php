@@ -126,17 +126,21 @@ final class Message
      */
     private function parse(string|Stringable $message, array $context): string
     {
-        $message = (string)$message;
+        $message = (string) $message;
 
-        return preg_replace_callback('/{([\w.]+)}/', static function (array $matches) use ($context) {
-            $placeholderName = $matches[1];
+        return preg_replace_callback(
+            '/{([\w.]+)}/',
+            static function (array $matches) use ($context) {
+                $placeholderName = $matches[1];
 
-            if (isset($context[$placeholderName])) {
-                /** @psalm-suppress PossiblyInvalidCast */
-                return (string) $context[$placeholderName];
-            }
+                if (isset($context[$placeholderName])) {
+                    /** @psalm-suppress PossiblyInvalidCast */
+                    return (string) $context[$placeholderName];
+                }
 
-            return $matches[0];
-        }, $message);
+                return $matches[0];
+            },
+            $message
+        );
     }
 }

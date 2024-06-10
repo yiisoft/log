@@ -55,17 +55,17 @@ final class MessageTest extends TestCase
     public function parseMessageProvider(): array
     {
         return [
-            [
+            'no-placeholder' => [
                 'no placeholder',
                 ['foo' => 'some'],
                 'no placeholder',
             ],
-            [
+            'string-placeholder' => [
                 'has {foo} placeholder',
                 ['foo' => 'some'],
                 'has some placeholder',
             ],
-            [
+            'placeholder-wo-context' => [
                 'has {foo} placeholder',
                 [],
                 'has {foo} placeholder',

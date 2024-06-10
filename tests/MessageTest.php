@@ -139,12 +139,12 @@ final class MessageTest extends TestCase
             ],
             'nested-extended-6' => [
                 'has "{key1\..\.key2\..\.key3}" placeholder',
-                ['key1.' =>  ['.key2.' =>  ['.key3' => 'test']]],
+                ['key1.' => ['.key2.' => ['.key3' => 'test']]],
                 'has "test" placeholder',
             ],
             'nested-extended-7' => [
                 'has "{key1\..\.key2\..\.key3}" placeholder',
-                ['key1.' =>  ['.key2.' =>  ['.key3' => 'test']]],
+                ['key1.' => ['.key2.' => ['.key3' => 'test']]],
                 'has "test" placeholder',
             ],
             'empty' => [

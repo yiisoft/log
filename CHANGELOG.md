@@ -7,6 +7,8 @@
   `Logger::assertLevelIsSupported()` (@vjik)
 - Chg #104: Deprecate method `Logger::validateLevel()` (@vjik)
 - Bug #98: Fix error on formatting trace, when it doesn't contain "file" and "line" (@vjik)
+- New #108: Support of nested values in message templates' variables, e. g. `{foo.bar}` (@vjik)
+- Bug #89: Fix error on parse messages, that contains variables that cannot cast to a string (@vjik)
 
 ## 2.0.0 May 22, 2022
 

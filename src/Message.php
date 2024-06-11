@@ -8,6 +8,8 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Stringable;
+use Yiisoft\Log\Message\ContextValueExtractor;
+use Yiisoft\VarDumper\VarDumper;
 
 use function preg_replace_callback;
 
@@ -126,17 +128,25 @@ final class Message
      */
     private function parse(string|Stringable $message, array $context): string
     {
-        $message = (string)$message;
+        $message = (string) $message;
 
-        return preg_replace_callback('/{([\w.]+)}/', static function (array $matches) use ($context) {
-            $placeholderName = $matches[1];
-
-            if (isset($context[$placeholderName])) {
-                /** @psalm-suppress PossiblyInvalidCast */
-                return (string) $context[$placeholderName];
-            }
-
-            return $matches[0];
-        }, $message);
+        return preg_replace_callback(
+            '/{(.*)}/',
+            static function (array $matches) use ($context) {
+                [$exist, $value] = ContextValueExtractor::extract($context, $matches[1]);
+                if ($exist) {
+                    if (
+                        is_scalar($value)
+                        || $value instanceof Stringable
+                        || $value === null
+                    ) {
+                        return (string) $value;
+                    }
+                    return VarDumper::create($value)->asString();
+                }
+                return $matches[0];
+            },
+            $message
+        );
     }
 }

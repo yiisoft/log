@@ -16,6 +16,8 @@ use Yiisoft\Log\Message;
 use Yiisoft\Log\Target;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
+use Yiisoft\Log\Tests\TestAsset\StubContextEnricher;
+
 use function memory_get_usage;
 
 final class LoggerTest extends TestCase
@@ -67,7 +69,7 @@ final class LoggerTest extends TestCase
         $this->assertSame('application', $messages[0]->context('category'));
         $this->assertSame([
             'file' => __FILE__,
-            'line' => 61,
+            'line' => 63,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',
@@ -400,6 +402,24 @@ final class LoggerTest extends TestCase
 
         $this->setInaccessibleMessages($logger, [$message]);
         $logger->flush(true);
+    }
+
+    public function testSetTraceLevelWithCustomContextEnricher(): void
+    {
+        $logger = new Logger(contextEnricher: new StubContextEnricher());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"Logger::setTraceLevel()" is unavailable when using a custom context enricher.');
+        $logger->setTraceLevel(0);
+    }
+
+    public function testSetExcludedTracePathsWithCustomContextEnricher(): void
+    {
+        $logger = new Logger(contextEnricher: new StubContextEnricher());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('"Logger::setExcludedTracePaths()" is unavailable when using a custom context enricher.');
+        $logger->setExcludedTracePaths([]);
     }
 
     /**

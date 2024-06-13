@@ -191,7 +191,9 @@ final class Logger implements LoggerInterface
     public function setTraceLevel(int $traceLevel): self
     {
         if (!$this->contextEnricher instanceof ContextEnricher) {
-            throw new RuntimeException();
+            throw new RuntimeException(
+                '"Logger::setTraceLevel()" is unavailable when using a custom context enricher.'
+            );
         }
         $this->contextEnricher->setTraceLevel($traceLevel);
         return $this;
@@ -210,7 +212,9 @@ final class Logger implements LoggerInterface
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {
         if (!$this->contextEnricher instanceof ContextEnricher) {
-            throw new RuntimeException();
+            throw new RuntimeException(
+                '"Logger::setExcludedTracePaths()" is unavailable when using a custom context enricher.'
+            );
         }
         $this->contextEnricher->setExcludedTracePaths($excludedTracePaths);
         return $this;

@@ -15,7 +15,6 @@ use Yiisoft\Log\Logger;
 use Yiisoft\Log\Message;
 use Yiisoft\Log\Target;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
-
 use Yiisoft\Log\Tests\TestAsset\StubContextEnricher;
 
 use function memory_get_usage;

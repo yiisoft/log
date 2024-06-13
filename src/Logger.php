@@ -8,18 +8,17 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
+use RuntimeException;
 use Stringable;
 use Throwable;
-use Yiisoft\Log\Message\CategoryFilter;
+use Yiisoft\Log\ContextEnricher\ContextEnricher;
+use Yiisoft\Log\ContextEnricher\ContextEnricherInterface;
 
-use function array_filter;
 use function count;
-use function debug_backtrace;
 use function gettype;
 use function implode;
 use function in_array;
 use function is_string;
-use function memory_get_usage;
 use function microtime;
 use function register_shutdown_function;
 use function sprintf;
@@ -35,7 +34,6 @@ use function sprintf;
  * When the application ends or {@see Logger::$flushInterval} is reached, Logger will call {@see Logger::flush()}
  * to send logged messages to different log targets, such as file or email according to the {@see Logger::$targets}.
  *
- * @psalm-import-type Backtrace from Message
  * @psalm-import-type LogMessageContext from Message
  */
 final class Logger implements LoggerInterface
@@ -67,11 +65,6 @@ final class Logger implements LoggerInterface
     private array $targets = [];
 
     /**
-     * @var string[] Array of paths to exclude from tracing when tracing is enabled with {@see Logger::setTraceLevel()}.
-     */
-    private array $excludedTracePaths = [];
-
-    /**
      * @var int How many log messages should be logged before they are flushed from memory and sent to targets.
      *
      * Defaults to 1000, meaning the {@see Logger::flush()} method will be invoked once every 1000 messages logged.
@@ -82,22 +75,22 @@ final class Logger implements LoggerInterface
      */
     private int $flushInterval = 1000;
 
-    /**
-     * @var int How much call stack information (file name and line number) should be logged for each log message.
-     *
-     * If it is greater than 0, at most that number of call stacks will be logged.
-     * Note that only application call stacks are counted.
-     */
-    private int $traceLevel = 0;
+    private ContextEnricherInterface $contextEnricher;
 
     /**
      * Initializes the logger by registering {@see Logger::flush()} as a shutdown function.
      *
      * @param Target[] $targets The log targets.
+     * @param ContextEnricherInterface|null $contextEnricher The context enricher. If null, {@see ContextEnricher} with
+     * default parameters will be used.
      */
-    public function __construct(array $targets = [])
+    public function __construct(
+        array $targets = [],
+        ?ContextEnricherInterface $contextEnricher = null,
+    )
     {
         $this->setTargets($targets);
+        $this->contextEnricher = $contextEnricher ?? new ContextEnricher();
 
         register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
@@ -154,12 +147,11 @@ final class Logger implements LoggerInterface
     {
         self::assertLevelIsString($level);
 
-        $context['time'] ??= microtime(true);
-        $context['trace'] ??= $this->collectTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-        $context['memory'] ??= memory_get_usage();
-        $context['category'] ??= CategoryFilter::DEFAULT;
-
-        $this->messages[] = new Message($level, $message, $context);
+        $this->messages[] = new Message(
+            $level,
+            $message,
+            $this->contextEnricher->process($context),
+        );
 
         if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {
             $this->flush();
@@ -199,11 +191,15 @@ final class Logger implements LoggerInterface
      *
      * @param int $traceLevel The number of call stack information.
      *
-     * @see Logger::$traceLevel
+     * @deprecated since 2.1, to be removed in 3.0 version. Use {@see self::$contextEnricher}
+     * and {@see ContextEnricher::setTraceLevel()} instead.
      */
     public function setTraceLevel(int $traceLevel): self
     {
-        $this->traceLevel = $traceLevel;
+        if (!$this->contextEnricher instanceof ContextEnricher) {
+            throw new RuntimeException();
+        }
+        $this->contextEnricher->setTraceLevel($traceLevel);
         return $this;
     }
 
@@ -214,21 +210,15 @@ final class Logger implements LoggerInterface
      *
      * @throws InvalidArgumentException for non-string values.
      *
-     * @see Logger::$excludedTracePaths
+     * @deprecated since 2.1, to be removed in 3.0 version. Use {@see self::$contextEnricher}
+     * and {@see ContextEnricher::setExcludedTracePaths()} instead.
      */
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {
-        foreach ($excludedTracePaths as $excludedTracePath) {
-            /** @psalm-suppress DocblockTypeContradiction */
-            if (!is_string($excludedTracePath)) {
-                throw new InvalidArgumentException(sprintf(
-                    'The trace path must be a string, %s received.',
-                    gettype($excludedTracePath)
-                ));
-            }
+        if (!$this->contextEnricher instanceof ContextEnricher) {
+            throw new RuntimeException();
         }
-
-        $this->excludedTracePaths = $excludedTracePaths;
+        $this->contextEnricher->setExcludedTracePaths($excludedTracePaths);
         return $this;
     }
 
@@ -334,42 +324,5 @@ final class Logger implements LoggerInterface
         if (!empty($targetErrors)) {
             $this->dispatch($targetErrors, true);
         }
-    }
-
-    /**
-     * Collects a trace when tracing is enabled with {@see Logger::setTraceLevel()}.
-     *
-     * @param array $backtrace The list of call stack information.
-     * @psalm-param Backtrace|list<array{object?:object,args?:array}> $backtrace
-     *
-     * @return array Collected a list of call stack information.
-     * @psalm-return Backtrace
-     */
-    private function collectTrace(array $backtrace): array
-    {
-        $traces = [];
-
-        if ($this->traceLevel > 0) {
-            $count = 0;
-
-            foreach ($backtrace as $trace) {
-                if (isset($trace['file'], $trace['line'])) {
-                    $excludedMatch = array_filter(
-                        $this->excludedTracePaths,
-                        static fn ($path) => str_contains($trace['file'], $path)
-                    );
-
-                    if (empty($excludedMatch)) {
-                        unset($trace['object'], $trace['args']);
-                        $traces[] = $trace;
-                        if (++$count >= $this->traceLevel) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $traces;
     }
 }

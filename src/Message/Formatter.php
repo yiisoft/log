@@ -21,8 +21,6 @@ use function sprintf;
  * Formatter formats log messages.
  *
  * @internal
- *
- * @psalm-import-type Backtrace from Message
  */
 final class Formatter
 {
@@ -233,14 +231,17 @@ final class Formatter
      */
     private function getTrace(Message $message): string
     {
-        /** @psalm-var Backtrace $traces */
         $traces = $message->context('trace', []);
-        if (empty($traces)) {
+        if (empty($traces) || !is_array($traces)) {
             return '';
         }
 
         $lines = array_map(
-            static function (array $trace): string {
+            static function (mixed $trace): string {
+                if (!is_array($trace)) {
+                    return '???';
+                }
+
                 $file = $trace['file'] ?? null;
                 $line = $trace['line'] ?? null;
                 if (is_string($file) && is_int($line)) {

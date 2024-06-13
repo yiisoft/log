@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace Yiisoft\Log\ContextEnricher;
 
 use InvalidArgumentException;
-use Yiisoft\Log\Message;
 use Yiisoft\Log\Message\CategoryFilter;
 
 /**
- * @psalm-import-type Backtrace from Message
+ * @psalm-type Backtrace = list<array{
+ *      file:string,
+ *      line:int,
+ *      function?:string,
+ *      class?:string,
+ *      type?:string,
+ *  }>
  */
 final class ContextEnricher implements ContextEnricherInterface
 {

@@ -33,8 +33,6 @@ use function sprintf;
  *
  * When the application ends or {@see Logger::$flushInterval} is reached, Logger will call {@see Logger::flush()}
  * to send logged messages to different log targets, such as file or email according to the {@see Logger::$targets}.
- *
- * @psalm-import-type LogMessageContext from Message
  */
 final class Logger implements LoggerInterface
 {
@@ -139,10 +137,6 @@ final class Logger implements LoggerInterface
         return $this->targets;
     }
 
-    /**
-     * @psalm-param LogMessageContext $context
-     * @psalm-suppress MoreSpecificImplementedParamType,MixedArgumentTypeCoercion
-     */
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
         self::assertLevelIsString($level);

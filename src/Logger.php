@@ -85,8 +85,7 @@ final class Logger implements LoggerInterface
     public function __construct(
         array $targets = [],
         ?ContextEnricherInterface $contextEnricher = null,
-    )
-    {
+    ) {
         $this->setTargets($targets);
         $this->contextEnricher = $contextEnricher ?? new ContextEnricher();
 

@@ -15,7 +15,7 @@ use Yiisoft\Log\Logger;
 use Yiisoft\Log\Message;
 use Yiisoft\Log\Target;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
-use Yiisoft\Log\Tests\TestAsset\StubContextEnricher;
+use Yiisoft\Log\Tests\TestAsset\StubContextProvider;
 
 use function memory_get_usage;
 
@@ -403,21 +403,21 @@ final class LoggerTest extends TestCase
         $logger->flush(true);
     }
 
-    public function testSetTraceLevelWithCustomContextEnricher(): void
+    public function testSetTraceLevelWithCustomContextProvider(): void
     {
-        $logger = new Logger(contextEnricher: new StubContextEnricher());
+        $logger = new Logger(contextProvider: new StubContextProvider());
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"Logger::setTraceLevel()" is unavailable when using a custom context enricher.');
+        $this->expectExceptionMessage('"Logger::setTraceLevel()" is unavailable when using a custom context provider.');
         $logger->setTraceLevel(0);
     }
 
-    public function testSetExcludedTracePathsWithCustomContextEnricher(): void
+    public function testSetExcludedTracePathsWithCustomContextProvider(): void
     {
-        $logger = new Logger(contextEnricher: new StubContextEnricher());
+        $logger = new Logger(contextProvider: new StubContextProvider());
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('"Logger::setExcludedTracePaths()" is unavailable when using a custom context enricher.');
+        $this->expectExceptionMessage('"Logger::setExcludedTracePaths()" is unavailable when using a custom context provider.');
         $logger->setExcludedTracePaths([]);
     }
 

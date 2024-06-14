@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Log\ContextEnricher;
+namespace Yiisoft\Log\ContextProvider;
 
 use InvalidArgumentException;
 use Yiisoft\Log\Message\CategoryFilter;
@@ -16,7 +16,7 @@ use Yiisoft\Log\Message\CategoryFilter;
  *      type?:string,
  *  }>
  */
-final class ContextEnricher implements ContextEnricherInterface
+final class ContextProvider implements ContextProviderInterface
 {
     /**
      * @var string[] $excludedTracePaths Array of paths to exclude from tracing when tracing is enabled.
@@ -37,17 +37,16 @@ final class ContextEnricher implements ContextEnricherInterface
         $this->setExcludedTracePaths($excludedTracePaths);
     }
 
-    public function process(array $context): array
+    public function getContext(): array
     {
-        $context['time'] ??= microtime(true);
-
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         array_shift($trace);
-        $context['trace'] ??= $this->collectTrace($trace);
-
-        $context['memory'] ??= memory_get_usage();
-        $context['category'] ??= CategoryFilter::DEFAULT;
-        return $context;
+        return [
+            'time' => microtime(true),
+            'trace' => $this->collectTrace($trace),
+            'memory' => memory_get_usage(),
+            'category' => CategoryFilter::DEFAULT,
+        ];
     }
 
     /**

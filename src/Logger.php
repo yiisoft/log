@@ -11,8 +11,8 @@ use Psr\Log\LogLevel;
 use RuntimeException;
 use Stringable;
 use Throwable;
-use Yiisoft\Log\ContextEnricher\ContextEnricher;
-use Yiisoft\Log\ContextEnricher\ContextEnricherInterface;
+use Yiisoft\Log\ContextProvider\ContextProvider;
+use Yiisoft\Log\ContextProvider\ContextProviderInterface;
 
 use function count;
 use function gettype;
@@ -73,21 +73,21 @@ final class Logger implements LoggerInterface
      */
     private int $flushInterval = 1000;
 
-    private ContextEnricherInterface $contextEnricher;
+    private ContextProviderInterface $contextProvider;
 
     /**
      * Initializes the logger by registering {@see Logger::flush()} as a shutdown function.
      *
      * @param Target[] $targets The log targets.
-     * @param ContextEnricherInterface|null $contextEnricher The context enricher. If null, {@see ContextEnricher} with
+     * @param ContextProviderInterface|null $contextProvider The context provider. If null, {@see ContextProvider} with
      * default parameters will be used.
      */
     public function __construct(
         array $targets = [],
-        ?ContextEnricherInterface $contextEnricher = null,
+        ?ContextProviderInterface $contextProvider = null,
     ) {
         $this->setTargets($targets);
-        $this->contextEnricher = $contextEnricher ?? new ContextEnricher();
+        $this->contextProvider = $contextProvider ?? new ContextProvider();
 
         register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
@@ -143,7 +143,7 @@ final class Logger implements LoggerInterface
         $this->messages[] = new Message(
             $level,
             $message,
-            $this->contextEnricher->process($context),
+            array_merge($this->contextProvider->getContext(), $context),
         );
 
         if ($this->flushInterval > 0 && count($this->messages) >= $this->flushInterval) {
@@ -184,17 +184,17 @@ final class Logger implements LoggerInterface
      *
      * @param int $traceLevel The number of call stack information.
      *
-     * @deprecated since 2.1, to be removed in 3.0 version. Use {@see self::$contextEnricher}
-     * and {@see ContextEnricher::setTraceLevel()} instead.
+     * @deprecated since 2.1, to be removed in 3.0 version. Use {@see self::$contextProvider}
+     * and {@see ContextProvider::setTraceLevel()} instead.
      */
     public function setTraceLevel(int $traceLevel): self
     {
-        if (!$this->contextEnricher instanceof ContextEnricher) {
+        if (!$this->contextProvider instanceof ContextProvider) {
             throw new RuntimeException(
-                '"Logger::setTraceLevel()" is unavailable when using a custom context enricher.'
+                '"Logger::setTraceLevel()" is unavailable when using a custom context provider.'
             );
         }
-        $this->contextEnricher->setTraceLevel($traceLevel);
+        $this->contextProvider->setTraceLevel($traceLevel);
         return $this;
     }
 
@@ -205,17 +205,17 @@ final class Logger implements LoggerInterface
      *
      * @throws InvalidArgumentException for non-string values.
      *
-     * @deprecated since 2.1, to be removed in 3.0 version. Use {@see self::$contextEnricher}
-     * and {@see ContextEnricher::setExcludedTracePaths()} instead.
+     * @deprecated since 2.1, to be removed in 3.0 version. Use {@see self::$contextProvider}
+     * and {@see ContextProvider::setExcludedTracePaths()} instead.
      */
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {
-        if (!$this->contextEnricher instanceof ContextEnricher) {
+        if (!$this->contextProvider instanceof ContextProvider) {
             throw new RuntimeException(
-                '"Logger::setExcludedTracePaths()" is unavailable when using a custom context enricher.'
+                '"Logger::setExcludedTracePaths()" is unavailable when using a custom context provider.'
             );
         }
-        $this->contextEnricher->setExcludedTracePaths($excludedTracePaths);
+        $this->contextProvider->setExcludedTracePaths($excludedTracePaths);
         return $this;
     }
 

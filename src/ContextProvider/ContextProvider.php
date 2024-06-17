@@ -28,12 +28,13 @@ final class ContextProvider implements ContextProviderInterface
      * log message. If it is greater than 0, at most that number of call stacks will be logged. Note that only
      * application call stacks are counted.
      * @param string[] $excludedTracePaths Array of paths to exclude from tracing when tracing is enabled
-     *  with {@see $traceLevel}.
+     * with {@see $traceLevel}.
      */
     public function __construct(
         private int $traceLevel = 0,
         array $excludedTracePaths = [],
     ) {
+        /** @psalm-suppress DeprecatedMethod `setExcludedTracePaths` will be private and not deprecated */
         $this->setExcludedTracePaths($excludedTracePaths);
     }
 
@@ -55,6 +56,8 @@ final class ContextProvider implements ContextProviderInterface
      * @param int $traceLevel The number of call stack information.
      *
      * @see self::$traceLevel
+     *
+     * @deprecated since 2.1.0, to be removed in 3.0.0. Use constructor parameter "traceLevel" instead.
      */
     public function setTraceLevel(int $traceLevel): self
     {
@@ -70,6 +73,8 @@ final class ContextProvider implements ContextProviderInterface
      * @throws InvalidArgumentException for non-string values.
      *
      * @see self::$excludedTracePaths
+     *
+     * @deprecated since 2.1.0, to be removed in 3.0.0. Use constructor parameter "excludedTracePaths" instead.
      */
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {

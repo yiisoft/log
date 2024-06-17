@@ -194,6 +194,7 @@ final class Logger implements LoggerInterface
                 '"Logger::setTraceLevel()" is unavailable when using a custom context provider.'
             );
         }
+        /** @psalm-suppress DeprecatedMethod */
         $this->contextProvider->setTraceLevel($traceLevel);
         return $this;
     }
@@ -215,6 +216,7 @@ final class Logger implements LoggerInterface
                 '"Logger::setExcludedTracePaths()" is unavailable when using a custom context provider.'
             );
         }
+        /** @psalm-suppress DeprecatedMethod */
         $this->contextProvider->setExcludedTracePaths($excludedTracePaths);
         return $this;
     }

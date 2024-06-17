@@ -15,20 +15,6 @@ use function preg_replace_callback;
 
 /**
  * Message is a data object that stores log message data.
- *
- * @psalm-type Backtrace = list<array{
- *     file:string,
- *     line:int,
- *     function?:string,
- *     class?:string,
- *     type?:string,
- * }>
- * @psalm-type LogMessageContext = array{
- *     category?:string,
- *     memory?:int,
- *     time?:float,
- *     trace?:Backtrace,
- * }&array
  */
 final class Message
 {
@@ -45,8 +31,7 @@ final class Message
     private string $message;
 
     /**
-     * @var array<string, mixed> Log message context.
-     * @psalm-var LogMessageContext
+     * @var array Log message context.
      *
      * Message context has a following keys:
      *
@@ -60,8 +45,7 @@ final class Message
     /**
      * @param string $level Log message level.
      * @param string|Stringable $message Log message.
-     * @param array<string, mixed> $context Log message context.
-     * @psalm-param LogMessageContext $context
+     * @param array $context Log message context.
      *
      * @throws InvalidArgumentException for invalid log message level.
      *
@@ -105,7 +89,6 @@ final class Message
      * @param mixed $default If the context parameter does not exist, the `$default` will be returned.
      *
      * @return mixed The context parameter value.
-     * @psalm-return LogMessageContext|mixed
      */
     public function context(string $name = null, mixed $default = null): mixed
     {
@@ -121,8 +104,7 @@ final class Message
      * where foo will be replaced by the context data in key "foo".
      *
      * @param string|Stringable $message Raw log message.
-     * @param array<string, mixed> $context Message context.
-     * @psalm-param LogMessageContext $context
+     * @param array $context Message context.
      *
      * @return string Parsed message.
      */

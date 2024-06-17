@@ -56,7 +56,7 @@ $logger->info('Info message', ['key' => 'value']);
 $logger->debug('Debug message', ['key' => 'value']);
 ```
 
-## Message Flushing and Exporting
+### Message Flushing and Exporting
 
 Log messages are collected and stored in memory. To limit memory consumption, the logger will flush
 the recorded messages to the log targets each time a certain number of log messages accumulate.
@@ -76,7 +76,7 @@ $target->setExportInterval(100); // default is 1000
 
 > Note: All message flushing and exporting also occurs when the application ends.
 
-## Logging targets
+### Logging targets
 
 This package contains two targets:
 
@@ -89,6 +89,42 @@ Extra logging targets are implemented as separate packages:
 - [Email](https://github.com/yiisoft/log-target-email)
 - [File](https://github.com/yiisoft/log-target-file)
 - [Syslog](https://github.com/yiisoft/log-target-syslog)
+
+### Context providers
+
+Context providers are used to provide additional context data for log messages. You can define your own context provider
+in `Logger` constructor:
+
+```php
+$logger = new \Yiisoft\Log\Logger(contextProvider: $myContextProvider);
+```
+
+By default, the logger uses built-in `Yiisoft\Log\ContextProvider\ContextProvider` that added following data to context:
+
+- `time` — current Unix timestamp with microseconds (float value);
+- `trace` — array of call stack information;
+- `memory` — memory usage in bytes.
+- `category` — category of the log message (always "application").
+
+`Yiisoft\Log\ContextProvider\ContextProvider` constructor parameters:
+
+- `traceLevel` — how much call stack information (file name and line number) should be logged for each
+  log message. If it is greater than 0, at most that number of call stacks will be logged. Note that only
+  application call stacks are counted.
+- `excludedTracePaths` — array of paths to exclude from tracing when tracing is enabled with `traceLevel`.
+
+Example of custom parameters' usage:
+
+```php
+$logger = new \Yiisoft\Log\Logger(
+    contextProvider: new Yiisoft\Log\ContextProvider\ContextProvider(
+        traceLevel: 3,
+        excludedTracePaths: [
+            '/vendor/yiisoft/di',
+        ],
+    )
+);
+```
 
 ## Documentation
 

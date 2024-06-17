@@ -1,6 +1,6 @@
 # Yii Logging Library Change Log
 
-## 2.0.1 under development
+## 2.1.0 under development
 
 - Bug #84: Change the type of the `$level` parameter in the `Message` constructor to `string` (@dood-)
 - New #104: Add new static methods `Logger::assertLevelIsValid()`, `Logger::assertLevelIsString()` and
@@ -9,6 +9,9 @@
 - Bug #98: Fix error on formatting trace, when it doesn't contain "file" and "line" (@vjik)
 - New #108: Support of nested values in message templates' variables, e. g. `{foo.bar}` (@vjik)
 - Bug #89: Fix error on parse messages, that contains variables that cannot cast to a string (@vjik)
+- New #109: Add context provider (@vjik)
+- Chg #109: Deprecate `Logger` methods `setTraceLevel()` and `setExcludedTracePaths()` in favor of context provider
+  usage (@vjik)
 
 ## 2.0.0 May 22, 2022
 

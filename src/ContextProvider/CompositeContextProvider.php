@@ -22,10 +22,10 @@ final class CompositeContextProvider implements ContextProviderInterface
 
     public function getContext(): array
     {
-        $context = [];
+        $contexts = [];
         foreach ($this->providers as $provider) {
-            $context = array_merge($context, $provider->getContext());
+            $contexts[] = $provider->getContext();
         }
-        return $context;
+        return array_merge(...$contexts);
     }
 }

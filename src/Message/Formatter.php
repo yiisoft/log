@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Log\Message;
 
 use DateTime;
+use DateTimeInterface;
+use Exception;
+use LogicException;
 use RuntimeException;
 use Yiisoft\Log\Message;
 use Yiisoft\VarDumper\VarDumper;
@@ -140,16 +143,33 @@ final class Formatter
      */
     private function getTime(Message $message): string
     {
-        /** @psalm-suppress PossiblyInvalidCast */
-        $timestamp = (string) $message->context('time', microtime(true));
+        $time = $message->context('time');
 
-        $format = match (true) {
-            str_contains($timestamp, '.') => 'U.u',
-            str_contains($timestamp, ',') => 'U,u',
-            default => 'U',
-        };
+        if (is_int($time) || is_float($time)) {
+            try {
+                $date = new DateTime('@' . $time);
+            } catch (Exception $e) {
+                throw new LogicException('Invalid time value in log context: ' . $time . '.', previous: $e);
+            }
+        } elseif (is_string($time)) {
+            $format = match (true) {
+                str_contains($time, '.') => 'U.u',
+                str_contains($time, ',') => 'U,u',
+                default => 'U',
+            };
+            $date = DateTime::createFromFormat($format, $time);
+            if ($date === false) {
+                throw new LogicException('Invalid time value in log context: "' . $time . '".');
+            }
+        } elseif ($time instanceof DateTimeInterface) {
+            $date = $time;
+        } elseif ($time === null) {
+            $date = new DateTime();
+        } else {
+            throw new LogicException('Invalid time value in log context. Got "' . get_debug_type($time) . '".');
+        }
 
-        return DateTime::createFromFormat($format, $timestamp)->format($this->timestampFormat);
+        return $date->format($this->timestampFormat);
     }
 
     /**

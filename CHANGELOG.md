@@ -12,6 +12,7 @@
 - New #109: Add context provider (@vjik)
 - Chg #109: Deprecate `Logger` methods `setTraceLevel()` and `setExcludedTracePaths()` in favor of context provider
   usage (@vjik)
+- New #111: Add `DateTime` and `DateTimeImmutable` support as time in log context (@vjik)
 
 ## 2.0.0 May 22, 2022
 

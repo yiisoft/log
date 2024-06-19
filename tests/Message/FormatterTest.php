@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests\Message;
 
+use DateTime;
 use Exception;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use RuntimeException;
@@ -261,5 +263,57 @@ final class FormatterTest extends TestCase
         $this->formatter->setPrefix($value);
         $this->expectException(RuntimeException::class);
         $this->formatter->format(new Message(LogLevel::INFO, 'test', ['foo' => 'bar']), []);
+    }
+
+    public static function dataTime(): array
+    {
+        return [
+            'int' => ['1970-01-01 00:00:01.000000', 1],
+            'float' => ['1970-01-01 00:00:01.230000', 1.23],
+            'string-int' => ['1970-01-01 00:00:23.000000', '23'],
+            'string-float' => ['1970-01-01 00:00:23.600000', '23.6'],
+            'string-float-comma' => ['1970-01-01 00:00:23.600000', '23,6'],
+            'datetime' => ['1970-01-01 00:00:23.00000', new DateTime('@23')],
+        ];
+    }
+
+    /**
+     * @dataProvider dataTime
+     */
+    public function testTime(string $expected, mixed $value): void
+    {
+        $formatter = new Formatter();
+        $result = $formatter->format(new Message(LogLevel::INFO, 'test', ['time' => $value]), []);
+        $this->assertStringStartsWith($expected, $result);
+    }
+
+    public function testTimeWithInvalidFloat(): void
+    {
+        $formatter = new Formatter();
+        $message = new Message(LogLevel::INFO, 'test', ['time' => 1234231.9135123512]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Invalid time value in log context: 1234231.9135124.');
+        $formatter->format($message, []);
+    }
+
+    public function testTimeWithInvalidString(): void
+    {
+        $formatter = new Formatter();
+        $message = new Message(LogLevel::INFO, 'test', ['time' => 'hello']);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Invalid time value in log context: "hello".');
+        $formatter->format($message, []);
+    }
+
+    public function testTimeWithInvalidType(): void
+    {
+        $formatter = new Formatter();
+        $message = new Message(LogLevel::INFO, 'test', ['time' => []]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Invalid time value in log context. Got "array".');
+        $formatter->format($message, []);
     }
 }

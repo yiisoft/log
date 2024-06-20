@@ -13,7 +13,8 @@
 - Chg #109: Deprecate `Logger` methods `setTraceLevel()` and `setExcludedTracePaths()` in favor of context provider
   usage (@vjik)
 - New #111: Add `DateTime` and `DateTimeImmutable` support as time in log context (@vjik)
-- New #112: Add `Message::category()` method (@vjik)
+- New #112: Add `Message::category()` method and `Message::DEFAULT_CATEGORY` constant, deprecate
+  `CategoryFilter::DEFAULT` in favor it (@vjik)
 
 ## 2.0.0 May 22, 2022
 

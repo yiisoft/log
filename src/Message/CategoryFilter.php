@@ -6,6 +6,8 @@ namespace Yiisoft\Log\Message;
 
 use InvalidArgumentException;
 
+use Yiisoft\Log\Message;
+
 use function gettype;
 use function is_string;
 use function rtrim;
@@ -18,6 +20,9 @@ use function sprintf;
  */
 final class CategoryFilter
 {
+    /**
+     * @deprecated Since 2.1, will be removed in 3.0. Use {@see Message::DEFAULT_CATEGORY} instead.
+     */
     public const DEFAULT = 'application';
 
     /**

@@ -9,7 +9,6 @@ use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Stringable;
-use Yiisoft\Log\Message\CategoryFilter;
 use Yiisoft\Log\Message\ContextValueExtractor;
 use Yiisoft\VarDumper\VarDumper;
 
@@ -20,6 +19,8 @@ use function preg_replace_callback;
  */
 final class Message
 {
+    public const DEFAULT_CATEGORY = 'application';
+
     /**
      * @var string Log message level.
      *
@@ -103,7 +104,7 @@ final class Message
 
     public function category(): string
     {
-        $category = $this->context['category'] ?? CategoryFilter::DEFAULT;
+        $category = $this->context['category'] ?? self::DEFAULT_CATEGORY;
         if (!is_string($category)) {
             throw new LogicException(
                 'Invalid category value in log context. Expected "string", got "' . get_debug_type($category) . '".'

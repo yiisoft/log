@@ -172,8 +172,8 @@ final class MessageTest extends TestCase
     public static function dataCategory(): array
     {
         return [
-            'without-category' => [Message\CategoryFilter::DEFAULT, []],
-            'null-category' => [Message\CategoryFilter::DEFAULT, ['category' => null]],
+            'without-category' => [Message::DEFAULT_CATEGORY, []],
+            'null-category' => [Message::DEFAULT_CATEGORY, ['category' => null]],
             'with-category' => ['test', ['category' => 'test']],
         ];
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Log\ContextProvider;
 
 use InvalidArgumentException;
-use Yiisoft\Log\Message\CategoryFilter;
+use Yiisoft\Log\Message;
 
 /**
  * @psalm-type Backtrace = list<array{
@@ -46,7 +46,7 @@ final class ContextProvider implements ContextProviderInterface
             'time' => microtime(true),
             'trace' => $this->collectTrace($trace),
             'memory' => memory_get_usage(),
-            'category' => CategoryFilter::DEFAULT,
+            'category' => Message::DEFAULT_CATEGORY,
         ];
     }
 

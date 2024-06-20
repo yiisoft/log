@@ -384,10 +384,7 @@ abstract class Target
                 continue;
             }
 
-            /** @var string $category */
-            $category = $message->context('category', '');
-
-            if ($this->categories->isExcluded($category)) {
+            if ($this->categories->isExcluded($message->category())) {
                 unset($messages[$i]);
                 continue;
             }

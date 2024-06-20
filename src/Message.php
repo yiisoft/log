@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
+use LogicException;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Stringable;
+use Yiisoft\Log\Message\CategoryFilter;
 use Yiisoft\Log\Message\ContextValueExtractor;
 use Yiisoft\VarDumper\VarDumper;
 
@@ -97,6 +99,15 @@ final class Message
         }
 
         return $this->context[$name] ?? $default;
+    }
+
+    public function category(): string
+    {
+        $category = $this->context['category'] ?? CategoryFilter::DEFAULT;
+        if (!is_string($category)) {
+            throw new LogicException('Invalid category value in log context. Got "' . get_debug_type($category) . '".');
+        }
+        return $category;
     }
 
     /**

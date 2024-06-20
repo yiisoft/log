@@ -105,7 +105,9 @@ final class Message
     {
         $category = $this->context['category'] ?? CategoryFilter::DEFAULT;
         if (!is_string($category)) {
-            throw new LogicException('Invalid category value in log context. Got "' . get_debug_type($category) . '".');
+            throw new LogicException(
+                'Invalid category value in log context. Expected "string", got "' . get_debug_type($category) . '".'
+            );
         }
         return $category;
     }

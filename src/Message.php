@@ -102,6 +102,11 @@ final class Message
         return $this->context[$name] ?? $default;
     }
 
+    /**
+     * Returns the log message category. {@see self::DEFAULT_CATEGORY} is returned if the category is not set.
+     *
+     * @return string The log message category.
+     */
     public function category(): string
     {
         $category = $this->context['category'] ?? self::DEFAULT_CATEGORY;

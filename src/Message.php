@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
+use LogicException;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
@@ -18,6 +19,8 @@ use function preg_replace_callback;
  */
 final class Message
 {
+    public const DEFAULT_CATEGORY = 'application';
+
     /**
      * @var string Log message level.
      *
@@ -97,6 +100,22 @@ final class Message
         }
 
         return $this->context[$name] ?? $default;
+    }
+
+    /**
+     * Returns the log message category. {@see self::DEFAULT_CATEGORY} is returned if the category is not set.
+     *
+     * @return string The log message category.
+     */
+    public function category(): string
+    {
+        $category = $this->context['category'] ?? self::DEFAULT_CATEGORY;
+        if (!is_string($category)) {
+            throw new LogicException(
+                'Invalid category value in log context. Expected "string", got "' . get_debug_type($category) . '".'
+            );
+        }
+        return $category;
     }
 
     /**

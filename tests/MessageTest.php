@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Tests;
 
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
@@ -166,5 +167,32 @@ final class MessageTest extends TestCase
     {
         $message = new Message(LogLevel::INFO, $message, $context);
         $this->assertSame($expected, $message->message());
+    }
+
+    public static function dataCategory(): array
+    {
+        return [
+            'without-category' => [Message::DEFAULT_CATEGORY, []],
+            'null-category' => [Message::DEFAULT_CATEGORY, ['category' => null]],
+            'with-category' => ['test', ['category' => 'test']],
+        ];
+    }
+
+    /**
+     * @dataProvider dataCategory
+     */
+    public function testCategory(string $expected, array $context): void
+    {
+        $message = new Message(LogLevel::INFO, 'message', $context);
+        $this->assertSame($expected, $message->category());
+    }
+
+    public function testInvalidCategoryType(): void
+    {
+        $message = new Message(LogLevel::INFO, 'message', ['category' => 23.1]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Invalid category value in log context. Expected "string", got "float".');
+        $message->category();
     }
 }

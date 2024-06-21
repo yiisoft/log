@@ -127,10 +127,8 @@ final class Formatter
         $time = $this->getTime($message);
         $prefix = $this->getPrefix($message, $commonContext);
         $context = $this->getContext($message, $commonContext);
-        /** @var string $category */
-        $category = $message->context('category', CategoryFilter::DEFAULT);
 
-        return "{$time} {$prefix}[{$message->level()}][{$category}] {$message->message()}{$context}";
+        return "{$time} {$prefix}[{$message->level()}][{$message->category()}] {$message->message()}{$context}";
     }
 
     /**

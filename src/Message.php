@@ -144,7 +144,6 @@ final class Message
          * @psalm-var list<TraceItem> $trace We believe that the debug trace in context is always received as result of call
          * `debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)`.
          */
-
         return $trace;
     }
 

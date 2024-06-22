@@ -16,6 +16,14 @@ use function preg_replace_callback;
 
 /**
  * Message is a data object that stores log message data.
+ *
+ * @psalm-type TraceItem = array{
+ *     file?:string,
+ *     line?:int,
+ *     function?:string,
+ *     class?:string,
+ *     type?:string,
+ * }
  */
 final class Message
 {
@@ -116,6 +124,27 @@ final class Message
             );
         }
         return $category;
+    }
+
+    /**
+     * Returns the debug trace.
+     *
+     * @return array[]|null The debug trace or null if the trace is not set.
+     *
+     * @psalm-return list<TraceItem>|null
+     */
+    public function trace(): ?array
+    {
+        $trace = $this->context['trace'] ?? null;
+        if ($trace === null) {
+            return null;
+        }
+
+        /**
+         * @psalm-var list<TraceItem> $trace We believe that the debug trace in context is always received as result of call
+         * `debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)`.
+         */
+        return $trace;
     }
 
     /**

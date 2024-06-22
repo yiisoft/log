@@ -248,17 +248,13 @@ final class Formatter
      */
     private function getTrace(Message $message): string
     {
-        $traces = $message->context('trace', []);
-        if (empty($traces) || !is_array($traces)) {
+        $traces = $message->trace();
+        if ($traces === null) {
             return '';
         }
 
         $lines = array_map(
             static function (mixed $trace): string {
-                if (!is_array($trace)) {
-                    return '???';
-                }
-
                 $file = $trace['file'] ?? null;
                 $line = $trace['line'] ?? null;
                 if (is_string($file) && is_int($line)) {

@@ -8,13 +8,7 @@ use InvalidArgumentException;
 use Yiisoft\Log\Message;
 
 /**
- * @psalm-type Backtrace = list<array{
- *      file:string,
- *      line:int,
- *      function?:string,
- *      class?:string,
- *      type?:string,
- *  }>
+ * @psalm-import-type TraceItem from Message
  */
 final class ContextProvider implements ContextProviderInterface
 {
@@ -40,6 +34,7 @@ final class ContextProvider implements ContextProviderInterface
 
     public function getContext(): array
     {
+        /** @psalm-var list<TraceItem> $trace */
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         array_shift($trace);
         return [
@@ -97,11 +92,11 @@ final class ContextProvider implements ContextProviderInterface
     /**
      * Collects a trace when tracing is enabled with {@see Logger::setTraceLevel()}.
      *
-     * @param array $backtrace The list of call stack information.
-     * @psalm-param Backtrace|list<array{object?:object,args?:array}> $backtrace
+     * @param array[] $backtrace The list of call stack information.
+     * @psalm-param list<TraceItem> $backtrace
      *
-     * @return array Collected a list of call stack information.
-     * @psalm-return Backtrace
+     * @return array[] Collected a list of call stack information.
+     * @psalm-return list<TraceItem>
      */
     private function collectTrace(array $backtrace): array
     {

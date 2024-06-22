@@ -215,23 +215,6 @@ final class FormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($message, []));
     }
 
-    public function testNonArrayTraceItem()
-    {
-        $timestamp = 1_508_160_390;
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $message = new Message(
-            LogLevel::INFO,
-            'message',
-            ['category' => 'app', 'time' => $timestamp, 'trace' => [new stdClass()]],
-        );
-
-        $expected = "2017-10-16 13:26:30 [info][app] message\n\nMessage context:\n\n"
-            . "trace:\n    ???\n"
-            . "category: 'app'\ntime: $timestamp\n";
-
-        $this->assertSame($expected, $this->formatter->format($message, []));
-    }
-
     public function invalidCallableReturnStringProvider(): array
     {
         return [

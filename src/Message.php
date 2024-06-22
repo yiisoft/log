@@ -18,8 +18,8 @@ use function preg_replace_callback;
  * Message is a data object that stores log message data.
  *
  * @psalm-type TraceItem = array{
- *     file:string,
- *     line:int,
+ *     file?:string,
+ *     line?:int,
  *     function?:string,
  *     class?:string,
  *     type?:string,
@@ -141,7 +141,7 @@ final class Message
         }
 
         /**
-         * @psalm-var TraceItem $item We believe that the debug trace in context is always received as result of call
+         * @psalm-var list<TraceItem> $trace We believe that the debug trace in context is always received as result of call
          * `debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)`.
          */
 

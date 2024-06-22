@@ -118,7 +118,6 @@ final class ContextProvider implements ContextProviderInterface
                     );
 
                     if (empty($excludedMatch)) {
-                        unset($trace['object'], $trace['args']);
                         $traces[] = $trace;
                         if (++$count >= $this->traceLevel) {
                             break;

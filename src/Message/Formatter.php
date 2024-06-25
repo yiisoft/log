@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Message;
 
-use DateTime;
-use DateTimeInterface;
-use Exception;
-use LogicException;
 use RuntimeException;
 use Yiisoft\Log\Message;
 use Yiisoft\VarDumper\VarDumper;

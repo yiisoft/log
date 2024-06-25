@@ -17,6 +17,7 @@
   `CategoryFilter::DEFAULT` in favor it (@vjik)
 - New #113: Add `Message::trace()` method (@vjik)
 - Enh #113: Remove unnecessary `unset` call in `ContextProvider` (@vjik)
+- New #114: Add `Message::time()` method (@vjik)
 
 ## 2.0.0 May 22, 2022
 

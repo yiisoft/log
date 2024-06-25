@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log;
 
+use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
 use LogicException;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerTrait;
@@ -48,10 +51,15 @@ final class Message
      *
      * - category: string, message category.
      * - memory: int, memory usage in bytes, obtained by `memory_get_usage()`.
-     * - time: float, message timestamp obtained by microtime(true).
+     * - time: float, message timestamp obtained by `microtime(true)`.
      * - trace: array, debug backtrace, contains the application code call stacks.
      */
     private array $context;
+
+    /**
+     * Default time of the log message that used when the time is not set in the context.
+     */
+    private DateTimeImmutable $defaultTime;
 
     /**
      * @param string $level Log message level.
@@ -69,6 +77,7 @@ final class Message
         $this->level = $level;
         $this->message = $this->parse($message, $context);
         $this->context = $context;
+        $this->defaultTime = new DateTimeImmutable();
     }
 
     /**
@@ -145,6 +154,43 @@ final class Message
          * `debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)`.
          */
         return $trace;
+    }
+
+    /**
+     * Returns the time of the log message.
+     *
+     * @return DateTimeImmutable The log message time.
+     */
+    public function time(): DateTimeImmutable
+    {
+        $time = $this->context['time'] ?? $this->defaultTime;
+
+        if ($time instanceof DateTimeInterface) {
+            return DateTimeImmutable::createFromInterface($time);
+        }
+
+        if (is_int($time) || is_float($time)) {
+            try {
+                return new DateTimeImmutable('@' . $time);
+            } catch (Exception $e) {
+                throw new LogicException('Invalid time value in log context: ' . $time . '.', previous: $e);
+            }
+        }
+
+        if (is_string($time)) {
+            $format = match (true) {
+                str_contains($time, '.') => 'U.u',
+                str_contains($time, ',') => 'U,u',
+                default => 'U',
+            };
+            $date = DateTimeImmutable::createFromFormat($format, $time);
+            if ($date === false) {
+                throw new LogicException('Invalid time value in log context: "' . $time . '".');
+            }
+            return $date;
+        }
+
+        throw new LogicException('Invalid time value in log context. Got "' . get_debug_type($time) . '".');
     }
 
     /**

@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Message;
 
-use DateTime;
-use DateTimeInterface;
-use Exception;
-use LogicException;
 use RuntimeException;
 use Yiisoft\Log\Message;
 use Yiisoft\VarDumper\VarDumper;
@@ -124,49 +120,11 @@ final class Formatter
      */
     private function defaultFormat(Message $message, array $commonContext): string
     {
-        $time = $this->getTime($message);
+        $time = $message->time()->format($this->timestampFormat);
         $prefix = $this->getPrefix($message, $commonContext);
         $context = $this->getContext($message, $commonContext);
 
         return "{$time} {$prefix}[{$message->level()}][{$message->category()}] {$message->message()}{$context}";
-    }
-
-    /**
-     * Gets formatted timestamp for message, according to {@see Formatter::$timestampFormat}.
-     *
-     * @param Message $message The log message.
-     *
-     * @return string Formatted timestamp for message.
-     */
-    private function getTime(Message $message): string
-    {
-        $time = $message->context('time');
-
-        if (is_int($time) || is_float($time)) {
-            try {
-                $date = new DateTime('@' . $time);
-            } catch (Exception $e) {
-                throw new LogicException('Invalid time value in log context: ' . $time . '.', previous: $e);
-            }
-        } elseif (is_string($time)) {
-            $format = match (true) {
-                str_contains($time, '.') => 'U.u',
-                str_contains($time, ',') => 'U,u',
-                default => 'U',
-            };
-            $date = DateTime::createFromFormat($format, $time);
-            if ($date === false) {
-                throw new LogicException('Invalid time value in log context: "' . $time . '".');
-            }
-        } elseif ($time instanceof DateTimeInterface) {
-            $date = $time;
-        } elseif ($time === null) {
-            $date = new DateTime();
-        } else {
-            throw new LogicException('Invalid time value in log context. Got "' . get_debug_type($time) . '".');
-        }
-
-        return $date->format($this->timestampFormat);
     }
 
     /**

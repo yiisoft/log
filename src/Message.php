@@ -57,7 +57,7 @@ final class Message
     private array $context;
 
     /**
-     * Default time of the log message that used when the time is not set in the context.
+     * Default time to use when the time is not set in the context.
      */
     private DateTimeImmutable $defaultTime;
 

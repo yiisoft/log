@@ -6,6 +6,7 @@ namespace Yiisoft\Log;
 
 use InvalidArgumentException;
 use RuntimeException;
+use Yiisoft\Log\ContextProvider\CommonContextProvider;
 use Yiisoft\Log\Message\CategoryFilter;
 use Yiisoft\Log\Message\Formatter;
 
@@ -176,6 +177,8 @@ abstract class Target
      * @return self
      *
      * @see Target::$commonContext
+     *
+     * @deprecated since 2.1, to be removed in 3.0. Use {@see CommonContextProvider} instead.
      */
     public function setCommonContext(array $commonContext): self
     {
@@ -359,6 +362,8 @@ abstract class Target
      * Gets a user parameters in the `key => value` format that should be logged in a each message.
      *
      * @return array The user parameters in the `key => value` format.
+     *
+     * @deprecated since 2.1, to be removed in 3.0. Use {@see CommonContextProvider} instead.
      */
     protected function getCommonContext(): array
     {

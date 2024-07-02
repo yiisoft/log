@@ -18,6 +18,7 @@
 - New #113: Add `Message::trace()` method (@vjik)
 - Enh #113: Remove unnecessary `unset` call in `ContextProvider` (@vjik)
 - New #114: Add `Message::time()` method (@vjik)
+- Chg #116: Deprecate methods `setCommonContext()` and `getCommonContext()` in `Target` class (@vjik)
 
 ## 2.0.0 May 22, 2022
 

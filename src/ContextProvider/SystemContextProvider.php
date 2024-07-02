@@ -10,7 +10,7 @@ use Yiisoft\Log\Message;
 /**
  * @psalm-import-type TraceItem from Message
  */
-final class ContextProvider implements ContextProviderInterface
+final class SystemContextProvider implements ContextProviderInterface
 {
     /**
      * @var string[] $excludedTracePaths Array of paths to exclude from tracing when tracing is enabled.

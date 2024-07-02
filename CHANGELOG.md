@@ -9,7 +9,7 @@
 - Bug #98: Fix error on formatting trace, when it doesn't contain "file" and "line" (@vjik)
 - New #108: Support of nested values in message templates' variables, e. g. `{foo.bar}` (@vjik)
 - Bug #89: Fix error on parse messages, that contains variables that cannot cast to a string (@vjik)
-- New #109: Add context provider (@vjik)
+- New #109, #116: Add context providers (@vjik)
 - Chg #109: Deprecate `Logger` methods `setTraceLevel()` and `setExcludedTracePaths()` in favor of context provider
   usage (@vjik)
 - New #111: Add `DateTime` and `DateTimeImmutable` support as time in log context (@vjik)

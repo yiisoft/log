@@ -11,7 +11,7 @@ use Psr\Log\LogLevel;
 use RuntimeException;
 use Stringable;
 use Throwable;
-use Yiisoft\Log\ContextProvider\ContextProvider;
+use Yiisoft\Log\ContextProvider\SystemContextProvider;
 use Yiisoft\Log\ContextProvider\ContextProviderInterface;
 
 use function count;
@@ -79,7 +79,7 @@ final class Logger implements LoggerInterface
      * Initializes the logger by registering {@see Logger::flush()} as a shutdown function.
      *
      * @param Target[] $targets The log targets.
-     * @param ContextProviderInterface|null $contextProvider The context provider. If null, {@see ContextProvider} with
+     * @param ContextProviderInterface|null $contextProvider The context provider. If null, {@see SystemContextProvider} with
      * default parameters will be used.
      */
     public function __construct(
@@ -87,7 +87,7 @@ final class Logger implements LoggerInterface
         ?ContextProviderInterface $contextProvider = null,
     ) {
         $this->setTargets($targets);
-        $this->contextProvider = $contextProvider ?? new ContextProvider();
+        $this->contextProvider = $contextProvider ?? new SystemContextProvider();
 
         register_shutdown_function(function () {
             // make regular flush before other shutdown functions, which allows session data collection and so on
@@ -185,11 +185,11 @@ final class Logger implements LoggerInterface
      * @param int $traceLevel The number of call stack information.
      *
      * @deprecated since 2.1, to be removed in 3.0 version. Use {@see self::$contextProvider}
-     * and {@see ContextProvider::setTraceLevel()} instead.
+     * and {@see SystemContextProvider::setTraceLevel()} instead.
      */
     public function setTraceLevel(int $traceLevel): self
     {
-        if (!$this->contextProvider instanceof ContextProvider) {
+        if (!$this->contextProvider instanceof SystemContextProvider) {
             throw new RuntimeException(
                 '"Logger::setTraceLevel()" is unavailable when using a custom context provider.'
             );
@@ -207,11 +207,11 @@ final class Logger implements LoggerInterface
      * @throws InvalidArgumentException for non-string values.
      *
      * @deprecated since 2.1, to be removed in 3.0 version. Use {@see self::$contextProvider}
-     * and {@see ContextProvider::setExcludedTracePaths()} instead.
+     * and {@see SystemContextProvider::setExcludedTracePaths()} instead.
      */
     public function setExcludedTracePaths(array $excludedTracePaths): self
     {
-        if (!$this->contextProvider instanceof ContextProvider) {
+        if (!$this->contextProvider instanceof SystemContextProvider) {
             throw new RuntimeException(
                 '"Logger::setExcludedTracePaths()" is unavailable when using a custom context provider.'
             );

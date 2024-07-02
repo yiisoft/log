@@ -99,14 +99,24 @@ in `Logger` constructor:
 $logger = new \Yiisoft\Log\Logger(contextProvider: $myContextProvider);
 ```
 
-By default, the logger uses built-in `Yiisoft\Log\ContextProvider\ContextProvider` that added following data to context:
+Out of the box, the following context providers are available:
+
+- `SystemContextProvider` — adds system information (time, memory usage, trace, default category);
+- `CommonContextProvider` — adds common data;
+- `CompositeContextProvider` — allows combining multiple context providers.
+
+By default, the logger uses built-in `SystemContextProvider`.
+
+#### `SystemContextProvider`
+
+`SystemContextProvider` added following data to context:
 
 - `time` — current Unix timestamp with microseconds (float value);
 - `trace` — array of call stack information;
 - `memory` — memory usage in bytes.
 - `category` — category of the log message (always "application").
 
-`Yiisoft\Log\ContextProvider\ContextProvider` constructor parameters:
+`Yiisoft\Log\ContextProvider\SystemContextProvider` constructor parameters:
 
 - `traceLevel` — how much call stack information (file name and line number) should be logged for each
   log message. If it is greater than 0, at most that number of call stacks will be logged. Note that only
@@ -117,12 +127,37 @@ Example of custom parameters' usage:
 
 ```php
 $logger = new \Yiisoft\Log\Logger(
-    contextProvider: new Yiisoft\Log\ContextProvider\ContextProvider(
+    contextProvider: new Yiisoft\Log\ContextProvider\SystemContextProvider(
         traceLevel: 3,
         excludedTracePaths: [
             '/vendor/yiisoft/di',
         ],
-    )
+    ),
+);
+```
+
+#### `CommonContextProvider`
+
+`CommonContextProvider` allows to add additional common information to the log context. For example:
+
+```php
+$logger = new \Yiisoft\Log\Logger(
+    contextProvider: new Yiisoft\Log\ContextProvider\CommonContextProvider([
+       'environment' => 'production',
+    ]),
+);
+```
+
+#### `CompositeContextProvider`
+
+`CompositeContextProvider` allows to combine multiple context providers into one. For example:
+
+```php
+$logger = new \Yiisoft\Log\Logger(
+    contextProvider: new Yiisoft\Log\ContextProvider\CompositeContextProvider(
+        new Yiisoft\Log\ContextProvider\SystemContextProvider(),
+        new Yiisoft\Log\ContextProvider\CommonContextProvider(['environment' => 'production'])
+    ),
 );
 ```
 

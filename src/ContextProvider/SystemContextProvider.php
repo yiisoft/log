@@ -79,7 +79,7 @@ final class SystemContextProvider implements ContextProviderInterface
                 throw new InvalidArgumentException(
                     sprintf(
                         'The trace path must be a string, %s received.',
-                        gettype($excludedTracePath)
+                        get_debug_type($excludedTracePath)
                     )
                 );
             }

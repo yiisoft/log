@@ -8,7 +8,6 @@ use RuntimeException;
 use Yiisoft\Log\Message;
 use Yiisoft\VarDumper\VarDumper;
 
-use function gettype;
 use function implode;
 use function is_string;
 use function is_object;
@@ -103,7 +102,7 @@ final class Formatter
         if (!is_string($formatted)) {
             throw new RuntimeException(sprintf(
                 'The PHP callable "format" must return a string, %s received.',
-                gettype($formatted)
+                get_debug_type($formatted)
             ));
         }
 
@@ -151,7 +150,7 @@ final class Formatter
         if (!is_string($prefix)) {
             throw new RuntimeException(sprintf(
                 'The PHP callable "prefix" must return a string, %s received.',
-                gettype($prefix)
+                get_debug_type($prefix)
             ));
         }
 

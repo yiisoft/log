@@ -18,6 +18,7 @@
 - New #113: Add `Message::trace()` method (@vjik)
 - New #114: Add `Message::time()` method (@vjik)
 - Chg #116: Deprecate methods `setCommonContext()` and `getCommonContext()` in `Target` class (@vjik)
+- Chg #118: Replace `gettype()` to `get_debug_type()` in exception messages generation (@vjik)
 
 ## 2.0.0 May 22, 2022
 

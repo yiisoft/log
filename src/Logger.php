@@ -15,7 +15,6 @@ use Yiisoft\Log\ContextProvider\SystemContextProvider;
 use Yiisoft\Log\ContextProvider\ContextProviderInterface;
 
 use function count;
-use function gettype;
 use function implode;
 use function in_array;
 use function is_string;
@@ -113,7 +112,7 @@ final class Logger implements LoggerInterface
         if (!is_string($level)) {
             throw new \Psr\Log\InvalidArgumentException(sprintf(
                 'The log message level must be a string, %s provided.',
-                gettype($level)
+                get_debug_type($level)
             ));
         }
 
@@ -250,7 +249,7 @@ final class Logger implements LoggerInterface
         }
 
         throw new \Psr\Log\InvalidArgumentException(
-            sprintf('The log message level must be a string, %s provided.', gettype($level))
+            sprintf('The log message level must be a string, %s provided.', get_debug_type($level))
         );
     }
 

@@ -11,7 +11,6 @@ use Yiisoft\Log\Message\CategoryFilter;
 use Yiisoft\Log\Message\Formatter;
 
 use function count;
-use function gettype;
 use function in_array;
 use function is_bool;
 use function sprintf;
@@ -307,7 +306,7 @@ abstract class Target
         if (!is_bool($enabled = ($this->enabled)())) {
             throw new RuntimeException(sprintf(
                 'The PHP callable "enabled" must returns a boolean, %s received.',
-                gettype($enabled)
+                get_debug_type($enabled)
             ));
         }
 

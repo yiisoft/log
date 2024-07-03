@@ -8,7 +8,6 @@ use InvalidArgumentException;
 
 use Yiisoft\Log\Message;
 
-use function gettype;
 use function is_string;
 use function rtrim;
 use function sprintf;
@@ -123,7 +122,7 @@ final class CategoryFilter
             if (!is_string($category)) {
                 throw new InvalidArgumentException(sprintf(
                     'The log message category must be a string, %s received.',
-                    gettype($category)
+                    get_debug_type($category)
                 ));
             }
         }

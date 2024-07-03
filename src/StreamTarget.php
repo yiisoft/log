@@ -12,7 +12,6 @@ use function fclose;
 use function flock;
 use function fopen;
 use function fwrite;
-use function gettype;
 use function get_resource_type;
 use function is_resource;
 use function sprintf;
@@ -79,7 +78,7 @@ final class StreamTarget extends Target
         if (!is_resource($stream) || get_resource_type($stream) !== 'stream') {
             throw new InvalidArgumentException(sprintf(
                 'Invalid stream provided. It must be a string stream identifier or a stream resource, "%s" received.',
-                gettype($stream),
+                get_debug_type($stream),
             ));
         }
 

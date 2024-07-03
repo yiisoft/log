@@ -1,24 +1,24 @@
 # Yii Logging Library Change Log
 
-## 2.1.0 under development
+## 2.1.0 July 03, 2024
 
-- Bug #84: Change the type of the `$level` parameter in the `Message` constructor to `string` (@dood-)
 - New #104: Add new static methods `Logger::assertLevelIsValid()`, `Logger::assertLevelIsString()` and
   `Logger::assertLevelIsSupported()` (@vjik)
-- Chg #104: Deprecate method `Logger::validateLevel()` (@vjik)
-- Bug #98: Fix error on formatting trace, when it doesn't contain "file" and "line" (@vjik)
 - New #108: Support of nested values in message templates' variables, e. g. `{foo.bar}` (@vjik)
-- Bug #89: Fix error on parse messages, that contains variables that cannot cast to a string (@vjik)
 - New #109, #113, #116: Add context providers (@vjik)
-- Chg #109: Deprecate `Logger` methods `setTraceLevel()` and `setExcludedTracePaths()` in favor of context provider
-  usage (@vjik)
 - New #111: Add `DateTime` and `DateTimeImmutable` support as time in log context (@vjik)
 - New #112: Add `Message::category()` method and `Message::DEFAULT_CATEGORY` constant, deprecate
   `CategoryFilter::DEFAULT` in favor it (@vjik)
 - New #113: Add `Message::trace()` method (@vjik)
 - New #114: Add `Message::time()` method (@vjik)
+- Chg #104: Deprecate method `Logger::validateLevel()` (@vjik)
+- Chg #109: Deprecate `Logger` methods `setTraceLevel()` and `setExcludedTracePaths()` in favor of context provider
+  usage (@vjik)
 - Chg #116: Deprecate methods `setCommonContext()` and `getCommonContext()` in `Target` class (@vjik)
 - Chg #118: Replace `gettype()` to `get_debug_type()` in exception messages generation (@vjik)
+- Bug #84: Change the type of the `$level` parameter in the `Message` constructor to `string` (@dood-)
+- Bug #89: Fix error on parse messages, that contains variables that cannot cast to a string (@vjik)
+- Bug #98: Fix error on formatting trace, when it doesn't contain "file" and "line" (@vjik)
 
 ## 2.0.0 May 22, 2022
 

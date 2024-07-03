@@ -1,5 +1,9 @@
 # Yii Logging Library Change Log
 
+## 2.1.1 under development
+
+- no changes in this release.
+
 ## 2.1.0 July 03, 2024
 
 - New #104: Add new static methods `Logger::assertLevelIsValid()`, `Logger::assertLevelIsString()` and

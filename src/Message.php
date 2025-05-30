@@ -110,7 +110,7 @@ final class Message
      *
      * @return mixed The context parameter value.
      */
-    public function context(string $name = null, mixed $default = null): mixed
+    public function context(?string $name = null, mixed $default = null): mixed
     {
         if ($name === null) {
             return $this->context;

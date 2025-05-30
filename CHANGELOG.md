@@ -2,7 +2,7 @@
 
 ## 2.1.1 under development
 
-- no changes in this release.
+- Enh #123: Explicitly marking parameters as nullable (@Tigrov)
 
 ## 2.1.0 July 03, 2024
 

@@ -17,6 +17,11 @@ final class ContextValueExtractor
         $path = self::parsePath($key);
 
         $lastKey = array_pop($path);
+
+        if ($lastKey === null) {
+            return [false, null];
+        }
+
         $array = $context;
         foreach ($path as $pathItem) {
             $array = array_key_exists($pathItem, $array) ? $array[$pathItem] : null;

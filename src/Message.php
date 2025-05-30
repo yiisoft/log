@@ -206,6 +206,7 @@ final class Message
     {
         $message = (string) $message;
 
+        /** @var string */
         return preg_replace_callback(
             '/{(.*)}/',
             static function (array $matches) use ($context) {

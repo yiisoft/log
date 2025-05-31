@@ -18,6 +18,7 @@ final class ContextValueExtractor
 
         $lastKey = array_pop($path);
         $array = $context;
+
         foreach ($path as $pathItem) {
             $array = array_key_exists($pathItem, $array) ? $array[$pathItem] : null;
             if (!is_array($array)) {
@@ -31,12 +32,12 @@ final class ContextValueExtractor
     }
 
     /**
-     * @psalm-return list<string>
+     * @psalm-return non-empty-list<string>
      */
     private static function parsePath(string $path): array
     {
         if ($path === '') {
-            return [];
+            return [''];
         }
 
         if (!str_contains($path, '.')) {

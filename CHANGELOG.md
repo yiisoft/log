@@ -2,7 +2,8 @@
 
 ## 2.1.1 under development
 
-- no changes in this release.
+- Bug #123: Explicitly marking parameters as nullable (@Tigrov)
+- Bug #123: Fix `ContextValueExtractor::extract()` with empty key in PHP 8.4 (@Tigrov)
 
 ## 2.1.0 July 03, 2024
 

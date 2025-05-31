@@ -16,11 +16,8 @@ final class ContextValueExtractor
     {
         $path = self::parsePath($key);
 
+        /** @var string $lastKey */
         $lastKey = array_pop($path);
-
-        if ($lastKey === null) {
-            return [false, null];
-        }
 
         $array = $context;
         foreach ($path as $pathItem) {
@@ -41,7 +38,7 @@ final class ContextValueExtractor
     private static function parsePath(string $path): array
     {
         if ($path === '') {
-            return [];
+            return [''];
         }
 
         if (!str_contains($path, '.')) {

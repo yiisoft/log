@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Yiisoft\Log\Message;
 
+use function array_key_exists;
+use function count;
+use function is_array;
+use function sprintf;
+use function strlen;
+
 /**
  * @internal
  */
@@ -20,7 +26,7 @@ final class ContextValueExtractor
         $array = $context;
 
         foreach ($path as $pathItem) {
-            $array = array_key_exists($pathItem, $array) ? $array[$pathItem] : null;
+            $array = $array[$pathItem] ?? null;
             if (!is_array($array)) {
                 return [false, null];
             }

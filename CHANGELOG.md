@@ -1,9 +1,9 @@
 # Yii Logging Library Change Log
 
-## 2.1.1 under development
+## 2.1.1 June 03, 2025
 
-- Bug #123: Explicitly marking parameters as nullable (@Tigrov)
 - Enh #123, #124: Minor refactor internal class `ContextValueExtractor` (@Tigrov, @vjik)
+- Bug #123: Explicitly marking parameters as nullable (@Tigrov)
 
 ## 2.1.0 July 03, 2024
 

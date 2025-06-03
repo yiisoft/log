@@ -1,5 +1,9 @@
 # Yii Logging Library Change Log
 
+## 2.1.2 under development
+
+- no changes in this release.
+
 ## 2.1.1 June 03, 2025
 
 - Enh #123, #124: Minor refactor internal class `ContextValueExtractor` (@Tigrov, @vjik)

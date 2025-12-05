@@ -51,6 +51,9 @@
         "yiisoft/log-target-file": "Allows writing log messages to the files",
         "yiisoft/log-target-syslog": "Allows writing log messages to the Syslog"
     },
+    "conflict": {
+        "ext-psr": "*"
+    },
     "autoload": {
         "psr-4": {
             "Yiisoft\\Log\\": "src"

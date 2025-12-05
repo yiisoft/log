@@ -465,13 +465,13 @@ final class TargetTest extends TestCase
     {
         $target = new DummyTarget([LogLevel::ERROR, LogLevel::WARNING]);
         $logger = new Logger([DummyTarget::class => $target]);
-        
+
         $logger->setFlushInterval(1);
         $logger->log(LogLevel::INFO, 'testInfo');
         $logger->log(LogLevel::ERROR, 'testError');
         $logger->log(LogLevel::WARNING, 'testWarning');
         $logger->log(LogLevel::DEBUG, 'testDebug');
-        
+
         $messages = $target->getMessages();
         $this->assertCount(2, $messages);
         $this->assertSame('testError', $messages[0]->message());
@@ -482,12 +482,12 @@ final class TargetTest extends TestCase
     {
         $target = new DummyTarget([]);
         $logger = new Logger([DummyTarget::class => $target]);
-        
+
         $logger->setFlushInterval(1);
         $logger->log(LogLevel::INFO, 'testInfo');
         $logger->log(LogLevel::ERROR, 'testError');
         $logger->log(LogLevel::DEBUG, 'testDebug');
-        
+
         $messages = $target->getMessages();
         $this->assertCount(3, $messages);
     }

@@ -80,6 +80,6 @@ final class PsrTargetTest extends TestCase
             true
         );
 
-        $this->expectOutputString("info: message-1error: message-3");
+        $this->expectOutputString('info: message-1error: message-3');
     }
 }

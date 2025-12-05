@@ -105,7 +105,7 @@ final class StreamTargetTest extends TestCase
     {
         $target = new StreamTarget('php://output', [LogLevel::ERROR, LogLevel::INFO]);
         $target->setFormat(static fn (Message $message) => "[{$message->level()}] {$message->message()}");
-        
+
         $target->collect(
             [
                 new Message(LogLevel::INFO, 'message-1', ['foo' => 'bar']),
@@ -114,7 +114,7 @@ final class StreamTargetTest extends TestCase
             ],
             true
         );
-        
+
         $this->expectOutputString("[info] message-1\n[error] message-3\n");
     }
 }

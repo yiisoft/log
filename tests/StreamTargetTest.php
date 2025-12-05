@@ -100,4 +100,21 @@ final class StreamTargetTest extends TestCase
             true
         );
     }
+
+    public function testSetLevelsViaConstructor(): void
+    {
+        $target = new StreamTarget('php://output', [LogLevel::ERROR, LogLevel::INFO]);
+        $target->setFormat(static fn (Message $message) => "[{$message->level()}] {$message->message()}");
+        
+        $target->collect(
+            [
+                new Message(LogLevel::INFO, 'message-1', ['foo' => 'bar']),
+                new Message(LogLevel::DEBUG, 'message-2', ['foo' => true]),
+                new Message(LogLevel::ERROR, 'message-3', ['foo' => 1]),
+            ],
+            true
+        );
+        
+        $this->expectOutputString("[info] message-1\n[error] message-3\n");
+    }
 }

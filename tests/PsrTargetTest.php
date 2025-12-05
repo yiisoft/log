@@ -56,4 +56,30 @@ final class PsrTargetTest extends TestCase
         $this->target->collect([new Message($level, $message, $context)], true);
         $this->expectOutputString("{$level}: {$message}: " . json_encode($context, JSON_THROW_ON_ERROR));
     }
+
+    public function testSetLevelsViaConstructor(): void
+    {
+        $target = new PsrTarget(
+            new class () implements LoggerInterface {
+                use LoggerTrait;
+
+                public function log($level, $message, array $context = []): void
+                {
+                    echo "{$level}: {$message}";
+                }
+            },
+            [LogLevel::ERROR, LogLevel::INFO]
+        );
+
+        $target->collect(
+            [
+                new Message(LogLevel::INFO, 'message-1', ['foo' => 'bar']),
+                new Message(LogLevel::DEBUG, 'message-2', ['foo' => true]),
+                new Message(LogLevel::ERROR, 'message-3', ['foo' => 1]),
+            ],
+            true
+        );
+
+        $this->expectOutputString("info: message-1error: message-3");
+    }
 }

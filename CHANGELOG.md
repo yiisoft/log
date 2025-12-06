@@ -2,6 +2,7 @@
 
 ## 2.1.2 under development
 
+- New: Add optional `$levels` parameter to `Target` constructor allowing log level filtering at instantiation (@copilot)
 - Chg #126: Add `ext-psr` to `conflict` section in `composer.json` (@samdark)
 
 ## 2.1.1 June 03, 2025

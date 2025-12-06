@@ -14,9 +14,9 @@ final class DummyTarget extends Target
     private array $exportMessages = [];
     private Formatter $exportFormatter;
 
-    public function __construct()
+    public function __construct(array $levels = [])
     {
-        parent::__construct();
+        parent::__construct($levels);
         $this->exportFormatter = new Formatter();
     }
 

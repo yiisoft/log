@@ -14,7 +14,7 @@
 
 - New #104: Add new static methods `Logger::assertLevelIsValid()`, `Logger::assertLevelIsString()` and
   `Logger::assertLevelIsSupported()` (@vjik)
-- New #108: Support of nested values in message templates' variables, e. g. `{foo.bar}` (@vjik)
+- New #108: Support of nested values in message templates' variables, e.g. `{foo.bar}` (@vjik)
 - New #109, #113, #116: Add context providers (@vjik)
 - New #111: Add `DateTime` and `DateTimeImmutable` support as time in log context (@vjik)
 - New #112: Add `Message::category()` method and `Message::DEFAULT_CATEGORY` constant, deprecate

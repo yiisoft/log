@@ -65,7 +65,7 @@ final class PsrTargetTest extends TestCase
 
                 public function log($level, $message, array $context = []): void
                 {
-                    echo "{$level}: {$message}";
+                    echo "$level: $message";
                 }
             },
             [LogLevel::ERROR, LogLevel::INFO]

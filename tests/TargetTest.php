@@ -481,7 +481,7 @@ final class TargetTest extends TestCase
     public function testSetLevelsViaConstructorWithEmptyArray(): void
     {
         $target = new DummyTarget([]);
-        $logger = new Logger([DummyTarget::class => $target]);
+        $logger = new Logger([$target]);
 
         $logger->setFlushInterval(1);
         $logger->log(LogLevel::INFO, 'testInfo');

@@ -1,6 +1,6 @@
 # Yii Logging Library Change Log
 
-## 2.1.2 under development
+## 2.2.0 December 13, 2025
 
 - New #125: Add optional `$levels` parameter to `Target` constructor allowing log level filtering at instantiation (@samdark)
 - Chg #126: Add `ext-psr` to `conflict` section in `composer.json` (@samdark)

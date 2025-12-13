@@ -81,11 +81,14 @@ abstract class Target
 
     /**
      * When defining a constructor in child classes, you must call `parent::__construct()`.
+     *
+     * @param string[] $levels The {@see \Psr\Log\LogLevel log message levels} that this target is interested in.
      */
-    public function __construct()
+    public function __construct(array $levels = [])
     {
         $this->categories = new CategoryFilter();
         $this->formatter = new Formatter();
+        $this->setLevels($levels);
     }
 
     /**
@@ -147,7 +150,7 @@ abstract class Target
     }
 
     /**
-     * Sets a list of log message levels that current target is interested in.
+     * Sets a list of {@see \Psr\Log\LogLevel log message levels} that current target is interested in.
      *
      * @param string[] $levels The list of log message levels.
      *

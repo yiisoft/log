@@ -15,10 +15,11 @@ final class PsrTarget extends Target
      * Sets the PSR-3 logger used to save messages of this target.
      *
      * @param LoggerInterface $logger The logger instance to be used for messages processing.
+     * @param string[] $levels The {@see \Psr\Log\LogLevel log message levels} that this target is interested in.
      */
-    public function __construct(private LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger, array $levels = [])
     {
-        parent::__construct();
+        parent::__construct($levels);
     }
 
     /**

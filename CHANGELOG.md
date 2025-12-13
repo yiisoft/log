@@ -2,6 +2,7 @@
 
 ## 2.1.2 under development
 
+- New #125: Add optional `$levels` parameter to `Target` constructor allowing log level filtering at instantiation (@samdark)
 - Chg #126: Add `ext-psr` to `conflict` section in `composer.json` (@samdark)
 
 ## 2.1.1 June 03, 2025
@@ -13,7 +14,7 @@
 
 - New #104: Add new static methods `Logger::assertLevelIsValid()`, `Logger::assertLevelIsString()` and
   `Logger::assertLevelIsSupported()` (@vjik)
-- New #108: Support of nested values in message templates' variables, e. g. `{foo.bar}` (@vjik)
+- New #108: Support of nested values in message templates' variables, e.g. `{foo.bar}` (@vjik)
 - New #109, #113, #116: Add context providers (@vjik)
 - New #111: Add `DateTime` and `DateTimeImmutable` support as time in log context (@vjik)
 - New #112: Add `Message::category()` method and `Message::DEFAULT_CATEGORY` constant, deprecate

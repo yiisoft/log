@@ -27,10 +27,11 @@ final class StreamTarget extends Target
 {
     /**
      * @param resource|string $stream A string stream identifier or a stream resource.
+     * @param string[] $levels The {@see \Psr\Log\LogLevel log message levels} that this target is interested in.
      */
-    public function __construct(private $stream = 'php://stdout')
+    public function __construct(private $stream = 'php://stdout', array $levels = [])
     {
-        parent::__construct();
+        parent::__construct($levels);
     }
 
     protected function export(): void

@@ -112,6 +112,11 @@ final class MessageTest extends TestCase
                 ['a{b}c' => 'test'],
                 'has "test" placeholder',
             ],
+            'deeply-nested-placeholder' => [
+                'has "{a{b}c{d{e}}}" placeholder',
+                ['a{b}c{d{e}}' => 'test'],
+                'has "test" placeholder',
+            ],
             'nested-quoted' => [
                 'has "{foo\.ba\\\\r}" placeholder',
                 ['foo.ba\\r' => 'test'],
@@ -156,6 +161,16 @@ final class MessageTest extends TestCase
                 'Value — "{}"',
                 ['' => 'test'],
                 'Value — "test"',
+            ],
+            'multiple-placeholders' => [
+                'Placeholder 1: {p1} - Placeholder 2: {p2}',
+                ['p1' => 'hello', 'p2' => 'world'],
+                'Placeholder 1: hello - Placeholder 2: world',
+            ],
+            'multiple-placeholders-nested' => [
+                'Placeholder 1: {a1{a2{a3}}} - Placeholder 2: {b1{b2{b3}}}',
+                ['a1{a2{a3}}' => 'hello', 'b1{b2{b3}}' => 'world'],
+                'Placeholder 1: hello - Placeholder 2: world',
             ],
         ];
     }

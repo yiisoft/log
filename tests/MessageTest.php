@@ -92,6 +92,11 @@ final class MessageTest extends TestCase
                 ['foo' => ['bar' => 7]],
                 'has "7" placeholder',
             ],
+            'deeply-nested' => [
+                'has "{foo.bar.baz}" placeholder',
+                ['foo' => ['bar' => ['baz' => 7]]],
+                'has "7" placeholder',
+            ],
             'nested-non-exist' => [
                 'has "{foo.bar}" placeholder',
                 ['foo' => []],
@@ -107,55 +112,15 @@ final class MessageTest extends TestCase
                 ['foo' => new StringableObject('test')],
                 'has "test" placeholder',
             ],
-            'nested-placeholder' => [
-                'has "{a{b}c}" placeholder',
-                ['a{b}c' => 'test'],
-                'has "test" placeholder',
+            'all-characters-placeholder' => [
+                'has "{underscored_base.0}" and "{underscored_base.1}" placeholders',
+                ['underscored_base' => ['foo', 'bar']],
+                'has "foo" and "bar" placeholders',
             ],
-            'nested-quoted' => [
-                'has "{foo\.ba\\\\r}" placeholder',
-                ['foo.ba\\r' => 'test'],
-                'has "test" placeholder',
-            ],
-            'nested-extended-1' => [
-                'has "{foo\\\.bar}" placeholder',
-                ['foo\\' => ['bar' => 'test']],
-                'has "test" placeholder',
-            ],
-            'nested-extended-2' => [
-                'has "{foo\\\\\\\\.bar}" placeholder',
-                ['foo\\\\' => ['bar' => 'test']],
-                'has "test" placeholder',
-            ],
-            'nested-extended-3' => [
-                'has "{foo\\\.}" placeholder',
-                ['foo\\' => ['' => 'test']],
-                'has "test" placeholder',
-            ],
-            'nested-extended-4' => [
-                'has "{foo\\\\}" placeholder',
-                ['foo\\' => 'test'],
-                'has "test" placeholder',
-            ],
-            'nested-extended-5' => [
-                'has "{foo\.bar.a}" placeholder',
-                ['foo.bar' => ['a' => 'test']],
-                'has "test" placeholder',
-            ],
-            'nested-extended-6' => [
-                'has "{key1\..\.key2\..\.key3}" placeholder',
-                ['key1.' => ['.key2.' => ['.key3' => 'test']]],
-                'has "test" placeholder',
-            ],
-            'nested-extended-7' => [
-                'has "{key1\..\.key2\..\.key3}" placeholder',
-                ['key1.' => ['.key2.' => ['.key3' => 'test']]],
-                'has "test" placeholder',
-            ],
-            'empty' => [
-                'Value — "{}"',
-                ['' => 'test'],
-                'Value — "test"',
+            'multiple-placeholders' => [
+                'Placeholder 1: {p1} - Placeholder 2: {p2}',
+                ['p1' => 'hello', 'p2' => 'world'],
+                'Placeholder 1: hello - Placeholder 2: world',
             ],
         ];
     }

@@ -206,9 +206,13 @@ final class Message
     {
         $message = (string) $message;
 
+        if (!str_contains($message, '{')) {
+            return $message;
+        }
+
         /** @var string */
         return preg_replace_callback(
-            '/\{([\w\._]+)\}/',
+            '/{([\w._]+)}/',
             static function (array $matches) use ($context) {
                 [$exist, $value] = ContextValueExtractor::extract($context, $matches[1]);
                 if ($exist) {

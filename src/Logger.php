@@ -105,6 +105,8 @@ final class Logger implements LoggerInterface
      *
      * @return string The text display of the level.
      * @deprecated since 2.1, to be removed in 3.0. Use {@see LogLevel::assertLevelIsValid()} instead.
+     * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress MixedReturnStatement
      */
     public static function validateLevel(mixed $level): string
     {

@@ -3,7 +3,7 @@
 ## 2.2.1 under development
 
 - Bug #130: Updated `Message::parse()` to correctly support multiple placeholders (@technicated)
-- Chg #130, #131: Changed `Message::parse()` to conform to PSR-3, removing support for placeholders with arbitrary names
+- Chg #130, #133: Changed `Message::parse()` to conform to PSR-3, removing support for placeholders with arbitrary names
   and nested placeholders (@technicated, @vjik)
 
 ## 2.2.0 December 13, 2025

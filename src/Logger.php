@@ -13,6 +13,7 @@ use Stringable;
 use Throwable;
 use Yiisoft\Log\ContextProvider\ContextProviderInterface;
 use Yiisoft\Log\ContextProvider\SystemContextProvider;
+
 use function count;
 use function implode;
 use function in_array;

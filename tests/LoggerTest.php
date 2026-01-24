@@ -54,11 +54,24 @@ final class LoggerTest extends TestCase
         $this->assertGreaterThanOrEqual($memory, $messages[1]->context('memory'));
     }
 
+    public function testLogWithWrongLevel(): void
+    {
+        $this->expectException(\Psr\Log\InvalidArgumentException::class);
+        $this->logger->log(123, 'test1');
+    }
+
+    public function testLogWithUnsupportedLevel(): void
+    {
+        $this->expectException(\Psr\Log\InvalidArgumentException::class);
+        $this->logger->log('unsupported-level', 'test1');
+    }
+
     public function testLogWithTraceLevel(): void
     {
         $memory = memory_get_usage();
         $this->logger->setTraceLevel($traceLevel = 3);
 
+        $line = __LINE__;
         $this->logger->log(LogLevel::INFO, 'test3');
         $messages = $this->getInaccessibleMessages($this->logger);
 
@@ -68,7 +81,7 @@ final class LoggerTest extends TestCase
         $this->assertSame('application', $messages[0]->context('category'));
         $this->assertSame([
             'file' => __FILE__,
-            'line' => 62,
+            'line' => $line + 1,
             'function' => 'log',
             'class' => Logger::class,
             'type' => '->',
@@ -143,6 +156,7 @@ final class LoggerTest extends TestCase
         $this->logger->info('info message');
         $messages = $this->getInaccessibleMessages($this->logger);
 
+        $this->assertNotEmpty($messages[1]->context('trace'));
         foreach ($messages[1]->context('trace') as $trace) {
             $this->assertNotSame(__FILE__, $trace['file']);
         }

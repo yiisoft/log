@@ -105,7 +105,7 @@ final class Logger implements LoggerInterface
      * @throws \Psr\Log\InvalidArgumentException for invalid log message level.
      *
      * @return string The text display of the level.
-     * @deprecated since 2.1, to be removed in 3.0. Use {@see LogLevel::assertLevelIsValid()} instead.
+     * @deprecated since 2.1, to be removed in 3.0. Use {@see Logger::assertLevelIsValid()} instead.
      * @psalm-suppress MixedInferredReturnType
      * @psalm-suppress MixedReturnStatement
      */

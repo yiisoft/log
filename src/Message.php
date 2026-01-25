@@ -212,7 +212,7 @@ final class Message
 
         /** @var string */
         return preg_replace_callback(
-            '/{([\w._]+)}/',
+            '/\{([\w\.\\\\_]+)\}/',
             static function (array $matches) use ($context) {
                 [$exist, $value] = ContextValueExtractor::extract($context, $matches[1]);
                 if ($exist) {

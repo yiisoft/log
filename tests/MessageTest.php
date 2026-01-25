@@ -122,6 +122,46 @@ final class MessageTest extends TestCase
                 ['p1' => 'hello', 'p2' => 'world'],
                 'Placeholder 1: hello - Placeholder 2: world',
             ],
+            'nested-quoted' => [
+                'has "{foo\.ba\\\\r}" placeholder',
+                ['foo.ba\\r' => 'test'],
+                'has "test" placeholder',
+            ],
+            'nested-extended-1' => [
+                'has "{foo\\\.bar}" placeholder',
+                ['foo\\' => ['bar' => 'test']],
+                'has "test" placeholder',
+            ],
+            'nested-extended-2' => [
+                'has "{foo\\\\\\\\.bar}" placeholder',
+                ['foo\\\\' => ['bar' => 'test']],
+                'has "test" placeholder',
+            ],
+            'nested-extended-3' => [
+                'has "{foo\\\.}" placeholder',
+                ['foo\\' => ['' => 'test']],
+                'has "test" placeholder',
+            ],
+            'nested-extended-4' => [
+                'has "{foo\\\\}" placeholder',
+                ['foo\\' => 'test'],
+                'has "test" placeholder',
+            ],
+            'nested-extended-5' => [
+                'has "{foo\.bar.a}" placeholder',
+                ['foo.bar' => ['a' => 'test']],
+                'has "test" placeholder',
+            ],
+            'nested-extended-6' => [
+                'has "{key1\..\.key2\..\.key3}" placeholder',
+                ['key1.' => ['.key2.' => ['.key3' => 'test']]],
+                'has "test" placeholder',
+            ],
+            'nested-extended-7' => [
+                'has "{key1\..\.key2\..\.key3}" placeholder',
+                ['key1.' => ['.key2.' => ['.key3' => 'test']]],
+                'has "test" placeholder',
+            ],
         ];
     }
 

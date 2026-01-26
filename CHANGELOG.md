@@ -5,6 +5,7 @@
 - Bug #130: Updated `Message::parse()` to correctly support multiple placeholders (@technicated)
 - Chg #130: Changed `Message::parse()` to conform to PSR-3, removing support for placeholders with arbitrary names and nested placeholders (@technicated)
 - New #135: Added validation for `$traceLevel` in `SystemContextProvider` to ensure values are greater than or equal to zero
+- Chg #130, #133: Changed `Message::parse()` to conform to PSR-3 (@technicated, @vjik)
 
 ## 2.2.0 December 13, 2025
 

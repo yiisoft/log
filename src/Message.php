@@ -206,6 +206,10 @@ final class Message
     {
         $message = (string) $message;
 
+        if (!str_contains($message, '{')) {
+            return $message;
+        }
+
         /** @var string */
         return preg_replace_callback(
             '/\{([\w\.\\\\_]+)\}/',

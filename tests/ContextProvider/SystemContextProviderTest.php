@@ -19,10 +19,11 @@ final class SystemContextProviderTest extends TestCase
     public function testContextHasNeededData(): void
     {
         $provider = new SystemContextProvider();
+        $context = $provider->getContext();
 
-        $this->assertArrayHasKey('time', $provider->getContext());
-        $this->assertArrayHasKey('trace', $provider->getContext());
-        $this->assertArrayHasKey('memory', $provider->getContext());
-        $this->assertArrayHasKey('category', $provider->getContext());
+        $this->assertArrayHasKey('time', $context);
+        $this->assertArrayHasKey('trace', $context);
+        $this->assertArrayHasKey('memory', $context);
+        $this->assertArrayHasKey('category', $context);
     }
 }

@@ -31,7 +31,7 @@ final class CompositeContextProviderTest extends TestCase
                 'b' => 3,
                 'c' => 4,
             ],
-            $context
+            $context,
         );
     }
 }

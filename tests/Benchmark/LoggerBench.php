@@ -14,7 +14,7 @@ final class LoggerBench
 
     public function __construct()
     {
-        $this->logger = new Logger([new class () extends Target {
+        $this->logger = new Logger([new class extends Target {
             protected function export(): void
             {
                 // noop

@@ -20,6 +20,9 @@ use function json_encode;
 use function implode;
 use function strtoupper;
 use function ucfirst;
+use function count;
+
+use const JSON_THROW_ON_ERROR;
 
 final class TargetTest extends TestCase
 {
@@ -91,12 +94,12 @@ final class TargetTest extends TestCase
         $logger->log(LogLevel::ERROR, 'testI', ['category' => 'Yiisoft\Db\Command::query']);
 
         $messages = $this->target->getMessages();
-        $texts = array_map(static fn (Message $message): string => $message->message(), $messages);
+        $texts = array_map(static fn(Message $message): string => $message->message(), $messages);
 
         $this->assertCount(
             count($expected),
             $messages,
-            'Expected ' . implode(',', $expected) . ', got ' . implode(',', $texts)
+            'Expected ' . implode(',', $expected) . ', got ' . implode(',', $texts),
         );
 
         $i = 0;
@@ -114,19 +117,19 @@ final class TargetTest extends TestCase
         $this->assertFalse($this->target->isEnabled());
 
         $enabled = true;
-        $this->target->setEnabled(static fn () => $enabled);
+        $this->target->setEnabled(static fn() => $enabled);
         $this->assertTrue($this->target->isEnabled());
     }
 
     public function invalidCallableEnabledProvider(): array
     {
         return [
-            'string' => [fn () => 'a'],
-            'int' => [fn () => 1],
-            'float' => [fn () => 1.1],
-            'array' => [fn () => []],
-            'callable' => [fn () => static fn () => true],
-            'object' => [fn () => new stdClass()],
+            'string' => [fn() => 'a'],
+            'int' => [fn() => 1],
+            'float' => [fn() => 1.1],
+            'array' => [fn() => []],
+            'callable' => [fn() => static fn() => true],
+            'object' => [fn() => new stdClass()],
         ];
     }
 
@@ -223,7 +226,7 @@ final class TargetTest extends TestCase
             'float' => [[1.1]],
             'array' => [[[]]],
             'bool' => [[true]],
-            'callable' => [[fn () => null]],
+            'callable' => [[fn() => null]],
             'object' => [[new stdClass()]],
         ];
     }
@@ -257,7 +260,7 @@ final class TargetTest extends TestCase
 
     public function testSetFormat(): void
     {
-        $this->target->setFormat(static fn (Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
+        $this->target->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
 
         $expected = '[info][app] message';
         $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app']);
@@ -266,7 +269,7 @@ final class TargetTest extends TestCase
 
     public function testSetPrefix(): void
     {
-        $this->target->setPrefix(static fn () => 'Prefix: ');
+        $this->target->setPrefix(static fn() => 'Prefix: ');
         $expected = '2017-10-16 13:26:30.608300 Prefix: [info][app] message'
             . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083\n";
         $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
@@ -275,8 +278,8 @@ final class TargetTest extends TestCase
 
     public function testSetFormatAndSetPrefix(): void
     {
-        $this->target->setFormat(static fn (Message $message) => "({$message->level()}) {$message->message()}");
-        $this->target->setPrefix(static fn (Message $message) => strtoupper($message->context('category') . ': '));
+        $this->target->setFormat(static fn(Message $message) => "({$message->level()}) {$message->message()}");
+        $this->target->setPrefix(static fn(Message $message) => strtoupper($message->context('category') . ': '));
 
         $expected = 'APP: (info) message';
         $this->collectOneAndExport(LogLevel::INFO, 'message', ['category' => 'app']);
@@ -308,8 +311,8 @@ final class TargetTest extends TestCase
      */
     public function testFormatMessagesWithSeparatorAndSetFormatAndSetPrefix(array $messages, bool $export): void
     {
-        $this->target->setFormat(static fn (Message $message) => "({$message->level()}) {$message->message()}");
-        $this->target->setPrefix(static fn (Message $message) => strtoupper($message->context('category') . ': '));
+        $this->target->setFormat(static fn(Message $message) => "({$message->level()}) {$message->message()}");
+        $this->target->setPrefix(static fn(Message $message) => strtoupper($message->context('category') . ': '));
 
         $expected = "APP: (info) message-1\nAPP: (debug) message-2\n";
         $this->target->collect($messages, $export);
@@ -322,8 +325,8 @@ final class TargetTest extends TestCase
      */
     public function testGetFormattedMessagesAndSetFormatAndSetPrefix(array $messages, bool $export): void
     {
-        $this->target->setFormat(static fn (Message $message) => "({$message->level()}) {$message->message()}");
-        $this->target->setPrefix(static fn (Message $message) => strtoupper($message->context('category') . ': '));
+        $this->target->setFormat(static fn(Message $message) => "({$message->level()}) {$message->message()}");
+        $this->target->setPrefix(static fn(Message $message) => strtoupper($message->context('category') . ': '));
 
         $expected = ['APP: (info) message-1', 'APP: (debug) message-2'];
         $this->target->collect($messages, $export);
@@ -337,7 +340,7 @@ final class TargetTest extends TestCase
     public function testSetExportIntervalAndSetFormat(array $messages, bool $export): void
     {
         $this->target->setExportInterval(3);
-        $this->target->setFormat(static fn (Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
+        $this->target->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
         $this->target->collect($messages, $export);
 
         $this->assertSame((int) $export, $this->target->getExportCount());
@@ -351,10 +354,10 @@ final class TargetTest extends TestCase
             'float' => [['foo' => 1.1], 'foo: 1.1'],
             'array' => [['foo' => []], 'foo: []'],
             'null' => [['foo' => null], 'foo: null'],
-            'callable' => [['foo' => fn () => null], 'foo: fn () => null'],
+            'callable' => [['foo' => fn() => null], 'foo: fn() => null'],
             'exception' => [['foo' => $exception = new Exception('some error')], "foo: {$exception->__toString()}"],
             'stringable-object' => [
-                ['foo' => new class () {
+                ['foo' => new class {
                     public function __toString(): string
                     {
                         return 'stringable-object';
@@ -396,7 +399,7 @@ final class TargetTest extends TestCase
     public function testSetFormatWithoutMessageContextAndSetCommonContext(): void
     {
         $this->target->setCommonContext($commonContext = ['foo' => 'bar', 'baz' => true]);
-        $this->target->setFormat(static fn (Message $message, array $commonContext) => "[{$message->level()}] {$message->message()}, common context: " . json_encode($commonContext, JSON_THROW_ON_ERROR));
+        $this->target->setFormat(static fn(Message $message, array $commonContext) => "[{$message->level()}] {$message->message()}, common context: " . json_encode($commonContext, JSON_THROW_ON_ERROR));
         $this->collectOneAndExport(LogLevel::INFO, 'message');
         $expected = '[info] message, common context: {"foo":"bar","baz":true}';
 
@@ -407,12 +410,12 @@ final class TargetTest extends TestCase
     public function invalidCallableReturnStringProvider(): array
     {
         return [
-            'string' => [fn () => true],
-            'int' => [fn () => 1],
-            'float' => [fn () => 1.1],
-            'array' => [fn () => []],
-            'callable' => [fn () => static fn () => 'a'],
-            'object' => [fn () => new stdClass()],
+            'string' => [fn() => true],
+            'int' => [fn() => 1],
+            'float' => [fn() => 1.1],
+            'array' => [fn() => []],
+            'callable' => [fn() => static fn() => 'a'],
+            'object' => [fn() => new stdClass()],
         ];
     }
 
@@ -436,7 +439,7 @@ final class TargetTest extends TestCase
             'bool' => [[true]],
             'null' => [[null]],
             'array' => [[[]]],
-            'callable' => [[fn () => null]],
+            'callable' => [[fn() => null]],
             'object' => [[new stdClass()]],
         ];
     }

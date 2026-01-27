@@ -19,6 +19,8 @@ use function date;
 use function json_encode;
 use function strtoupper;
 
+use const JSON_THROW_ON_ERROR;
+
 final class FormatterTest extends TestCase
 {
     private Formatter $formatter;
@@ -36,10 +38,10 @@ final class FormatterTest extends TestCase
             'float' => [['foo' => 1.1], 'foo: 1.1'],
             'null' => [['foo' => null], 'foo: null'],
             'array' => [['foo' => []], 'foo: []'],
-            'callable' => [['foo' => fn () => null], 'foo: fn () => null'],
+            'callable' => [['foo' => fn() => null], 'foo: fn() => null'],
             'exception' => [['foo' => $exception = new Exception('some error')], "foo: {$exception->__toString()}"],
             'stringable-object' => [
-                ['foo' => new class () {
+                ['foo' => new class {
                     public function __toString(): string
                     {
                         return 'stringable-object';
@@ -90,7 +92,7 @@ final class FormatterTest extends TestCase
 
     public function testFormatWithSetFormatNotIncludingCommonContext(): void
     {
-        $this->formatter->setFormat(static fn (Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
+        $this->formatter->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");
         $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = '[info][app] message';
 
@@ -99,7 +101,7 @@ final class FormatterTest extends TestCase
 
     public function testFormatWithSetPrefix(): void
     {
-        $this->formatter->setPrefix(static fn () => 'Prefix: ');
+        $this->formatter->setPrefix(static fn() => 'Prefix: ');
         $message = new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390.6083]);
         $expected = '2017-10-16 13:26:30.608300 Prefix: [info][app] message'
             . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390.6083\n"
@@ -129,13 +131,13 @@ final class FormatterTest extends TestCase
 
     public function testFormatWithSetFormatAndSetPrefix(): void
     {
-        $this->formatter->setFormat(static fn (Message $message) => "({$message->level()}) {$message->message()}");
+        $this->formatter->setFormat(static fn(Message $message) => "({$message->level()}) {$message->message()}");
         $this->formatter->setPrefix(
             static function (Message $message) {
                 $category = strtoupper($message->context('category'));
                 $time = date('H:i:s', $message->context('time'));
                 return "{$category}: ({$time})";
-            }
+            },
         );
 
         $time = 1_508_160_390;
@@ -143,7 +145,7 @@ final class FormatterTest extends TestCase
 
         $this->assertSame(
             'APP: (' . date('H:i:s', $time) . ')(info) message',
-            $this->formatter->format($message, [])
+            $this->formatter->format($message, []),
         );
     }
 
@@ -218,13 +220,13 @@ final class FormatterTest extends TestCase
     public function invalidCallableReturnStringProvider(): array
     {
         return [
-            'string' => [fn () => true],
-            'int' => [fn () => 1],
-            'float' => [fn () => 1.1],
-            'array' => [fn () => []],
-            'null' => [fn () => null],
-            'callable' => [fn () => static fn () => 'a'],
-            'object' => [fn () => new stdClass()],
+            'string' => [fn() => true],
+            'int' => [fn() => 1],
+            'float' => [fn() => 1.1],
+            'array' => [fn() => []],
+            'null' => [fn() => null],
+            'callable' => [fn() => static fn() => 'a'],
+            'object' => [fn() => new stdClass()],
         ];
     }
 

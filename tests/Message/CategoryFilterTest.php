@@ -25,7 +25,7 @@ final class CategoryFilterTest extends TestCase
             'float' => [[1.1]],
             'array' => [[[]]],
             'bool' => [[true]],
-            'callable' => [[fn () => null]],
+            'callable' => [[fn() => null]],
             'object' => [[new stdClass()]],
         ];
     }

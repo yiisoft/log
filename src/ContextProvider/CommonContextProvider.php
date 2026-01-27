@@ -11,8 +11,7 @@ final class CommonContextProvider implements ContextProviderInterface
 {
     public function __construct(
         private array $data,
-    ) {
-    }
+    ) {}
 
     public function getContext(): array
     {

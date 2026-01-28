@@ -121,7 +121,7 @@ final class CategoryFilter
             if (!is_string($category)) {
                 throw new InvalidArgumentException(sprintf(
                     'The log message category must be a string, %s received.',
-                    get_debug_type($category)
+                    get_debug_type($category),
                 ));
             }
         }

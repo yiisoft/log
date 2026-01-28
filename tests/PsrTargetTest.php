@@ -14,13 +14,15 @@ use Yiisoft\Log\PsrTarget;
 
 use function json_encode;
 
+use const JSON_THROW_ON_ERROR;
+
 final class PsrTargetTest extends TestCase
 {
     private PsrTarget $target;
 
     public function setUp(): void
     {
-        $this->target = new PsrTarget(new class () implements LoggerInterface {
+        $this->target = new PsrTarget(new class implements LoggerInterface {
             use LoggerTrait;
 
             public string $message = '';
@@ -60,7 +62,7 @@ final class PsrTargetTest extends TestCase
     public function testSetLevelsViaConstructor(): void
     {
         $target = new PsrTarget(
-            new class () implements LoggerInterface {
+            new class implements LoggerInterface {
                 use LoggerTrait;
 
                 public function log($level, $message, array $context = []): void
@@ -68,7 +70,7 @@ final class PsrTargetTest extends TestCase
                     echo "$level: $message";
                 }
             },
-            [LogLevel::ERROR, LogLevel::INFO]
+            [LogLevel::ERROR, LogLevel::INFO],
         );
 
         $target->collect(
@@ -77,7 +79,7 @@ final class PsrTargetTest extends TestCase
                 new Message(LogLevel::DEBUG, 'message-2', ['foo' => true]),
                 new Message(LogLevel::ERROR, 'message-3', ['foo' => 1]),
             ],
-            true
+            true,
         );
 
         $this->expectOutputString('info: message-1error: message-3');

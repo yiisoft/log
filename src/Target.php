@@ -18,7 +18,7 @@ use function sprintf;
 /**
  * Target is the base class for all log target classes.
  *
- * A log target object will filter the messages logged by {@see \Yiisoft\Log\Logger} according
+ * A log target object will filter the messages logged by {@see Logger} according
  * to its {@see Target::setLevels()} and {@see Target::setCategories()}. It may also export
  * the filtered messages to specific destination defined by the target, such as emails, files.
  *
@@ -72,12 +72,6 @@ abstract class Target
      * @var bool|callable Enables or disables the current target to export.
      */
     private $enabled = true;
-
-    /**
-     * Exports log messages to a specific destination.
-     * Child classes must implement this method.
-     */
-    abstract protected function export(): void;
 
     /**
      * When defining a constructor in child classes, you must call `parent::__construct()`.
@@ -309,12 +303,18 @@ abstract class Target
         if (!is_bool($enabled = ($this->enabled)())) {
             throw new RuntimeException(sprintf(
                 'The PHP callable "enabled" must returns a boolean, %s received.',
-                get_debug_type($enabled)
+                get_debug_type($enabled),
             ));
         }
 
         return $enabled;
     }
+
+    /**
+     * Exports log messages to a specific destination.
+     * Child classes must implement this method.
+     */
+    abstract protected function export(): void;
 
     /**
      * Gets a list of log messages that are retrieved from the logger so far by this log target.

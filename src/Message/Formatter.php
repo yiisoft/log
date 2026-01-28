@@ -13,6 +13,7 @@ use function is_string;
 use function is_object;
 use function method_exists;
 use function sprintf;
+use function is_int;
 
 /**
  * Formatter formats log messages.
@@ -102,7 +103,7 @@ final class Formatter
         if (!is_string($formatted)) {
             throw new RuntimeException(sprintf(
                 'The PHP callable "format" must return a string, %s received.',
-                get_debug_type($formatted)
+                get_debug_type($formatted),
             ));
         }
 
@@ -150,7 +151,7 @@ final class Formatter
         if (!is_string($prefix)) {
             throw new RuntimeException(sprintf(
                 'The PHP callable "prefix" must return a string, %s received.',
-                get_debug_type($prefix)
+                get_debug_type($prefix),
             ));
         }
 

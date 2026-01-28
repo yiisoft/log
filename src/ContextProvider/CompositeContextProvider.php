@@ -15,7 +15,7 @@ final class CompositeContextProvider implements ContextProviderInterface
     private array $providers;
 
     public function __construct(
-        ContextProviderInterface ...$providers
+        ContextProviderInterface ...$providers,
     ) {
         $this->providers = $providers;
     }

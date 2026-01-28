@@ -11,8 +11,8 @@ use Psr\Log\LogLevel;
 use RuntimeException;
 use Stringable;
 use Throwable;
-use Yiisoft\Log\ContextProvider\SystemContextProvider;
 use Yiisoft\Log\ContextProvider\ContextProviderInterface;
+use Yiisoft\Log\ContextProvider\SystemContextProvider;
 
 use function count;
 use function implode;
@@ -105,24 +105,13 @@ final class Logger implements LoggerInterface
      * @throws \Psr\Log\InvalidArgumentException for invalid log message level.
      *
      * @return string The text display of the level.
-     * @deprecated since 2.1, to be removed in 3.0. Use {@see LogLevel::assertLevelIsValid()} instead.
+     * @deprecated since 2.1, to be removed in 3.0. Use {@see Logger::assertLevelIsValid()} instead.
+     * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress MixedReturnStatement
      */
     public static function validateLevel(mixed $level): string
     {
-        if (!is_string($level)) {
-            throw new \Psr\Log\InvalidArgumentException(sprintf(
-                'The log message level must be a string, %s provided.',
-                get_debug_type($level),
-            ));
-        }
-
-        if (!in_array($level, self::LEVELS, true)) {
-            throw new \Psr\Log\InvalidArgumentException(sprintf(
-                'Invalid log message level "%s" provided. The following values are supported: "%s".',
-                $level,
-                implode('", "', self::LEVELS),
-            ));
-        }
+        self::assertLevelIsValid($level);
 
         return $level;
     }

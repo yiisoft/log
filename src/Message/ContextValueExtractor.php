@@ -10,6 +10,8 @@ use function is_array;
 use function sprintf;
 use function strlen;
 
+use const PREG_SPLIT_OFFSET_CAPTURE;
+
 /**
  * @internal
  */
@@ -55,11 +57,11 @@ final class ContextValueExtractor
             sprintf(
                 '/(?<!%1$s)((?>%1$s%1$s)*)%2$s/',
                 preg_quote('\\', '/'),
-                preg_quote('.', '/')
+                preg_quote('.', '/'),
             ),
             $path,
             -1,
-            PREG_SPLIT_OFFSET_CAPTURE
+            PREG_SPLIT_OFFSET_CAPTURE,
         );
         $result = [];
         $countResults = count($matches);
@@ -79,9 +81,9 @@ final class ContextValueExtractor
                     '\\',
                     '.',
                 ],
-                $key
+                $key,
             ),
-            $result
+            $result,
         );
     }
 }

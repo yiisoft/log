@@ -7,6 +7,11 @@ namespace Yiisoft\Log\ContextProvider;
 use InvalidArgumentException;
 use Yiisoft\Log\Message;
 
+use function is_string;
+use function sprintf;
+
+use const DEBUG_BACKTRACE_IGNORE_ARGS;
+
 /**
  * @psalm-import-type TraceItem from Message
  */
@@ -82,8 +87,8 @@ final class SystemContextProvider implements ContextProviderInterface
                 throw new InvalidArgumentException(
                     sprintf(
                         'The trace path must be a string, %s received.',
-                        get_debug_type($excludedTracePath)
-                    )
+                        get_debug_type($excludedTracePath),
+                    ),
                 );
             }
         }

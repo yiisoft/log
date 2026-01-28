@@ -10,8 +10,7 @@ final class StubContextProvider implements ContextProviderInterface
 {
     public function __construct(
         private array $context = [],
-    ) {
-    }
+    ) {}
 
     public function getContext(): array
     {

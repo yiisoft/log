@@ -16,6 +16,10 @@ use Yiisoft\Log\Message\ContextValueExtractor;
 use Yiisoft\VarDumper\VarDumper;
 
 use function preg_replace_callback;
+use function is_float;
+use function is_int;
+use function is_scalar;
+use function is_string;
 
 /**
  * Message is a data object that stores log message data.
@@ -129,7 +133,7 @@ final class Message
         $category = $this->context['category'] ?? self::DEFAULT_CATEGORY;
         if (!is_string($category)) {
             throw new LogicException(
-                'Invalid category value in log context. Expected "string", got "' . get_debug_type($category) . '".'
+                'Invalid category value in log context. Expected "string", got "' . get_debug_type($category) . '".',
             );
         }
         return $category;
@@ -206,6 +210,10 @@ final class Message
     {
         $message = (string) $message;
 
+        if (!str_contains($message, '{')) {
+            return $message;
+        }
+
         /** @var string */
         return preg_replace_callback(
             '/\{([\w\.\\\\_]+)\}/',
@@ -223,7 +231,7 @@ final class Message
                 }
                 return $matches[0];
             },
-            $message
+            $message,
         );
     }
 }

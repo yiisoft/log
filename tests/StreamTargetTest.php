@@ -79,13 +79,30 @@ final class StreamTargetTest extends TestCase
         $this->exportStreamTarget($target);
     }
 
+    public function testSetLevelsViaConstructor(): void
+    {
+        $target = new StreamTarget('php://output', [LogLevel::ERROR, LogLevel::INFO]);
+        $target->setFormat(static fn(Message $message) => "[{$message->level()}] {$message->message()}");
+
+        $target->collect(
+            [
+                new Message(LogLevel::INFO, 'message-1', ['foo' => 'bar']),
+                new Message(LogLevel::DEBUG, 'message-2', ['foo' => true]),
+                new Message(LogLevel::ERROR, 'message-3', ['foo' => 1]),
+            ],
+            true,
+        );
+
+        $this->expectOutputString("[info] message-1\n[error] message-3\n");
+    }
+
     /**
      * @param resource|string $stream
      */
     private function createStreamTarget($stream): StreamTarget
     {
         $target = new StreamTarget($stream);
-        $target->setFormat(static fn (Message $message) => "[{$message->level()}] {$message->message()}");
+        $target->setFormat(static fn(Message $message) => "[{$message->level()}] {$message->message()}");
         return $target;
     }
 
@@ -97,24 +114,7 @@ final class StreamTargetTest extends TestCase
                 new Message(LogLevel::DEBUG, 'message-2', ['foo' => true]),
                 new Message(LogLevel::ERROR, 'message-3', ['foo' => 1]),
             ],
-            true
+            true,
         );
-    }
-
-    public function testSetLevelsViaConstructor(): void
-    {
-        $target = new StreamTarget('php://output', [LogLevel::ERROR, LogLevel::INFO]);
-        $target->setFormat(static fn (Message $message) => "[{$message->level()}] {$message->message()}");
-
-        $target->collect(
-            [
-                new Message(LogLevel::INFO, 'message-1', ['foo' => 'bar']),
-                new Message(LogLevel::DEBUG, 'message-2', ['foo' => true]),
-                new Message(LogLevel::ERROR, 'message-3', ['foo' => 1]),
-            ],
-            true
-        );
-
-        $this->expectOutputString("[info] message-1\n[error] message-3\n");
     }
 }

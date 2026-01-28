@@ -18,6 +18,8 @@ use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 use Yiisoft\Log\Tests\TestAsset\StubContextProvider;
 
 use function memory_get_usage;
+use function count;
+use function is_float;
 
 final class LoggerTest extends TestCase
 {
@@ -95,7 +97,7 @@ final class LoggerTest extends TestCase
         return [
             'string' => ['test', 'test'],
             'stringable-object' => [
-                $stringableObject = new class () {
+                $stringableObject = new class {
                     public function __toString(): string
                     {
                         return 'Stringable object';
@@ -170,7 +172,7 @@ final class LoggerTest extends TestCase
             'array' => [[[]]],
             'bool' => [[true]],
             'null' => [[null]],
-            'callable' => [[fn () => null]],
+            'callable' => [[fn() => null]],
             'object' => [[new stdClass()]],
         ];
     }
@@ -204,7 +206,7 @@ final class LoggerTest extends TestCase
             'bool' => [true],
             'null' => [null],
             'array' => [[]],
-            'callable' => [fn () => null],
+            'callable' => [fn() => null],
             'object' => [new stdClass()],
         ];
     }
@@ -238,7 +240,7 @@ final class LoggerTest extends TestCase
             'bool' => [[true]],
             'null' => [[null]],
             'array' => [[[]]],
-            'callable' => [[fn () => null]],
+            'callable' => [[fn() => null]],
             'object' => [[new stdClass()]],
         ];
     }
@@ -351,7 +353,7 @@ final class LoggerTest extends TestCase
             ->method('collect')
             ->with(
                 $this->equalTo([$message]),
-                $this->equalTo(true)
+                $this->equalTo(true),
             );
 
         $logger = new Logger(['fakeTarget' => $target]);
@@ -396,7 +398,7 @@ final class LoggerTest extends TestCase
                             && $message->context('exception') === $exception;
                     }),
                     $this->equalTo(true),
-                ]
+                ],
             );
 
         $target2
@@ -404,7 +406,7 @@ final class LoggerTest extends TestCase
             ->method('collect')
             ->with(
                 $this->equalTo([$message]),
-                $this->equalTo(true)
+                $this->equalTo(true),
             )
             ->will($this->throwException($exception));
 

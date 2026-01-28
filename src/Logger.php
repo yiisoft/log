@@ -57,7 +57,7 @@ final class Logger implements LoggerInterface
     private array $messages = [];
 
     /**
-     * @var Target[] the log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
+     * @var Target[] the log targets. Each array element represents a single {@see Target} instance.
      */
     private array $targets = [];
 
@@ -117,7 +117,7 @@ final class Logger implements LoggerInterface
     }
 
     /**
-     * @return Target[] The log targets. Each array element represents a single {@see \Yiisoft\Log\Target} instance.
+     * @return Target[] The log targets. Each array element represents a single {@see Target} instance.
      */
     public function getTargets(): array
     {
@@ -179,7 +179,7 @@ final class Logger implements LoggerInterface
     {
         if (!$this->contextProvider instanceof SystemContextProvider) {
             throw new RuntimeException(
-                '"Logger::setTraceLevel()" is unavailable when using a custom context provider.'
+                '"Logger::setTraceLevel()" is unavailable when using a custom context provider.',
             );
         }
         /** @psalm-suppress DeprecatedMethod */
@@ -201,7 +201,7 @@ final class Logger implements LoggerInterface
     {
         if (!$this->contextProvider instanceof SystemContextProvider) {
             throw new RuntimeException(
-                '"Logger::setExcludedTracePaths()" is unavailable when using a custom context provider.'
+                '"Logger::setExcludedTracePaths()" is unavailable when using a custom context provider.',
             );
         }
         /** @psalm-suppress DeprecatedMethod */
@@ -238,7 +238,7 @@ final class Logger implements LoggerInterface
         }
 
         throw new \Psr\Log\InvalidArgumentException(
-            sprintf('The log message level must be a string, %s provided.', get_debug_type($level))
+            sprintf('The log message level must be a string, %s provided.', get_debug_type($level)),
         );
     }
 
@@ -259,15 +259,15 @@ final class Logger implements LoggerInterface
             sprintf(
                 'Invalid log message level "%s" provided. The following values are supported: "%s".',
                 $level,
-                implode('", "', self::LEVELS)
-            )
+                implode('", "', self::LEVELS),
+            ),
         );
     }
 
     /**
      * Sets a target to {@see Logger::$targets}.
      *
-     * @param Target[] $targets The log targets. Each array element represents a single {@see \Yiisoft\Log\Target}
+     * @param Target[] $targets The log targets. Each array element represents a single {@see Target}
      * instance or the configuration for creating the log target instance.
      *
      * @throws InvalidArgumentException for non-instance Target.

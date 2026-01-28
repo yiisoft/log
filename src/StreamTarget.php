@@ -6,6 +6,7 @@ namespace Yiisoft\Log;
 
 use InvalidArgumentException;
 use RuntimeException;
+use Psr\Log\LogLevel;
 
 use function error_get_last;
 use function fclose;
@@ -17,6 +18,8 @@ use function is_resource;
 use function sprintf;
 use function stream_get_meta_data;
 
+use function is_string;
+
 use const LOCK_EX;
 use const LOCK_UN;
 
@@ -27,7 +30,7 @@ final class StreamTarget extends Target
 {
     /**
      * @param resource|string $stream A string stream identifier or a stream resource.
-     * @param string[] $levels The {@see \Psr\Log\LogLevel log message levels} that this target is interested in.
+     * @param string[] $levels The {@see LogLevel log message levels} that this target is interested in.
      */
     public function __construct(private $stream = 'php://stdout', array $levels = [])
     {

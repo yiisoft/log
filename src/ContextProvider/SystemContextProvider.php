@@ -33,6 +33,7 @@ final class SystemContextProvider implements ContextProviderInterface
         private int $traceLevel = 0,
         array $excludedTracePaths = [],
     ) {
+        $this->assertTraceLevelIsValid($this->traceLevel);
         /** @psalm-suppress DeprecatedMethod `setExcludedTracePaths` will be private and not deprecated */
         $this->setExcludedTracePaths($excludedTracePaths);
     }
@@ -61,7 +62,9 @@ final class SystemContextProvider implements ContextProviderInterface
      */
     public function setTraceLevel(int $traceLevel): self
     {
+        $this->assertTraceLevelIsValid($traceLevel);
         $this->traceLevel = $traceLevel;
+
         return $this;
     }
 
@@ -114,7 +117,7 @@ final class SystemContextProvider implements ContextProviderInterface
                 if (isset($trace['file'], $trace['line'])) {
                     $excludedMatch = array_filter(
                         $this->excludedTracePaths,
-                        static fn($path) => str_contains($trace['file'], $path),
+                        static fn(string $path): bool => str_contains($trace['file'], $path),
                     );
 
                     if (empty($excludedMatch)) {
@@ -128,5 +131,24 @@ final class SystemContextProvider implements ContextProviderInterface
         }
 
         return $traces;
+    }
+
+    /**
+     * Validates $traceLevel property
+     *
+     * @param int $traceLevel The number of call stack information.
+     *
+     * @see self::$traceLevel
+     */
+    private function assertTraceLevelIsValid(int $traceLevel): void
+    {
+        if ($traceLevel < 0) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Trace level must be greater than or equal to zero, %s received.',
+                    $traceLevel,
+                ),
+            );
+        }
     }
 }

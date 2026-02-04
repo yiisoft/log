@@ -142,10 +142,6 @@ final class Logger implements LoggerInterface
      */
     public function flush(bool $final = false): void
     {
-        if (empty($this->messages)) {
-            return;
-        }
-
         $messages = $this->messages;
         // https://github.com/yiisoft/yii2/issues/5619
         // new messages could be logged while the existing ones are being handled by targets

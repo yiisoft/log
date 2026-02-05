@@ -56,6 +56,68 @@ $logger->info('Info message', ['key' => 'value']);
 $logger->debug('Debug message', ['key' => 'value']);
 ```
 
+### PSR-3 Message Placeholders
+
+The logger is [PSR-3](https://www.php-fig.org/psr/psr-3/) compatible and supports message placeholders with additional enhancements. 
+Placeholders in the message string are replaced with values from the context array:
+
+```php
+$logger->info('User {username} logged in from {ip}', [
+    'username' => 'john_doe',
+    'ip' => '192.168.1.1',
+]);
+// Logs: "User john_doe logged in from 192.168.1.1"
+```
+
+Placeholder names must be enclosed in curly braces `{placeholder}` and correspond to keys in the context array.
+
+#### Nested Context Values
+
+As an enhancement beyond the PSR-3 specification, the logger supports accessing nested array values using dot notation:
+
+```php
+$logger->info('User {user.name} with ID {user.id} performed action', [
+    'user' => [
+        'id' => 123,
+        'name' => 'John Doe',
+    ],
+]);
+// Logs: "User John Doe with ID 123 performed action"
+```
+
+#### Supported Data Types
+
+Placeholders can handle various data types:
+
+- **Strings and numbers**: Rendered as-is
+- **null**: Rendered as an empty string
+- **Stringable objects**: Converted using `__toString()`
+- **Arrays and objects**: Rendered as formatted strings using VarDumper
+
+```php
+$logger->warning('Failed to process order {order_id}', [
+    'order_id' => 12345,
+]);
+
+$logger->error('Invalid data: {data}', [
+    'data' => ['key' => 'value'],
+]);
+```
+
+#### Context Data Preservation
+
+The context array is preserved in the log message and can be used by log targets for filtering, 
+formatting, or exporting. This allows you to pass structured data alongside human-readable messages:
+
+```php
+$logger->info('Payment processed', [
+    'amount' => 99.99,
+    'currency' => 'USD',
+    'transaction_id' => 'txn_123456',
+    'user_id' => 42,
+]);
+```
+
 ### Message Flushing and Exporting
 
 Log messages are collected and stored in memory. To limit memory consumption, the logger will flush

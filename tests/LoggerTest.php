@@ -349,11 +349,11 @@ final class LoggerTest extends TestCase
             ->getMockForAbstractClass();
 
         $target
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('collect')
-            ->with(
-                $this->equalTo([$message]),
-                $this->equalTo(true),
+            ->withConsecutive(
+                [$this->equalTo([$message]), $this->equalTo(true)],
+                [$this->equalTo([]), $this->equalTo(true)],
             );
 
         $logger = new Logger(['fakeTarget' => $target]);
@@ -383,7 +383,7 @@ final class LoggerTest extends TestCase
             ->getMockForAbstractClass();
 
         $target1
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('collect')
             ->withConsecutive(
                 [$this->equalTo([$message]), $this->equalTo(true)],

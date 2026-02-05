@@ -19,7 +19,6 @@ use function implode;
 use function in_array;
 use function is_string;
 use function microtime;
-use function register_shutdown_function;
 use function sprintf;
 
 /**
@@ -87,14 +86,11 @@ final class Logger implements LoggerInterface
     ) {
         $this->setTargets($targets);
         $this->contextProvider = $contextProvider ?? new SystemContextProvider();
+    }
 
-        register_shutdown_function(function () {
-            // make regular flush before other shutdown functions, which allows session data collection and so on
-            $this->flush();
-            // make sure log entries written by shutdown functions are also flushed
-            // ensure "flush()" is called last when there are multiple shutdown functions
-            register_shutdown_function([$this, 'flush'], true);
-        });
+    public function __destruct()
+    {
+        $this->flush(true);
     }
 
     /**

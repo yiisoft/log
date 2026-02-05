@@ -7,6 +7,7 @@
 - Chg #130, #133: Changed `Message::parse()` to conform to PSR-3 (@technicated, @vjik)
 - Enh #135: Add validation for `$traceLevel` in `SystemContextProvider` to ensure values are greater than or equal to zero (@rekmixa)
 - Enh #137: Explicitly import classes, functions, and constants in "use" section (@mspirkov)
+- Enh #138: Moved the final log flush from `register_shutdown_function()` to the `Logger::__destruct()` method (@olegbaturin)
 
 ## 2.2.0 December 13, 2025
 

@@ -58,7 +58,7 @@ $logger->debug('Debug message', ['key' => 'value']);
 
 ### PSR-3 Message Placeholders
 
-The logger supports [PSR-3](https://www.php-fig.org/psr/psr-3/) style message placeholders. 
+The logger is [PSR-3](https://www.php-fig.org/psr/psr-3/) compatible and supports message placeholders with additional enhancements. 
 Placeholders in the message string are replaced with values from the context array:
 
 ```php
@@ -73,7 +73,7 @@ Placeholder names must be enclosed in curly braces `{placeholder}` and correspon
 
 #### Nested Context Values
 
-The logger supports accessing nested array values using dot notation:
+As an enhancement beyond the PSR-3 specification, the logger supports accessing nested array values using dot notation:
 
 ```php
 $logger->info('User {user.name} with ID {user.id} performed action', [

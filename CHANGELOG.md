@@ -1,5 +1,9 @@
 # Yii Logging Library Change Log
 
+## 2.2.2 under development
+
+- no changes in this release.
+
 ## 2.2.1 March 22, 2026
 
 - Chg #130, #133: Changed `Message::parse()` to conform to PSR-3 (@technicated, @vjik)

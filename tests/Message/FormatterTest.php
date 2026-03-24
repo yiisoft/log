@@ -217,6 +217,44 @@ final class FormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($message, []));
     }
 
+    public function testFormatTraceWithFileButNoLineDoesNotUseFileLineFormat(): void
+    {
+        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
+        $message = new Message(
+            LogLevel::INFO,
+            'message',
+            [
+                'category' => 'app',
+                'time' => 1_508_160_390,
+                'trace' => [['file' => '/path/to/file', 'function' => 'myFunc']],
+            ],
+        );
+
+        $result = $this->formatter->format($message, []);
+
+        $this->assertStringNotContainsString('in /path/to/file:', $result);
+        $this->assertStringContainsString('myFunc', $result);
+    }
+
+    public function testFormatTraceWithLineButNoFileDoesNotUseFileLineFormat(): void
+    {
+        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
+        $message = new Message(
+            LogLevel::INFO,
+            'message',
+            [
+                'category' => 'app',
+                'time' => 1_508_160_390,
+                'trace' => [['line' => 99, 'function' => 'myFunc']],
+            ],
+        );
+
+        $result = $this->formatter->format($message, []);
+
+        $this->assertStringNotContainsString(':99', $result);
+        $this->assertStringContainsString('myFunc', $result);
+    }
+
     public function invalidCallableReturnStringProvider(): array
     {
         return [

@@ -192,6 +192,20 @@ final class MessageTest extends TestCase
         $this->assertSame($expected, $message->category());
     }
 
+    public function testTraceReturnsNullWhenNoTraceInContext(): void
+    {
+        $message = new Message(LogLevel::INFO, 'message', ['foo' => 'bar']);
+
+        $this->assertNull($message->trace());
+    }
+
+    public function testMessageWithoutPlaceholdersReturnsUnchanged(): void
+    {
+        $message = new Message(LogLevel::INFO, 'simple message without braces', ['foo' => 'bar']);
+
+        $this->assertSame('simple message without braces', $message->message());
+    }
+
     public function testInvalidCategoryType(): void
     {
         $message = new Message(LogLevel::INFO, 'message', ['category' => 23.1]);

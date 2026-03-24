@@ -26,4 +26,12 @@ final class SystemContextProviderTest extends TestCase
         $this->assertArrayHasKey('memory', $context);
         $this->assertArrayHasKey('category', $context);
     }
+
+    public function testSetTraceLevelWithNegativeValueThrowsException(): void
+    {
+        $provider = new SystemContextProvider();
+
+        $this->expectException(InvalidArgumentException::class);
+        $provider->setTraceLevel(-1);
+    }
 }

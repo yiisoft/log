@@ -419,6 +419,18 @@ final class LoggerTest extends TestCase
         $logger->flush(true);
     }
 
+    public function testAssertLevelIsStringWithValidLevel(): void
+    {
+        Logger::assertLevelIsString('info');
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testAssertLevelIsStringWithInvalidLevelThrowsException(): void
+    {
+        $this->expectException(\Psr\Log\InvalidArgumentException::class);
+        Logger::assertLevelIsString(123);
+    }
+
     public function testFlushIntervalZeroDoesNotFlushDuringLog(): void
     {
         $this->logger->setFlushInterval(0);

@@ -183,6 +183,51 @@ abstract class Target
     }
 
     /**
+     * Sets the format for the string representation of the log context.
+     *
+     * @param callable $contextFormat The PHP callable to format the log context.
+     *
+     * @return self
+     *
+     * @see Formatter::$contextFormat
+     */
+    public function setContextFormat(callable $contextFormat): self
+    {
+        $this->formatter->setContextFormat($contextFormat);
+        return $this;
+    }
+
+    /**
+     * Sets a template string for the context output.
+     *
+     * @param string $contextTemplate The template string with `{trace}`, `{message}`, and `{common}` placeholders.
+     *
+     * @return self
+     *
+     * @see Formatter::$contextTemplate
+     */
+    public function setContextTemplate(string $contextTemplate): self
+    {
+        $this->formatter->setContextTemplate($contextTemplate);
+        return $this;
+    }
+
+    /**
+     * Sets a PHP callable that converts a value to a string.
+     *
+     * @param callable $convertToString The PHP callable to convert a value to a string.
+     *
+     * @return self
+     *
+     * @see Formatter::$convertToString
+     */
+    public function setConvertToString(callable $convertToString): self
+    {
+        $this->formatter->setConvertToString($convertToString);
+        return $this;
+    }
+
+    /**
      * Sets a PHP callable that returns a string representation of the log message.
      *
      * @param callable $format The PHP callable to get a string value from.

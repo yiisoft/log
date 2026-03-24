@@ -223,6 +223,63 @@ $logger = new \Yiisoft\Log\Logger(
 );
 ```
 
+### Customizing log format
+
+Each target formats log messages using a built-in `Formatter`. You can customize various aspects of formatting.
+
+To replace the entire message format, use `setFormat()`:
+
+```php
+$target->setFormat(static function (\Yiisoft\Log\Message $message, array $commonContext): string {
+    return "[{$message->level()}][{$message->context('category')}] {$message->message()}";
+});
+```
+
+To add a prefix to every message:
+
+```php
+$target->setPrefix(static fn() => 'MyApp: ');
+```
+
+To change the timestamp format:
+
+```php
+$target->setTimestampFormat('Y-m-d H:i:s');
+```
+
+To replace how context values are converted to strings (default uses VarDumper):
+
+```php
+$target->setConvertToString(static fn(mixed $value): string => json_encode($value));
+```
+
+To reorder context sections (trace, message context, common context) use a template string with
+`{trace}`, `{message}`, and `{common}` placeholders. Each placeholder expands to its section with
+a header when non-empty, or an empty string when the section has no data:
+
+```php
+$target->setContextTemplate("{common}{message}{trace}\n");
+```
+
+For full control over context rendering, use a callable:
+
+```php
+$target->setContextFormat(
+    static function (string $trace, string $messageContext, string $commonContext): string {
+        $result = '';
+        if ($commonContext !== '') {
+            $result .= "\n\nCommon:\n" . $commonContext;
+        }
+        if ($messageContext !== '') {
+            $result .= "\n\nMessage:\n" . $messageContext;
+        }
+        return $result;
+    },
+);
+```
+
+If both `setContextFormat()` and `setContextTemplate()` are set, the callable takes precedence.
+
 ## Documentation
 
 - [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md)

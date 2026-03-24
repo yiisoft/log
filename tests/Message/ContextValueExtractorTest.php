@@ -9,81 +9,30 @@ use Yiisoft\Log\Message\ContextValueExtractor;
 
 final class ContextValueExtractorTest extends TestCase
 {
-    public function testExtractWithEmptyKeyFound(): void
+    public static function dataExtract(): array
     {
-        [$exists, $value] = ContextValueExtractor::extract(['' => 'found'], '');
-        $this->assertTrue($exists);
-        $this->assertSame('found', $value);
+        return [
+            'empty-key-found' => [['' => 'found'], '', [true, 'found']],
+            'empty-key-not-found' => [['foo' => 'bar'], '', [false, null]],
+            'simple-key' => [['foo' => 'bar'], 'foo', [true, 'bar']],
+            'missing-key' => [['foo' => 'bar'], 'baz', [false, null]],
+            'nested-key' => [['user' => ['name' => 'John']], 'user.name', [true, 'John']],
+            'nested-key-not-found' => [['user' => ['name' => 'John']], 'user.age', [false, null]],
+            'nested-key-non-array-intermediate' => [['user' => 'string'], 'user.name', [false, null]],
+            'escaped-dot' => [['user.name' => 'John'], 'user\.name', [true, 'John']],
+            'escaped-backslash' => [['user\\' => 'John'], 'user\\\\', [true, 'John']],
+            'deeply-nested' => [['a' => ['b' => ['c' => 'deep']]], 'a.b.c', [true, 'deep']],
+            'backslash-key-nested' => [['a\\' => ['b' => 'value']], 'a\\\\.b', [true, 'value']],
+            'multiple-backslashes-before-dot' => [['a\\\\' => ['b' => 'value']], 'a\\\\\\\\.b', [true, 'value']],
+            'escaped-dot-and-nesting' => [['a.b' => ['c' => 'value']], 'a\\.b.c', [true, 'value']],
+        ];
     }
 
-    public function testExtractWithEmptyKeyNotFound(): void
+    /**
+     * @dataProvider dataExtract
+     */
+    public function testExtract(array $context, string $key, array $expected): void
     {
-        [$exists, $value] = ContextValueExtractor::extract(['foo' => 'bar'], '');
-        $this->assertFalse($exists);
-        $this->assertNull($value);
-    }
-
-    public function testExtractWithSimpleKey(): void
-    {
-        $this->assertSame([true, 'bar'], ContextValueExtractor::extract(['foo' => 'bar'], 'foo'));
-    }
-
-    public function testExtractWithMissingKey(): void
-    {
-        $this->assertSame([false, null], ContextValueExtractor::extract(['foo' => 'bar'], 'baz'));
-    }
-
-    public function testExtractWithNestedKey(): void
-    {
-        $context = ['user' => ['name' => 'John']];
-        $this->assertSame([true, 'John'], ContextValueExtractor::extract($context, 'user.name'));
-    }
-
-    public function testExtractWithNestedKeyNotFound(): void
-    {
-        $context = ['user' => ['name' => 'John']];
-        $this->assertSame([false, null], ContextValueExtractor::extract($context, 'user.age'));
-    }
-
-    public function testExtractWithNestedKeyNonArrayIntermediate(): void
-    {
-        $context = ['user' => 'string'];
-        $this->assertSame([false, null], ContextValueExtractor::extract($context, 'user.name'));
-    }
-
-    public function testExtractWithEscapedDot(): void
-    {
-        $context = ['user.name' => 'John'];
-        $this->assertSame([true, 'John'], ContextValueExtractor::extract($context, 'user\.name'));
-    }
-
-    public function testExtractWithEscapedBackslash(): void
-    {
-        $context = ['user\\' => 'John'];
-        $this->assertSame([true, 'John'], ContextValueExtractor::extract($context, 'user\\\\'));
-    }
-
-    public function testExtractWithDeeplyNestedKey(): void
-    {
-        $context = ['a' => ['b' => ['c' => 'deep']]];
-        $this->assertSame([true, 'deep'], ContextValueExtractor::extract($context, 'a.b.c'));
-    }
-
-    public function testExtractWithBackslashKeyAndNestedAccess(): void
-    {
-        $context = ['a\\' => ['b' => 'value']];
-        $this->assertSame([true, 'value'], ContextValueExtractor::extract($context, 'a\\\\.b'));
-    }
-
-    public function testExtractWithMultipleBackslashesBeforeDot(): void
-    {
-        $context = ['a\\\\' => ['b' => 'value']];
-        $this->assertSame([true, 'value'], ContextValueExtractor::extract($context, 'a\\\\\\\\.b'));
-    }
-
-    public function testExtractWithEscapedDotAndNesting(): void
-    {
-        $context = ['a.b' => ['c' => 'value']];
-        $this->assertSame([true, 'value'], ContextValueExtractor::extract($context, 'a\\.b.c'));
+        $this->assertSame($expected, ContextValueExtractor::extract($context, $key));
     }
 }

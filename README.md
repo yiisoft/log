@@ -278,9 +278,9 @@ return [
 ];
 ```
 
-Log flushing is handled automatically via [yiisoft/config](https://github.com/yiisoft/config) plugin.
-The package ships `events-web.php` and `events-console.php` configs that flush logs after HTTP response
-is emitted and on console command termination.
+When using the [yiisoft/config](https://github.com/yiisoft/config) plugin, the shipped event configs are loaded automatically.
+The package provides `events-web.php` and `events-console.php` files that define event handlers to flush logs after the HTTP response
+is emitted and when a console command terminates.
 
 ## Documentation
 

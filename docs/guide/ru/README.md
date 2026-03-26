@@ -206,6 +206,65 @@ $logger = new \Yiisoft\Log\Logger(
 );
 ```
 
+### Настройка `LoggerInterface` в Yii 3
+
+В приложении Yii 3 `Psr\Log\LoggerInterface` резолвится через DI-контейнер.
+Чтобы использовать `Yiisoft\Log\Logger` как реализацию, добавьте привязку в DI-конфиг приложения
+(например `config/common/di/logger.php`):
+
+```php
+use Psr\Log\LoggerInterface;
+use Yiisoft\Definitions\ReferencesArray;
+use Yiisoft\Log\Logger;
+use Yiisoft\Log\StreamTarget;
+use Yiisoft\Log\Target\File\FileTarget;
+
+return [
+    LoggerInterface::class => [
+        'class' => Logger::class,
+        '__construct()' => [
+            'targets' => ReferencesArray::from([
+                FileTarget::class,
+                StreamTarget::class,
+            ]),
+        ],
+    ],
+];
+```
+
+Такой же паттерн используется в [yiisoft/demo-blog](https://github.com/yiisoft/demo-blog/blob/master/config/common/di/logger.php).
+
+Каждый таргет в `ReferencesArray::from()` резолвится DI-контейнером как отдельный сервис.
+Пакеты таргетов вроде [yiisoft/log-target-file](https://github.com/yiisoft/log-target-file) поставляют
+свои `di.php` и `params.php`, которые автоматически мержатся
+[плагином конфигурации](https://github.com/yiisoft/config), поэтому `FileTarget` работает из коробки
+с настройками по умолчанию (пишет в `@runtime/logs/app.log` с ротацией). `StreamTarget` из этого пакета
+пишет в `php://stdout` по умолчанию и не требует дополнительной настройки.
+
+Чтобы использовать только `StreamTarget` без пакета файлового таргета:
+
+```php
+use Psr\Log\LoggerInterface;
+use Yiisoft\Definitions\ReferencesArray;
+use Yiisoft\Log\Logger;
+use Yiisoft\Log\StreamTarget;
+
+return [
+    LoggerInterface::class => [
+        'class' => Logger::class,
+        '__construct()' => [
+            'targets' => ReferencesArray::from([
+                StreamTarget::class,
+            ]),
+        ],
+    ],
+];
+```
+
+При использовании [плагина конфигурации](https://github.com/yiisoft/config) event-конфиги загружаются автоматически.
+Пакет предоставляет файлы `events-web.php` и `events-console.php` с обработчиками для сброса логов
+после отправки HTTP-ответа и при завершении консольной команды.
+
 ## Документация
 
 - [Руководство Yii по логированию](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md)

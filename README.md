@@ -223,6 +223,65 @@ $logger = new \Yiisoft\Log\Logger(
 );
 ```
 
+### Configuring `LoggerInterface` in Yii 3
+
+In a Yii 3 application, `Psr\Log\LoggerInterface` is resolved through the DI container.
+To use `Yiisoft\Log\Logger` as the implementation, add the binding to your application's DI config
+(e.g. `config/common/di/logger.php`):
+
+```php
+use Psr\Log\LoggerInterface;
+use Yiisoft\Definitions\ReferencesArray;
+use Yiisoft\Log\Logger;
+use Yiisoft\Log\StreamTarget;
+use Yiisoft\Log\Target\File\FileTarget;
+
+return [
+    LoggerInterface::class => [
+        'class' => Logger::class,
+        '__construct()' => [
+            'targets' => ReferencesArray::from([
+                FileTarget::class,
+                StreamTarget::class,
+            ]),
+        ],
+    ],
+];
+```
+
+This is the same pattern used in [yiisoft/demo-blog](https://github.com/yiisoft/demo-blog/blob/master/config/common/di/logger.php).
+
+Each target listed in `ReferencesArray::from()` is resolved by the DI container as a separate service.
+Target packages like [yiisoft/log-target-file](https://github.com/yiisoft/log-target-file) ship their
+own `di.php` and `params.php` configs that are merged automatically by the
+[config plugin](https://github.com/yiisoft/config), so `FileTarget` works out of the box with
+default settings (writes to `@runtime/logs/app.log` with rotation). `StreamTarget` from this package
+writes to `php://stdout` by default and requires no extra configuration.
+
+To use only `StreamTarget` without the file target package:
+
+```php
+use Psr\Log\LoggerInterface;
+use Yiisoft\Definitions\ReferencesArray;
+use Yiisoft\Log\Logger;
+use Yiisoft\Log\StreamTarget;
+
+return [
+    LoggerInterface::class => [
+        'class' => Logger::class,
+        '__construct()' => [
+            'targets' => ReferencesArray::from([
+                StreamTarget::class,
+            ]),
+        ],
+    ],
+];
+```
+
+When using the [yiisoft/config](https://github.com/yiisoft/config) plugin, the shipped event configs are loaded automatically.
+The package provides `events-web.php` and `events-console.php` files that define event handlers to flush logs after the HTTP response
+is emitted and when a console command terminates.
+
 ## Documentation
 
 - Guide: [Russian - Русский](docs/guide/ru/README.md)

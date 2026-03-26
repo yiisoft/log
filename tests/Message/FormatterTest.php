@@ -217,7 +217,7 @@ final class FormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($message, []));
     }
 
-    public function testFormatTraceWithFileButNoLineDoesNotUseFileLineFormat(): void
+    public function testTraceWithFileWithoutLineUsesFunction(): void
     {
         $this->formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(
@@ -236,7 +236,7 @@ final class FormatterTest extends TestCase
         $this->assertStringContainsString('myFunc', $result);
     }
 
-    public function testFormatTraceWithLineButNoFileDoesNotUseFileLineFormat(): void
+    public function testTraceWithLineWithoutFileUsesFunction(): void
     {
         $this->formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(

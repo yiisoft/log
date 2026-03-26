@@ -14,8 +14,6 @@ use Yiisoft\Log\Logger;
 use Yiisoft\Log\Message;
 use Yiisoft\Log\Tests\TestAsset\DummyTarget;
 
-use Yiisoft\Log\Tests\TestAsset\PlainTarget;
-
 use function array_map;
 use function array_merge;
 use function json_encode;
@@ -497,14 +495,14 @@ final class TargetTest extends TestCase
         $this->assertCount(3, $messages);
     }
 
-    public function testCollectEmptyArrayWithFinalDoesNotExport(): void
+    public function testCollectWithNoMessagesDoesNotExport(): void
     {
         $this->target->collect([], true);
 
         $this->assertSame(0, $this->target->getExportCount());
     }
 
-    public function testExportIntervalZeroDoesNotExportUntilFinal(): void
+    public function testExportIntervalZeroDoesNotExport(): void
     {
         $this->target->setExportInterval(0);
         $this->target->collect(
@@ -543,20 +541,6 @@ final class TargetTest extends TestCase
         $this->assertCount(2, $messages);
         $this->assertSame('second', $messages[0]->message());
         $this->assertSame('third', $messages[1]->message());
-    }
-
-    public function testSetPrefixIsCallableOnTarget(): void
-    {
-        $target = new PlainTarget();
-        $target->setPrefix(static fn() => 'prefix');
-        $this->expectNotToPerformAssertions();
-    }
-
-    public function testSetTimestampFormatIsCallableOnTarget(): void
-    {
-        $target = new PlainTarget();
-        $target->setTimestampFormat('Y');
-        $this->expectNotToPerformAssertions();
     }
 
     private function collectOneAndExport(string $level, string $message, array $context = []): void

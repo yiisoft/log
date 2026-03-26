@@ -183,13 +183,17 @@ abstract class Target
     }
 
     /**
-     * Sets the format for the string representation of the log context.
+     * Sets a PHP callable that returns a string representation of the log context.
+     *
+     * If not set, the default context format will be used.
+     * If both this and {@see Target::setContextTemplate()} are set, the callable takes precedence.
+     *
+     * The signature of the callable should be
+     * `function (string $trace, string $messageContext, string $commonContext): string;`.
      *
      * @param callable $contextFormat The PHP callable to format the log context.
      *
      * @return self
-     *
-     * @see Formatter::$contextFormat
      */
     public function setContextFormat(callable $contextFormat): self
     {
@@ -200,11 +204,14 @@ abstract class Target
     /**
      * Sets a template string for the context output.
      *
+     * Supports `{trace}`, `{message}`, and `{common}` placeholders. Each placeholder is replaced with its
+     * formatted section (including header) if non-empty, or an empty string if the section has no data.
+     *
+     * For example, `"{common}{message}{trace}\n"` outputs common context first, then message context, then trace.
+     *
      * @param string $contextTemplate The template string with `{trace}`, `{message}`, and `{common}` placeholders.
      *
      * @return self
-     *
-     * @see Formatter::$contextTemplate
      */
     public function setContextTemplate(string $contextTemplate): self
     {
@@ -215,11 +222,13 @@ abstract class Target
     /**
      * Sets a PHP callable that converts a value to a string.
      *
+     * If not set, the default VarDumper-based conversion will be used.
+     *
+     * The signature of the callable should be `function (mixed $value): string;`.
+     *
      * @param callable $convertToString The PHP callable to convert a value to a string.
      *
      * @return self
-     *
-     * @see Formatter::$convertToString
      */
     public function setConvertToString(callable $convertToString): self
     {

@@ -263,6 +263,7 @@ final class TargetTest extends TestCase
         $this->target->setConvertToString(
             static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
         );
+        $this->target->setCommonContext(['server' => 'web']);
         $this->collectOneAndExport(LogLevel::INFO, 'message', [
             'category' => 'app',
             'time' => 1_508_160_390,
@@ -271,11 +272,6 @@ final class TargetTest extends TestCase
             . "\n\nMessage context:\n\ncategory: \"app\"\ntime: 1508160390"
             . "\n\nCommon context:\n\nserver: \"web\"\n"
         ;
-        $this->target->setCommonContext(['server' => 'web']);
-        $this->collectOneAndExport(LogLevel::INFO, 'message', [
-            'category' => 'app',
-            'time' => 1_508_160_390,
-        ]);
         $this->assertSame($expected, $this->target->formatMessages());
     }
 

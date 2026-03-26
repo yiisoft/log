@@ -250,7 +250,7 @@ $target->setTimestampFormat('Y-m-d H:i:s');
 To replace how context values are converted to strings (default uses VarDumper):
 
 ```php
-$target->setConvertToString(static fn(mixed $value): string => json_encode($value));
+$target->setConvertToString(static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR));
 ```
 
 To reorder context sections (trace, message context, common context) use a template string with

@@ -223,9 +223,9 @@ $logger = new \Yiisoft\Log\Logger(
 );
 ```
 
-### Configuring `LoggerInterface` in Yii 3
+### Configuring `LoggerInterface` in Yii3
 
-In a Yii 3 application, `Psr\Log\LoggerInterface` is resolved through the DI container.
+In a Yii3 application, `Psr\Log\LoggerInterface` is resolved through the DI container.
 To use `Yiisoft\Log\Logger` as the implementation, add the binding to your application's DI config
 (e.g. `config/common/di/logger.php`):
 
@@ -248,8 +248,6 @@ return [
     ],
 ];
 ```
-
-This is the same pattern used in [yiisoft/demo-blog](https://github.com/yiisoft/demo-blog/blob/master/config/common/di/logger.php).
 
 Each target listed in `ReferencesArray::from()` is resolved by the DI container as a separate service.
 Target packages like [yiisoft/log-target-file](https://github.com/yiisoft/log-target-file) ship their

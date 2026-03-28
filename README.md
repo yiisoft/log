@@ -284,6 +284,7 @@ is emitted and when a console command terminates.
 
 ## Documentation
 
+- Guide: [Russian - Русский](docs/guide/ru/README.md)
 - [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md)
 - [Internals](docs/internals.md)
 

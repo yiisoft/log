@@ -206,9 +206,9 @@ $logger = new \Yiisoft\Log\Logger(
 );
 ```
 
-### Настройка `LoggerInterface` в Yii 3
+### Настройка `LoggerInterface` в Yii3
 
-В приложении Yii 3 `Psr\Log\LoggerInterface` резолвится через DI-контейнер.
+В приложении Yii3 `Psr\Log\LoggerInterface` резолвится через DI-контейнер.
 Чтобы использовать `Yiisoft\Log\Logger` как реализацию, добавьте привязку в DI-конфиг приложения
 (например `config/common/di/logger.php`):
 
@@ -231,8 +231,6 @@ return [
     ],
 ];
 ```
-
-Такой же паттерн используется в [yiisoft/demo-blog](https://github.com/yiisoft/demo-blog/blob/master/config/common/di/logger.php).
 
 Каждый таргет в `ReferencesArray::from()` резолвится DI-контейнером как отдельный сервис.
 Пакеты таргетов вроде [yiisoft/log-target-file](https://github.com/yiisoft/log-target-file) поставляют

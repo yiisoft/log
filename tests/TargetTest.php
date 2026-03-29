@@ -556,6 +556,54 @@ final class TargetTest extends TestCase
         $this->assertCount(3, $messages);
     }
 
+    public function testCollectWithNoMessagesDoesNotExport(): void
+    {
+        $this->target->collect([], true);
+
+        $this->assertSame(0, $this->target->getExportCount());
+    }
+
+    public function testExportIntervalZeroDoesNotExport(): void
+    {
+        $this->target->setExportInterval(0);
+        $this->target->collect(
+            [new Message(LogLevel::INFO, 'message', ['category' => 'app'])],
+            false,
+        );
+
+        $this->assertSame(0, $this->target->getExportCount());
+    }
+
+    public function testSetTimestampFormatAffectsNonExportedMessages(): void
+    {
+        $this->target->setTimestampFormat('Y');
+        $this->target->collect(
+            [new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390])],
+            false,
+        );
+
+        $this->assertStringStartsWith('2017 ', $this->target->formatMessages());
+    }
+
+    public function testFilterContinuesAfterExcludedCategory(): void
+    {
+        $this->target->setExcept(['excluded']);
+        $this->target->collect(
+            [
+                new Message(LogLevel::INFO, 'first', ['category' => 'excluded']),
+                new Message(LogLevel::INFO, 'second', ['category' => 'allowed']),
+                new Message(LogLevel::INFO, 'third', ['category' => 'allowed']),
+            ],
+            false,
+        );
+
+        $messages = $this->target->getMessages();
+
+        $this->assertCount(2, $messages);
+        $this->assertSame('second', $messages[0]->message());
+        $this->assertSame('third', $messages[1]->message());
+    }
+
     private function collectOneAndExport(string $level, string $message, array $context = []): void
     {
         $this->target->collect([new Message($level, $message, $context)], true);

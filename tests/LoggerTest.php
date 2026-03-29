@@ -419,6 +419,15 @@ final class LoggerTest extends TestCase
         $logger->flush(true);
     }
 
+    public function testFlushIntervalZeroDoesNotFlushDuringLog(): void
+    {
+        $this->logger->setFlushInterval(0);
+        $this->target->setExportInterval(1);
+        $this->logger->log(LogLevel::INFO, 'test');
+
+        $this->assertSame(0, $this->target->getExportCount());
+    }
+
     public function testSetTraceLevelWithCustomContextProvider(): void
     {
         $logger = new Logger(contextProvider: new StubContextProvider());

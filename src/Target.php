@@ -183,6 +183,60 @@ abstract class Target
     }
 
     /**
+     * Sets a PHP callable that returns a string representation of the log context.
+     *
+     * If not set, the default context format will be used.
+     * If both this and {@see Target::setContextTemplate()} are set, the callable takes precedence.
+     *
+     * The signature of the callable should be
+     * `function (string $trace, string $messageContext, string $commonContext): string;`.
+     *
+     * @param callable $contextFormat The PHP callable to format the log context.
+     *
+     * @return self
+     */
+    public function setContextFormat(callable $contextFormat): self
+    {
+        $this->formatter->setContextFormat($contextFormat);
+        return $this;
+    }
+
+    /**
+     * Sets a template string for the context output.
+     *
+     * Supports `{trace}`, `{message}`, and `{common}` placeholders. Each placeholder is replaced with its
+     * formatted section (including header) if non-empty, or an empty string if the section has no data.
+     *
+     * For example, `"{common}{message}{trace}\n"` outputs common context first, then message context, then trace.
+     *
+     * @param string $contextTemplate The template string with `{trace}`, `{message}`, and `{common}` placeholders.
+     *
+     * @return self
+     */
+    public function setContextTemplate(string $contextTemplate): self
+    {
+        $this->formatter->setContextTemplate($contextTemplate);
+        return $this;
+    }
+
+    /**
+     * Sets a PHP callable that converts a value to a string.
+     *
+     * If not set, the default VarDumper-based conversion will be used.
+     *
+     * The signature of the callable should be `function (mixed $value): string;`.
+     *
+     * @param callable $convertToString The PHP callable to convert a value to a string.
+     *
+     * @return self
+     */
+    public function setConvertToString(callable $convertToString): self
+    {
+        $this->formatter->setConvertToString($convertToString);
+        return $this;
+    }
+
+    /**
      * Sets a PHP callable that returns a string representation of the log message.
      *
      * @param callable $format The PHP callable to get a string value from.

@@ -13,6 +13,7 @@ use function is_string;
 use function is_object;
 use function method_exists;
 use function sprintf;
+use function str_replace;
 use function is_int;
 
 /**
@@ -22,6 +23,27 @@ use function is_int;
  */
 final class Formatter
 {
+    /**
+     * @var callable|null
+     *
+     * @see Formatter::setContextFormat()
+     */
+    private $contextFormatter;
+
+    /**
+     * @var string|null
+     *
+     * @see Formatter::setContextTemplate()
+     */
+    private ?string $contextTemplate = null;
+
+    /**
+     * @var callable|null
+     *
+     * @see Formatter::setConvertToString()
+     */
+    private $convertToString;
+
     /**
      * @var callable|null PHP callable that returns a string representation of the log message.
      *
@@ -45,6 +67,51 @@ final class Formatter
      * @var string The date format for the log timestamp. Defaults to `Y-m-d H:i:s.u`.
      */
     private string $timestampFormat = 'Y-m-d H:i:s.u';
+
+    /**
+     * Sets a PHP callable that returns a string representation of the log context.
+     *
+     * If not set, the default context format will be used.
+     * If both this and {@see Formatter::setContextTemplate()} are set, the callable takes precedence.
+     *
+     * The signature of the callable should be
+     * `function (string $trace, string $messageContext, string $commonContext): string;`.
+     *
+     * @param callable $contextFormat The PHP callable to format the log context.
+     */
+    public function setContextFormat(callable $contextFormat): void
+    {
+        $this->contextFormatter = $contextFormat;
+    }
+
+    /**
+     * Sets a template string for the context output.
+     *
+     * Supports `{trace}`, `{message}`, and `{common}` placeholders. Each placeholder is replaced with its
+     * formatted section (including header) if non-empty, or an empty string if the section has no data.
+     *
+     * For example, `"{common}{message}{trace}\n"` outputs common context first, then message context, then trace.
+     *
+     * @param string $contextTemplate The template string with `{trace}`, `{message}`, and `{common}` placeholders.
+     */
+    public function setContextTemplate(string $contextTemplate): void
+    {
+        $this->contextTemplate = $contextTemplate;
+    }
+
+    /**
+     * Sets a PHP callable that converts a value to a string.
+     *
+     * If not set, the default VarDumper-based conversion will be used.
+     *
+     * The signature of the callable should be `function (mixed $value): string;`.
+     *
+     * @param callable $convertToString The PHP callable to convert a value to a string.
+     */
+    public function setConvertToString(callable $convertToString): void
+    {
+        $this->convertToString = $convertToString;
+    }
 
     /**
      * Sets the format for the string representation of the log message.
@@ -172,10 +239,6 @@ final class Formatter
         $context = [];
         $common = [];
 
-        if ($trace !== '') {
-            $context[] = $trace;
-        }
-
         /**
          * @var array-key $name
          * @var mixed $value
@@ -193,8 +256,48 @@ final class Formatter
             $common[] = "{$name}: " . $this->convertToString($value);
         }
 
-        return (empty($context) ? '' : "\n\nMessage context:\n\n" . implode("\n", $context))
-            . (empty($common) ? '' : "\n\nCommon context:\n\n" . implode("\n", $common)) . "\n";
+        $messageContext = implode("\n", $context);
+        $commonContextString = implode("\n", $common);
+
+        if ($this->contextFormatter !== null) {
+            $result = ($this->contextFormatter)($trace, $messageContext, $commonContextString);
+
+            if (!is_string($result)) {
+                throw new RuntimeException(sprintf(
+                    'The PHP callable "contextFormat" must return a string, %s received.',
+                    get_debug_type($result),
+                ));
+            }
+
+            return $result;
+        }
+
+        if ($this->contextTemplate !== null) {
+            return str_replace(
+                ['{trace}', '{message}', '{common}'],
+                [
+                    $trace === '' ? '' : "\n\nTrace:\n\n" . $trace,
+                    $messageContext === '' ? '' : "\n\nMessage context:\n\n" . $messageContext,
+                    $commonContextString === '' ? '' : "\n\nCommon context:\n\n" . $commonContextString,
+                ],
+                $this->contextTemplate,
+            );
+        }
+
+        $messageItems = [];
+
+        if ($trace !== '') {
+            $messageItems[] = $trace;
+        }
+
+        if ($messageContext !== '') {
+            $messageItems[] = $messageContext;
+        }
+
+        $messageSection = implode("\n", $messageItems);
+
+        return ($messageSection === '' ? '' : "\n\nMessage context:\n\n" . $messageSection)
+            . ($commonContextString === '' ? '' : "\n\nCommon context:\n\n" . $commonContextString) . "\n";
     }
 
     /**
@@ -244,6 +347,19 @@ final class Formatter
      */
     private function convertToString(mixed $value): string
     {
+        if ($this->convertToString !== null) {
+            $result = ($this->convertToString)($value);
+
+            if (!is_string($result)) {
+                throw new RuntimeException(sprintf(
+                    'The PHP callable "convertToString" must return a string, %s received.',
+                    get_debug_type($result),
+                ));
+            }
+
+            return $result;
+        }
+
         if (is_object($value) && method_exists($value, '__toString')) {
             return (string) $value;
         }

@@ -82,6 +82,24 @@ final class DummyTarget extends Target
         return parent::getCommonContext();
     }
 
+    public function setContextFormat(callable $contextFormat): self
+    {
+        $this->exportFormatter->setContextFormat($contextFormat);
+        return parent::setContextFormat($contextFormat);
+    }
+
+    public function setContextTemplate(string $contextTemplate): self
+    {
+        $this->exportFormatter->setContextTemplate($contextTemplate);
+        return parent::setContextTemplate($contextTemplate);
+    }
+
+    public function setConvertToString(callable $convertToString): self
+    {
+        $this->exportFormatter->setConvertToString($convertToString);
+        return parent::setConvertToString($convertToString);
+    }
+
     public function setFormat(callable $format): self
     {
         $this->exportFormatter->setFormat($format);

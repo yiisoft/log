@@ -2,7 +2,7 @@
 
 ## 2.2.2 under development
 
-- no changes in this release.
+- New #140: Add `setConvertToString()`, `setContextTemplate()`, and `setContextFormat()` to `Formatter` and `Target` (@WarLikeLaux)
 
 ## 2.2.1 March 22, 2026
 

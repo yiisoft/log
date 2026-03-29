@@ -258,6 +258,67 @@ final class TargetTest extends TestCase
         $this->target->setLevels($list);
     }
 
+    public function testSetConvertToString(): void
+    {
+        $this->target->setConvertToString(
+            static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
+        );
+        $this->target->setCommonContext(['server' => 'web']);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', [
+            'category' => 'app',
+            'time' => 1_508_160_390,
+        ]);
+        $expected = '2017-10-16 13:26:30.000000 [info][app] message'
+            . "\n\nMessage context:\n\ncategory: \"app\"\ntime: 1508160390"
+            . "\n\nCommon context:\n\nserver: \"web\"\n"
+        ;
+        $this->assertSame($expected, $this->target->formatMessages());
+    }
+
+    public function testSetContextTemplate(): void
+    {
+        $this->target->setTimestampFormat('Y-m-d H:i:s');
+        $this->target->setContextTemplate("{common}{message}\n");
+        $this->target->setCommonContext(['server' => 'web']);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', [
+            'category' => 'app',
+            'time' => 1_508_160_390,
+        ]);
+        $expected = "2017-10-16 13:26:30 [info][app] message"
+            . "\n\nCommon context:\n\nserver: 'web'"
+            . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390"
+            . "\n"
+        ;
+        $this->assertSame($expected, $this->target->formatMessages());
+    }
+
+    public function testSetContextFormat(): void
+    {
+        $this->target->setTimestampFormat('Y-m-d H:i:s');
+        $this->target->setContextFormat(
+            static function (string $trace, string $messageContext, string $commonContext): string {
+                $result = '';
+                if ($commonContext !== '') {
+                    $result .= "\n\nCommon:\n" . $commonContext;
+                }
+                if ($messageContext !== '') {
+                    $result .= "\n\nMessage:\n" . $messageContext;
+                }
+                return $result;
+            },
+        );
+        $this->target->setCommonContext(['server' => 'web']);
+        $this->collectOneAndExport(LogLevel::INFO, 'message', [
+            'category' => 'app',
+            'time' => 1_508_160_390,
+        ]);
+        $expected = "2017-10-16 13:26:30 [info][app] message"
+            . "\n\nCommon:\nserver: 'web'"
+            . "\n\nMessage:\ncategory: 'app'\ntime: 1508160390"
+        ;
+        $this->assertSame($expected, $this->target->formatMessages());
+    }
+
     public function testSetFormat(): void
     {
         $this->target->setFormat(static fn(Message $message) => "[{$message->level()}][{$message->context('category')}] {$message->message()}");

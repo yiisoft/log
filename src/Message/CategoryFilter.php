@@ -46,6 +46,18 @@ final class CategoryFilter
     private array $exclude = [];
 
     /**
+     * @param string[] $include The list of included log message categories.
+     * @param string[] $exclude The list of excluded log message categories.
+     *
+     * @throws InvalidArgumentException for invalid log message categories structure.
+     */
+    public function __construct(array $include = [], array $exclude = [])
+    {
+        $this->include($include);
+        $this->exclude($exclude);
+    }
+
+    /**
      * Sets the log message categories to be included.
      *
      * @param string[] $categories List of log message categories to be included.

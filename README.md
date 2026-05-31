@@ -136,7 +136,7 @@ To change the number of stored messages, pass the `exportInterval` constructor p
 $target = new \Yiisoft\Log\StreamTarget(exportInterval: 100); // default is 1000
 ```
 
-The `setExportInterval()` setter is deprecated since 2.2.2; use the constructor parameter instead. The same
+The `setExportInterval()` setter is deprecated; use the constructor parameter instead. The same
 applies to `setCategories()`, `setExcept()`, `setLevels()`, `setFormat()`, `setPrefix()`, `setTimestampFormat()`
 and `setEnabled()`.
 

@@ -400,7 +400,7 @@ final class TargetTest extends TestCase
 
     public function testExceptViaConstructor(): void
     {
-        $target = new DummyTarget(except: ['app']);
+        $target = new DummyTarget(exceptCategories: ['app']);
         $target->collect(
             [
                 new Message(LogLevel::INFO, 'in', ['category' => 'other']),

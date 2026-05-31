@@ -29,6 +29,9 @@ use function sprintf;
  */
 abstract class Target
 {
+    /**
+     * @var int
+     */
     public const DEFAULT_EXPORT_INTERVAL = 1000;
 
     private CategoryFilter $categories;

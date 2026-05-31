@@ -2,7 +2,7 @@
 
 ## 2.2.2 under development
 
-- Enh #XXX: Move `Target` configuration to constructor parameters and deprecate the corresponding setters (@WarLikeLaux)
+- Enh #146: Move `Target` configuration to constructor parameters and deprecate the corresponding setters (@WarLikeLaux)
 
 ## 2.2.1 March 22, 2026
 

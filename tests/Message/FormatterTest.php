@@ -217,10 +217,10 @@ final class FormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($message, []));
     }
 
-    public function testDefaultFormatWithSetConvertToString(): void
+    public function testDefaultFormatWithStringConverter(): void
     {
-        $this->formatter->setConvertToString(
-            static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
+        $formatter = new Formatter(
+            stringConverter: static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
         );
         $message = new Message(LogLevel::INFO, 'message', [
             'category' => 'app',
@@ -230,14 +230,13 @@ final class FormatterTest extends TestCase
             . "\n\nMessage context:\n\ncategory: \"app\"\ntime: 1508160390"
             . "\n\nCommon context:\n\nserver: \"web\"\n"
         ;
-        $this->assertSame($expected, $this->formatter->format($message, ['server' => 'web']));
+        $this->assertSame($expected, $formatter->format($message, ['server' => 'web']));
     }
 
-    public function testDefaultFormatWithSetContextFormat(): void
+    public function testDefaultFormatWithContextFormatCallable(): void
     {
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $this->formatter->setContextFormat(
-            static function (string $trace, string $messageContext, string $commonContext): string {
+        $formatter = new Formatter(
+            contextFormat: static function (string $trace, string $messageContext, string $commonContext): string {
                 $result = '';
                 if ($commonContext !== '') {
                     $result .= "\n\nCommon:\n" . $commonContext;
@@ -251,6 +250,7 @@ final class FormatterTest extends TestCase
                 return $result;
             },
         );
+        $formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(LogLevel::INFO, 'message', [
             'category' => 'app',
             'time' => 1_508_160_390,
@@ -261,13 +261,13 @@ final class FormatterTest extends TestCase
             . "\n\nTrace:\ntrace:\n    in /path/to/file:99"
             . "\n\nMessage:\ncategory: 'app'\ntime: 1508160390"
         ;
-        $this->assertSame($expected, $this->formatter->format($message, ['server' => 'web']));
+        $this->assertSame($expected, $formatter->format($message, ['server' => 'web']));
     }
 
-    public function testDefaultFormatWithSetContextTemplate(): void
+    public function testDefaultFormatWithContextTemplate(): void
     {
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $this->formatter->setContextTemplate("{common}{message}{trace}\n");
+        $formatter = new Formatter(contextFormat: "{common}{message}{trace}\n");
+        $formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(LogLevel::INFO, 'message', [
             'category' => 'app',
             'time' => 1_508_160_390,
@@ -279,13 +279,13 @@ final class FormatterTest extends TestCase
             . "\n\nTrace:\n\ntrace:\n    in /path/to/file:99"
             . "\n"
         ;
-        $this->assertSame($expected, $this->formatter->format($message, ['server' => 'web']));
+        $this->assertSame($expected, $formatter->format($message, ['server' => 'web']));
     }
 
-    public function testDefaultFormatWithSetContextTemplateEmptySections(): void
+    public function testDefaultFormatWithContextTemplateEmptySections(): void
     {
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $this->formatter->setContextTemplate("{trace}{message}{common}\n");
+        $formatter = new Formatter(contextFormat: "{trace}{message}{common}\n");
+        $formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(LogLevel::INFO, 'message', [
             'category' => 'app',
             'time' => 1_508_160_390,
@@ -294,13 +294,13 @@ final class FormatterTest extends TestCase
             . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390"
             . "\n"
         ;
-        $this->assertSame($expected, $this->formatter->format($message, []));
+        $this->assertSame($expected, $formatter->format($message, []));
     }
 
-    public function testDefaultFormatWithSetContextTemplateOnlyCommon(): void
+    public function testDefaultFormatWithContextTemplateOnlyCommon(): void
     {
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $this->formatter->setContextTemplate("{common}\n");
+        $formatter = new Formatter(contextFormat: "{common}\n");
+        $formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(LogLevel::INFO, 'message', [
             'category' => 'app',
             'time' => 1_508_160_390,
@@ -309,48 +309,13 @@ final class FormatterTest extends TestCase
             . "\n\nCommon context:\n\nserver: 'web'"
             . "\n"
         ;
-        $this->assertSame($expected, $this->formatter->format($message, ['server' => 'web']));
+        $this->assertSame($expected, $formatter->format($message, ['server' => 'web']));
     }
 
-    public function testSetContextFormatOverridesContextTemplate(): void
+    public function testStringConverterOverridesStringableObject(): void
     {
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $this->formatter->setContextTemplate("{common}{message}\n");
-        $this->formatter->setContextFormat(
-            static fn(string $trace, string $messageContext, string $commonContext): string => '[custom]',
-        );
-        $message = new Message(LogLevel::INFO, 'message', [
-            'category' => 'app',
-            'time' => 1_508_160_390,
-        ]);
-        $expected = '2017-10-16 13:26:30 [info][app] message[custom]';
-
-        $this->assertSame($expected, $this->formatter->format($message, []));
-    }
-
-    public function testSetContextTemplateOverridesContextFormat(): void
-    {
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $this->formatter->setContextFormat(
-            static fn(string $trace, string $messageContext, string $commonContext): string => '[custom]',
-        );
-        $this->formatter->setContextTemplate("{common}{message}\n");
-        $message = new Message(LogLevel::INFO, 'message', [
-            'category' => 'app',
-            'time' => 1_508_160_390,
-        ]);
-        $expected = '2017-10-16 13:26:30 [info][app] message'
-            . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390"
-            . "\n"
-        ;
-
-        $this->assertSame($expected, $this->formatter->format($message, []));
-    }
-
-    public function testDefaultFormatWithSetConvertToStringOverridesStringableObject(): void
-    {
-        $this->formatter->setConvertToString(
-            static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
+        $formatter = new Formatter(
+            stringConverter: static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
         );
         $object = new class {
             public function __toString(): string
@@ -363,33 +328,35 @@ final class FormatterTest extends TestCase
             'time' => 1_508_160_390,
             'obj' => $object,
         ]);
-        $result = $this->formatter->format($message, []);
+        $result = $formatter->format($message, []);
         $this->assertStringContainsString('obj: {}', $result);
         $this->assertStringNotContainsString('stringable-object', $result);
     }
 
-    public function testDefaultFormatWithSetConvertToStringDoesNotAffectTrace(): void
+    public function testStringConverterDoesNotAffectTrace(): void
     {
         $called = false;
-        $this->formatter->setConvertToString(static function (mixed $value) use (&$called): string {
-            $called = true;
-            return json_encode($value, JSON_THROW_ON_ERROR);
-        });
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
+        $formatter = new Formatter(
+            stringConverter: static function (mixed $value) use (&$called): string {
+                $called = true;
+                return json_encode($value, JSON_THROW_ON_ERROR);
+            },
+        );
+        $formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(LogLevel::INFO, 'message', [
             'time' => 1_508_160_390,
             'trace' => [['file' => '/path/to/file', 'line' => 99]],
         ]);
-        $result = $this->formatter->format($message, []);
+        $result = $formatter->format($message, []);
         $this->assertStringContainsString("trace:\n    in /path/to/file:99", $result);
         $this->assertTrue($called);
     }
 
-    public function testDefaultFormatWithSetContextFormatReceivesEmptyTrace(): void
+    public function testContextFormatReceivesEmptyTrace(): void
     {
         $receivedTrace = 'not-called';
-        $this->formatter->setContextFormat(
-            static function (string $trace, string $messageContext, string $commonContext) use (&$receivedTrace): string {
+        $formatter = new Formatter(
+            contextFormat: static function (string $trace, string $messageContext, string $commonContext) use (&$receivedTrace): string {
                 $receivedTrace = $trace;
                 return "\n" . $messageContext;
             },
@@ -398,15 +365,15 @@ final class FormatterTest extends TestCase
             'category' => 'app',
             'time' => 1_508_160_390,
         ]);
-        $this->formatter->format($message, []);
+        $formatter->format($message, []);
         $this->assertSame('', $receivedTrace);
     }
 
-    public function testDefaultFormatWithSetContextFormatReceivesEmptyCommonContext(): void
+    public function testContextFormatReceivesEmptyCommonContext(): void
     {
         $receivedCommon = 'not-called';
-        $this->formatter->setContextFormat(
-            static function (string $trace, string $messageContext, string $commonContext) use (&$receivedCommon): string {
+        $formatter = new Formatter(
+            contextFormat: static function (string $trace, string $messageContext, string $commonContext) use (&$receivedCommon): string {
                 $receivedCommon = $commonContext;
                 return "\n" . $messageContext;
             },
@@ -415,18 +382,14 @@ final class FormatterTest extends TestCase
             'category' => 'app',
             'time' => 1_508_160_390,
         ]);
-        $this->formatter->format($message, []);
+        $formatter->format($message, []);
         $this->assertSame('', $receivedCommon);
     }
 
-    public function testDefaultFormatWithSetConvertToStringAndSetContextFormat(): void
+    public function testDefaultFormatWithStringConverterAndContextFormat(): void
     {
-        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
-        $this->formatter->setConvertToString(
-            static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
-        );
-        $this->formatter->setContextFormat(
-            static function (string $trace, string $messageContext, string $commonContext): string {
+        $formatter = new Formatter(
+            contextFormat: static function (string $trace, string $messageContext, string $commonContext): string {
                 $result = '';
                 if ($commonContext !== '') {
                     $result .= "\n[C] " . $commonContext;
@@ -436,7 +399,9 @@ final class FormatterTest extends TestCase
                 }
                 return $result;
             },
+            stringConverter: static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
         );
+        $formatter->setTimestampFormat('Y-m-d H:i:s');
         $message = new Message(LogLevel::INFO, 'message', [
             'category' => 'app',
             'time' => 1_508_160_390,
@@ -445,7 +410,7 @@ final class FormatterTest extends TestCase
             . "\n[C] server: \"web\""
             . "\n[M] category: \"app\"\ntime: 1508160390"
         ;
-        $this->assertSame($expected, $this->formatter->format($message, ['server' => 'web']));
+        $this->assertSame($expected, $formatter->format($message, ['server' => 'web']));
     }
 
     public function testTraceWithFileWithoutLineUsesFunction(): void
@@ -519,20 +484,20 @@ final class FormatterTest extends TestCase
         $this->formatter->format(new Message(LogLevel::INFO, 'test', ['foo' => 'bar']), []);
     }
 
-    public function testFormatThrowExceptionForConvertToStringCallableReturnNotString(): void
+    public function testFormatThrowExceptionForStringConverterReturnNotString(): void
     {
-        $this->formatter->setConvertToString(static fn(mixed $value) => 123);
+        $formatter = new Formatter(stringConverter: static fn(mixed $value) => 123);
         $this->expectException(RuntimeException::class);
-        $this->formatter->format(new Message(LogLevel::INFO, 'test', ['foo' => 'bar']), []);
+        $formatter->format(new Message(LogLevel::INFO, 'test', ['foo' => 'bar']), []);
     }
 
     public function testFormatThrowExceptionForContextFormatCallableReturnNotString(): void
     {
-        $this->formatter->setContextFormat(
-            static fn(string $trace, string $messageContext, string $commonContext) => 123,
+        $formatter = new Formatter(
+            contextFormat: static fn(string $trace, string $messageContext, string $commonContext) => 123,
         );
         $this->expectException(RuntimeException::class);
-        $this->formatter->format(new Message(LogLevel::INFO, 'test', ['foo' => 'bar']), []);
+        $formatter->format(new Message(LogLevel::INFO, 'test', ['foo' => 'bar']), []);
     }
 
     public static function dataTime(): array

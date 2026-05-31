@@ -17,10 +17,16 @@ final class PsrTarget extends Target
      *
      * @param LoggerInterface $logger The logger instance to be used for messages processing.
      * @param string[] $levels The {@see LogLevel log message levels} that this target is interested in.
+     * @param string|callable|null $contextFormat A context format for the log context output. See {@see Target::__construct()}.
+     * @param callable|null $stringConverter A PHP callable that converts a context value to a string. See {@see Target::__construct()}.
      */
-    public function __construct(private LoggerInterface $logger, array $levels = [])
-    {
-        parent::__construct($levels);
+    public function __construct(
+        private LoggerInterface $logger,
+        array $levels = [],
+        string|callable|null $contextFormat = null,
+        ?callable $stringConverter = null,
+    ) {
+        parent::__construct($levels, $contextFormat, $stringConverter);
     }
 
     /**

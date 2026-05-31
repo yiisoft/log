@@ -23,8 +23,7 @@ final class Formatter
     /**
      * @var string|callable|null
      *
-     * @see Formatter::setContextFormat()
-     * @see Formatter::setContextTemplate()
+     * @see Formatter::__construct()
      */
     private $contextFormat = null;
 
@@ -50,7 +49,7 @@ final class Formatter
     /**
      * @var callable
      *
-     * @see Formatter::setConvertToString()
+     * @see Formatter::__construct()
      */
     private $stringConverter;
 
@@ -59,56 +58,21 @@ final class Formatter
      */
     private string $timestampFormat = 'Y-m-d H:i:s.u';
 
-    public function __construct()
-    {
-        $this->stringConverter = new VarDumperValueConverter();
-    }
-
     /**
-     * Sets a PHP callable that returns a string representation of the log context.
-     *
-     * If not set, the default context format will be used.
-     * This and {@see Formatter::setContextTemplate()} share the same setting, so the one set last takes effect.
-     *
-     * The signature of the callable should be
-     * `function (string $trace, string $messageContext, string $commonContext): string;`.
-     *
-     * @param callable $contextFormat The PHP callable to format the log context.
+     * @param string|callable|null $contextFormat A context format. A template string supports `{trace}`,
+     * `{message}` and `{common}` placeholders, each replaced with its formatted section (including header) if
+     * non-empty, or an empty string otherwise. For example, `"{common}{message}{trace}\n"` outputs common
+     * context first, then message context, then trace. A PHP callable gives full control over context rendering;
+     * its signature should be `function (string $trace, string $messageContext, string $commonContext): string;`.
+     * @param callable|null $stringConverter A PHP callable that converts a context value to a string. Its
+     * signature should be `function (mixed $value): string;`. Defaults to {@see VarDumperValueConverter}.
      */
-    public function setContextFormat(callable $contextFormat): void
-    {
+    public function __construct(
+        string|callable|null $contextFormat = null,
+        ?callable $stringConverter = null,
+    ) {
         $this->contextFormat = $contextFormat;
-    }
-
-    /**
-     * Sets a template string for the context output.
-     *
-     * Supports `{trace}`, `{message}`, and `{common}` placeholders. Each placeholder is replaced with its
-     * formatted section (including header) if non-empty, or an empty string if the section has no data.
-     *
-     * For example, `"{common}{message}{trace}\n"` outputs common context first, then message context, then trace.
-     *
-     * This and {@see Formatter::setContextFormat()} share the same setting, so the one set last takes effect.
-     *
-     * @param string $contextTemplate The template string with `{trace}`, `{message}`, and `{common}` placeholders.
-     */
-    public function setContextTemplate(string $contextTemplate): void
-    {
-        $this->contextFormat = $contextTemplate;
-    }
-
-    /**
-     * Sets a PHP callable that converts a value to a string.
-     *
-     * If not set, the default VarDumper-based conversion will be used.
-     *
-     * The signature of the callable should be `function (mixed $value): string;`.
-     *
-     * @param callable $convertToString The PHP callable to convert a value to a string.
-     */
-    public function setConvertToString(callable $convertToString): void
-    {
-        $this->stringConverter = $convertToString;
+        $this->stringConverter = $stringConverter ?? new VarDumperValueConverter();
     }
 
     /**

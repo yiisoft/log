@@ -2,7 +2,7 @@
 
 ## 2.2.2 under development
 
-- New #140: Add `setConvertToString()`, `setContextTemplate()`, and `setContextFormat()` to `Formatter` and `Target` (@WarLikeLaux)
+- New #140: Add `$contextFormat` and `$stringConverter` constructor parameters to `Target` for customizing context output (@WarLikeLaux)
 
 ## 2.2.1 March 22, 2026
 

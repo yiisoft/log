@@ -247,25 +247,29 @@ To change the timestamp format:
 $target->setTimestampFormat('Y-m-d H:i:s');
 ```
 
-To replace how context values are converted to strings (default uses VarDumper):
+The context output is customized via constructor parameters.
+
+To replace how context values are converted to strings (default uses VarDumper), pass `stringConverter`:
 
 ```php
-$target->setConvertToString(static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR));
+$target = new \Yiisoft\Log\StreamTarget(
+    stringConverter: static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
+);
 ```
 
-To reorder context sections (trace, message context, common context) use a template string with
-`{trace}`, `{message}`, and `{common}` placeholders. Each placeholder expands to its section with
+To reorder context sections (trace, message context, common context), pass a `contextFormat` template string
+with `{trace}`, `{message}`, and `{common}` placeholders. Each placeholder expands to its section with
 a header when non-empty, or an empty string when the section has no data:
 
 ```php
-$target->setContextTemplate("{common}{message}{trace}\n");
+$target = new \Yiisoft\Log\StreamTarget(contextFormat: "{common}{message}{trace}\n");
 ```
 
-For full control over context rendering, use a callable:
+For full control over context rendering, pass a `contextFormat` callable instead:
 
 ```php
-$target->setContextFormat(
-    static function (string $trace, string $messageContext, string $commonContext): string {
+$target = new \Yiisoft\Log\StreamTarget(
+    contextFormat: static function (string $trace, string $messageContext, string $commonContext): string {
         $result = '';
         if ($commonContext !== '') {
             $result .= "\n\nCommon:\n" . $commonContext;
@@ -278,7 +282,7 @@ $target->setContextFormat(
 );
 ```
 
-`setContextFormat()` and `setContextTemplate()` share the same setting, so the one called last takes effect.
+`contextFormat` accepts either a template string or a callable.
 
 ### Configuring `LoggerInterface` in Yii3
 

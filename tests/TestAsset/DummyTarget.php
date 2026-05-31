@@ -14,10 +14,13 @@ final class DummyTarget extends Target
     private array $exportMessages = [];
     private Formatter $exportFormatter;
 
-    public function __construct(array $levels = [])
-    {
-        parent::__construct($levels);
-        $this->exportFormatter = new Formatter();
+    public function __construct(
+        array $levels = [],
+        string|callable|null $contextFormat = null,
+        ?callable $stringConverter = null,
+    ) {
+        parent::__construct($levels, $contextFormat, $stringConverter);
+        $this->exportFormatter = new Formatter($contextFormat, $stringConverter);
     }
 
     public function export(): void
@@ -80,24 +83,6 @@ final class DummyTarget extends Target
     public function getCommonContext(): array
     {
         return parent::getCommonContext();
-    }
-
-    public function setContextFormat(callable $contextFormat): self
-    {
-        $this->exportFormatter->setContextFormat($contextFormat);
-        return parent::setContextFormat($contextFormat);
-    }
-
-    public function setContextTemplate(string $contextTemplate): self
-    {
-        $this->exportFormatter->setContextTemplate($contextTemplate);
-        return parent::setContextTemplate($contextTemplate);
-    }
-
-    public function setConvertToString(callable $convertToString): self
-    {
-        $this->exportFormatter->setConvertToString($convertToString);
-        return parent::setConvertToString($convertToString);
     }
 
     public function setFormat(callable $format): self

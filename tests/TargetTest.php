@@ -258,10 +258,10 @@ final class TargetTest extends TestCase
         $this->target->setLevels($list);
     }
 
-    public function testSetConvertToString(): void
+    public function testStringConverter(): void
     {
-        $this->target->setConvertToString(
-            static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
+        $this->target = new DummyTarget(
+            stringConverter: static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
         );
         $this->target->setCommonContext(['server' => 'web']);
         $this->collectOneAndExport(LogLevel::INFO, 'message', [
@@ -275,10 +275,10 @@ final class TargetTest extends TestCase
         $this->assertSame($expected, $this->target->formatMessages());
     }
 
-    public function testSetContextTemplate(): void
+    public function testContextTemplate(): void
     {
+        $this->target = new DummyTarget(contextFormat: "{common}{message}\n");
         $this->target->setTimestampFormat('Y-m-d H:i:s');
-        $this->target->setContextTemplate("{common}{message}\n");
         $this->target->setCommonContext(['server' => 'web']);
         $this->collectOneAndExport(LogLevel::INFO, 'message', [
             'category' => 'app',
@@ -292,11 +292,10 @@ final class TargetTest extends TestCase
         $this->assertSame($expected, $this->target->formatMessages());
     }
 
-    public function testSetContextFormat(): void
+    public function testContextFormat(): void
     {
-        $this->target->setTimestampFormat('Y-m-d H:i:s');
-        $this->target->setContextFormat(
-            static function (string $trace, string $messageContext, string $commonContext): string {
+        $this->target = new DummyTarget(
+            contextFormat: static function (string $trace, string $messageContext, string $commonContext): string {
                 $result = '';
                 if ($commonContext !== '') {
                     $result .= "\n\nCommon:\n" . $commonContext;
@@ -307,6 +306,7 @@ final class TargetTest extends TestCase
                 return $result;
             },
         );
+        $this->target->setTimestampFormat('Y-m-d H:i:s');
         $this->target->setCommonContext(['server' => 'web']);
         $this->collectOneAndExport(LogLevel::INFO, 'message', [
             'category' => 'app',

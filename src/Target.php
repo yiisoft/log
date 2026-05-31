@@ -30,7 +30,7 @@ use function sprintf;
 abstract class Target
 {
     /**
-     * @var int
+     * @psalm-suppress MissingClassConstType
      */
     public const DEFAULT_EXPORT_INTERVAL = 1000;
 

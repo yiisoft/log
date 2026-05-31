@@ -22,9 +22,6 @@ use function is_int;
  */
 final class Formatter
 {
-    /**
-     * @var string
-     */
     private const DEFAULT_TIMESTAMP_FORMAT = 'Y-m-d H:i:s.u';
 
     /**

@@ -114,11 +114,15 @@ $logger->setFlushInterval(100); // по умолчанию 1000
 ```
 
 Каждый таргет тоже накапливает сообщения в памяти. Экспорт работает по тому же принципу.
-Количество сообщений перед экспортом настраивается через `\Yiisoft\Log\Target::setExportInterval()`:
+Количество сообщений перед экспортом задаётся параметром конструктора `exportInterval`:
 
 ```php
-$target->setExportInterval(100); // по умолчанию 1000
+$target = new \Yiisoft\Log\StreamTarget(exportInterval: 100); // по умолчанию 1000
 ```
+
+> Сеттер `setExportInterval()` объявлен устаревшим с версии 2.2.2, используйте вместо него параметр конструктора.
+> То же касается `setCategories()`, `setExcept()`, `setLevels()`, `setFormat()`, `setPrefix()`,
+> `setTimestampFormat()` и `setEnabled()`.
 
 > Примечание: сброс и экспорт всех сообщений также происходит при завершении приложения.
 

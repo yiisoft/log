@@ -31,10 +31,26 @@ final class StreamTarget extends Target
     /**
      * @param resource|string $stream A string stream identifier or a stream resource.
      * @param string[] $levels The {@see LogLevel log message levels} that this target is interested in.
+     * @param string[] $categories The log message categories that this target is interested in.
+     * @param string[] $except The log message categories that this target is NOT interested in.
+     * @param callable|null $format A PHP callable that returns a string representation of the log message.
+     * @param callable|null $prefix A PHP callable that returns a string to be prefixed to every exported message.
+     * @param string|null $timestampFormat The date format for the log timestamp.
+     * @param int|null $exportInterval How many messages should be accumulated before they are exported.
+     * @param bool|callable $enabled Whether this target is enabled, or a PHP callable that returns a boolean.
      */
-    public function __construct(private $stream = 'php://stdout', array $levels = [])
-    {
-        parent::__construct($levels);
+    public function __construct(
+        private $stream = 'php://stdout',
+        array $levels = [],
+        array $categories = [],
+        array $except = [],
+        ?callable $format = null,
+        ?callable $prefix = null,
+        ?string $timestampFormat = null,
+        ?int $exportInterval = null,
+        bool|callable $enabled = true,
+    ) {
+        parent::__construct($levels, $categories, $except, $format, $prefix, $timestampFormat, $exportInterval, $enabled);
     }
 
     protected function export(): void

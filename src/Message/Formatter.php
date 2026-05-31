@@ -47,6 +47,25 @@ final class Formatter
     private string $timestampFormat = 'Y-m-d H:i:s.u';
 
     /**
+     * @param callable|null $format A PHP callable that returns a string representation of the log message.
+     * Its signature should be `function (Message $message, array $commonContext): string;`.
+     * @param callable|null $prefix A PHP callable that returns a string to be prefixed to every exported message.
+     * Its signature should be `function (Message $message, array $commonContext): string;`.
+     * @param string|null $timestampFormat The date format for the log timestamp. Defaults to `Y-m-d H:i:s.u`.
+     */
+    public function __construct(
+        ?callable $format = null,
+        ?callable $prefix = null,
+        ?string $timestampFormat = null,
+    ) {
+        $this->format = $format;
+        $this->prefix = $prefix;
+        if ($timestampFormat !== null) {
+            $this->timestampFormat = $timestampFormat;
+        }
+    }
+
+    /**
      * Sets the format for the string representation of the log message.
      *
      * @param callable $format The PHP callable to get a string representation of the log message.

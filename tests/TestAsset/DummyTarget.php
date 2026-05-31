@@ -14,10 +14,18 @@ final class DummyTarget extends Target
     private array $exportMessages = [];
     private Formatter $exportFormatter;
 
-    public function __construct(array $levels = [])
-    {
-        parent::__construct($levels);
-        $this->exportFormatter = new Formatter();
+    public function __construct(
+        array $levels = [],
+        array $categories = [],
+        array $except = [],
+        ?callable $format = null,
+        ?callable $prefix = null,
+        ?string $timestampFormat = null,
+        ?int $exportInterval = null,
+        bool|callable $enabled = true,
+    ) {
+        parent::__construct($levels, $categories, $except, $format, $prefix, $timestampFormat, $exportInterval, $enabled);
+        $this->exportFormatter = new Formatter($format, $prefix, $timestampFormat);
     }
 
     public function export(): void

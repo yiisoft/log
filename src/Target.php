@@ -77,12 +77,36 @@ abstract class Target
      * When defining a constructor in child classes, you must call `parent::__construct()`.
      *
      * @param string[] $levels The {@see \Psr\Log\LogLevel log message levels} that this target is interested in.
+     * @param string[] $categories The log message categories that this target is interested in.
+     * @param string[] $except The log message categories that this target is NOT interested in.
+     * @param callable|null $format A PHP callable that returns a string representation of the log message.
+     * @param callable|null $prefix A PHP callable that returns a string to be prefixed to every exported message.
+     * @param string|null $timestampFormat The date format for the log timestamp.
+     * @param int|null $exportInterval How many messages should be accumulated before they are exported.
+     * @param bool|callable $enabled Whether this target is enabled, or a PHP callable that returns a boolean.
      */
-    public function __construct(array $levels = [])
-    {
+    public function __construct(
+        array $levels = [],
+        array $categories = [],
+        array $except = [],
+        ?callable $format = null,
+        ?callable $prefix = null,
+        ?string $timestampFormat = null,
+        ?int $exportInterval = null,
+        bool|callable $enabled = true,
+    ) {
         $this->categories = new CategoryFilter();
-        $this->formatter = new Formatter();
-        $this->setLevels($levels);
+        $this->categories->include($categories);
+        $this->categories->exclude($except);
+        $this->formatter = new Formatter($format, $prefix, $timestampFormat);
+        $this->assertLevelsAreValid($levels);
+        $this->levels = $levels;
+
+        if ($exportInterval !== null) {
+            $this->exportInterval = $exportInterval;
+        }
+
+        $this->enabled = $enabled;
     }
 
     /**
@@ -119,6 +143,8 @@ abstract class Target
      * @return self
      *
      * @see CategoryFilter::$include
+     *
+     * @deprecated since 2.2.2, to be removed in 3.0. Use the `$categories` constructor parameter instead.
      */
     public function setCategories(array $categories): self
     {
@@ -136,6 +162,8 @@ abstract class Target
      * @return self
      *
      * @see CategoryFilter::$exclude
+     *
+     * @deprecated since 2.2.2, to be removed in 3.0. Use the `$except` constructor parameter instead.
      */
     public function setExcept(array $except): self
     {
@@ -153,14 +181,12 @@ abstract class Target
      * @return self
      *
      * @see Target::$levels
+     *
+     * @deprecated since 2.2.2, to be removed in 3.0. Use the `$levels` constructor parameter instead.
      */
     public function setLevels(array $levels): self
     {
-        foreach ($levels as $key => $level) {
-            Logger::assertLevelIsValid($level);
-            $levels[$key] = $level;
-        }
-
+        $this->assertLevelsAreValid($levels);
         $this->levels = $levels;
         return $this;
     }
@@ -190,6 +216,8 @@ abstract class Target
      * @return self
      *
      * @see Formatter::$format
+     *
+     * @deprecated since 2.2.2, to be removed in 3.0. Use the `$format` constructor parameter instead.
      */
     public function setFormat(callable $format): self
     {
@@ -205,6 +233,8 @@ abstract class Target
      * @return self
      *
      * @see Formatter::$prefix
+     *
+     * @deprecated since 2.2.2, to be removed in 3.0. Use the `$prefix` constructor parameter instead.
      */
     public function setPrefix(callable $prefix): self
     {
@@ -220,6 +250,8 @@ abstract class Target
      * @return self
      *
      * @see Target::$exportInterval
+     *
+     * @deprecated since 2.2.2, to be removed in 3.0. Use the `$exportInterval` constructor parameter instead.
      */
     public function setExportInterval(int $exportInterval): self
     {
@@ -235,6 +267,8 @@ abstract class Target
      * @return self
      *
      * @see Target::$timestampFormat
+     *
+     * @deprecated since 2.2.2, to be removed in 3.0. Use the `$timestampFormat` constructor parameter instead.
      */
     public function setTimestampFormat(string $format): self
     {
@@ -252,6 +286,8 @@ abstract class Target
      * @return self
      *
      * @see Target::$enabled
+     *
+     * @deprecated since 2.2.2, to be removed in 3.0. Use the `$enabled` constructor parameter instead.
      */
     public function setEnabled(callable $value): self
     {
@@ -370,6 +406,20 @@ abstract class Target
     protected function getCommonContext(): array
     {
         return $this->commonContext;
+    }
+
+    /**
+     * Asserts that every given log message level is valid.
+     *
+     * @param string[] $levels The list of log message levels.
+     *
+     * @throws InvalidArgumentException for invalid log message level.
+     */
+    private function assertLevelsAreValid(array $levels): void
+    {
+        foreach ($levels as $level) {
+            Logger::assertLevelIsValid($level);
+        }
     }
 
     /**

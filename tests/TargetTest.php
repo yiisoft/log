@@ -346,6 +346,81 @@ final class TargetTest extends TestCase
         $this->assertSame((int) $export, $this->target->getExportCount());
     }
 
+    public function testTimestampFormatViaConstructor(): void
+    {
+        $target = new DummyTarget(timestampFormat: 'Y-m-d H:i:s');
+        $target->collect([new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390])], true);
+        $expected = '2017-10-16 13:26:30 [info][app] message'
+            . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390\n";
+
+        $this->assertSame($expected, $target->formatMessages());
+    }
+
+    public function testExportIntervalViaConstructor(): void
+    {
+        $target = new DummyTarget(exportInterval: 1);
+        $target->collect([new Message(LogLevel::INFO, 'message', ['category' => 'app'])], false);
+
+        $this->assertSame(1, $target->getExportCount());
+    }
+
+    public function testFormatViaConstructor(): void
+    {
+        $target = new DummyTarget(format: static fn(Message $message) => "[{$message->level()}] {$message->message()}");
+        $target->collect([new Message(LogLevel::INFO, 'message', ['category' => 'app'])], true);
+
+        $this->assertSame('[info] message', $target->formatMessages());
+    }
+
+    public function testPrefixViaConstructor(): void
+    {
+        $target = new DummyTarget(prefix: static fn(): string => 'PFX: ', timestampFormat: 'Y-m-d H:i:s');
+        $target->collect([new Message(LogLevel::INFO, 'message', ['category' => 'app', 'time' => 1_508_160_390])], true);
+        $expected = '2017-10-16 13:26:30 PFX: [info][app] message'
+            . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390\n";
+
+        $this->assertSame($expected, $target->formatMessages());
+    }
+
+    public function testCategoriesViaConstructor(): void
+    {
+        $target = new DummyTarget(categories: ['app']);
+        $target->collect(
+            [
+                new Message(LogLevel::INFO, 'in', ['category' => 'app']),
+                new Message(LogLevel::INFO, 'out', ['category' => 'other']),
+            ],
+            true,
+        );
+        $messages = $target->getExportMessages();
+
+        $this->assertCount(1, $messages);
+        $this->assertSame('in', $messages[0]->message());
+    }
+
+    public function testExceptViaConstructor(): void
+    {
+        $target = new DummyTarget(except: ['app']);
+        $target->collect(
+            [
+                new Message(LogLevel::INFO, 'in', ['category' => 'other']),
+                new Message(LogLevel::INFO, 'out', ['category' => 'app']),
+            ],
+            true,
+        );
+        $messages = $target->getExportMessages();
+
+        $this->assertCount(1, $messages);
+        $this->assertSame('in', $messages[0]->message());
+    }
+
+    public function testEnabledViaConstructor(): void
+    {
+        $target = new DummyTarget(enabled: false);
+
+        $this->assertFalse($target->isEnabled());
+    }
+
     public function contextProvider(): array
     {
         return [

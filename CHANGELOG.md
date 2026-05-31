@@ -2,7 +2,7 @@
 
 ## 2.2.2 under development
 
-- no changes in this release.
+- Enh #XXX: Move `Target` configuration to constructor parameters and deprecate the corresponding setters (@WarLikeLaux)
 
 ## 2.2.1 March 22, 2026
 

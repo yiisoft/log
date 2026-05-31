@@ -186,7 +186,7 @@ abstract class Target
      * Sets a PHP callable that returns a string representation of the log context.
      *
      * If not set, the default context format will be used.
-     * If both this and {@see Target::setContextTemplate()} are set, the callable takes precedence.
+     * This and {@see Target::setContextTemplate()} share the same setting, so the one set last takes effect.
      *
      * The signature of the callable should be
      * `function (string $trace, string $messageContext, string $commonContext): string;`.
@@ -208,6 +208,8 @@ abstract class Target
      * formatted section (including header) if non-empty, or an empty string if the section has no data.
      *
      * For example, `"{common}{message}{trace}\n"` outputs common context first, then message context, then trace.
+     *
+     * This and {@see Target::setContextFormat()} share the same setting, so the one set last takes effect.
      *
      * @param string $contextTemplate The template string with `{trace}`, `{message}`, and `{common}` placeholders.
      *

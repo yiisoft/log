@@ -312,8 +312,9 @@ final class FormatterTest extends TestCase
         $this->assertSame($expected, $this->formatter->format($message, ['server' => 'web']));
     }
 
-    public function testContextFormatTakesPrecedenceOverContextTemplate(): void
+    public function testSetContextFormatOverridesContextTemplate(): void
     {
+        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
         $this->formatter->setContextTemplate("{common}{message}\n");
         $this->formatter->setContextFormat(
             static fn(string $trace, string $messageContext, string $commonContext): string => '[custom]',
@@ -322,9 +323,28 @@ final class FormatterTest extends TestCase
             'category' => 'app',
             'time' => 1_508_160_390,
         ]);
-        $result = $this->formatter->format($message, []);
-        $this->assertStringContainsString('[custom]', $result);
-        $this->assertStringNotContainsString('Common context', $result);
+        $expected = '2017-10-16 13:26:30 [info][app] message[custom]';
+
+        $this->assertSame($expected, $this->formatter->format($message, []));
+    }
+
+    public function testSetContextTemplateOverridesContextFormat(): void
+    {
+        $this->formatter->setTimestampFormat('Y-m-d H:i:s');
+        $this->formatter->setContextFormat(
+            static fn(string $trace, string $messageContext, string $commonContext): string => '[custom]',
+        );
+        $this->formatter->setContextTemplate("{common}{message}\n");
+        $message = new Message(LogLevel::INFO, 'message', [
+            'category' => 'app',
+            'time' => 1_508_160_390,
+        ]);
+        $expected = '2017-10-16 13:26:30 [info][app] message'
+            . "\n\nMessage context:\n\ncategory: 'app'\ntime: 1508160390"
+            . "\n"
+        ;
+
+        $this->assertSame($expected, $this->formatter->format($message, []));
     }
 
     public function testDefaultFormatWithSetConvertToStringOverridesStringableObject(): void

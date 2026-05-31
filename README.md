@@ -278,7 +278,7 @@ $target->setContextFormat(
 );
 ```
 
-If both `setContextFormat()` and `setContextTemplate()` are set, the callable takes precedence.
+`setContextFormat()` and `setContextTemplate()` share the same setting, so the one called last takes effect.
 
 ### Configuring `LoggerInterface` in Yii3
 

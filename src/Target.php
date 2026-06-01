@@ -43,6 +43,25 @@ abstract class Target
     private array $messages = [];
 
     /**
+     * @var string[] The log message levels that this target is interested in.
+     *
+     * @see LogLevel See constants for valid level names.
+     *
+     * The value should be an array of level names.
+     *
+     * For example:
+     *
+     * ```php
+     * ['error', 'warning'],
+     * // or
+     * [LogLevel::ERROR, LogLevel::WARNING]
+     * ```
+     *
+     * Defaults is empty array, meaning all available levels.
+     */
+    private array $levels = [];
+
+    /**
      * @var array The user parameters in the `key => value` format that should be logged in a each message.
      */
     private array $commonContext = [];
@@ -65,7 +84,7 @@ abstract class Target
      * @param bool|callable $enabled Whether this target is enabled, or a PHP callable that returns a boolean.
      */
     public function __construct(
-        private array $levels = [],
+        array $levels = [],
         array $categories = [],
         array $exceptCategories = [],
         ?callable $format = null,
@@ -74,9 +93,10 @@ abstract class Target
         private int $exportInterval = self::DEFAULT_EXPORT_INTERVAL,
         bool|callable $enabled = true,
     ) {
-        $this->assertLevelsAreValid($this->levels);
         $this->categories = new CategoryFilter($categories, $exceptCategories);
         $this->formatter = new Formatter($format, $prefix, $timestampFormat);
+        /** @psalm-suppress DeprecatedMethod */
+        $this->setLevels($levels);
         $this->enabled = $enabled;
     }
 
@@ -157,7 +177,10 @@ abstract class Target
      */
     public function setLevels(array $levels): self
     {
-        $this->assertLevelsAreValid($levels);
+        foreach ($levels as $level) {
+            Logger::assertLevelIsValid($level);
+        }
+
         $this->levels = $levels;
         return $this;
     }
@@ -377,20 +400,6 @@ abstract class Target
     protected function getCommonContext(): array
     {
         return $this->commonContext;
-    }
-
-    /**
-     * Asserts that every given log message level is valid.
-     *
-     * @param string[] $levels The list of log message levels.
-     *
-     * @throws InvalidArgumentException for invalid log message level.
-     */
-    private function assertLevelsAreValid(array $levels): void
-    {
-        foreach ($levels as $level) {
-            Logger::assertLevelIsValid($level);
-        }
     }
 
     /**

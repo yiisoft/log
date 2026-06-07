@@ -22,29 +22,22 @@ use function is_int;
  */
 final class Formatter
 {
-    /**
-     * @var callable|null PHP callable that returns a string representation of the log message.
-     *
-     * If not set, {@see Formatter::defaultFormat()} will be used.
-     *
-     * The signature of the callable should be `function (Message $message, array $commonContext): string;`.
-     */
-    private $format;
+    private const DEFAULT_TIMESTAMP_FORMAT = 'Y-m-d H:i:s.u';
 
     /**
-     * @var callable|null PHP callable that returns a string to be prefixed to every exported message.
-     *
-     * If not set, {@see Formatter::getPrefix()} will be used, which prefixes
-     * the message with context information such as user IP, user ID and session ID.
-     *
-     * The signature of the callable should be `function (Message $message, array $commonContext): string;`.
+     * @param callable|null $format A PHP callable that returns a string representation of the log message.
+     * If not set, {@see Formatter::defaultFormat()} is used.
+     * Its signature should be `function (Message $message, array $commonContext): string;`.
+     * @param callable|null $prefix A PHP callable that returns a string to be prefixed to every exported message.
+     * If not set, {@see Formatter::getPrefix()} is used.
+     * Its signature should be `function (Message $message, array $commonContext): string;`.
+     * @param string|null $timestampFormat The date format for the log timestamp. Defaults to `Y-m-d H:i:s.u`.
      */
-    private $prefix;
-
-    /**
-     * @var string The date format for the log timestamp. Defaults to `Y-m-d H:i:s.u`.
-     */
-    private string $timestampFormat = 'Y-m-d H:i:s.u';
+    public function __construct(
+        private $format = null,
+        private $prefix = null,
+        private ?string $timestampFormat = null,
+    ) {}
 
     /**
      * Sets the format for the string representation of the log message.
@@ -120,7 +113,7 @@ final class Formatter
      */
     private function defaultFormat(Message $message, array $commonContext): string
     {
-        $time = $message->time()->format($this->timestampFormat);
+        $time = $message->time()->format($this->timestampFormat ?? self::DEFAULT_TIMESTAMP_FORMAT);
         $prefix = $this->getPrefix($message, $commonContext);
         $context = $this->getContext($message, $commonContext);
 

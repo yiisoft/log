@@ -9,6 +9,7 @@ use RuntimeException;
 use Yiisoft\Log\ContextProvider\CommonContextProvider;
 use Yiisoft\Log\Message\CategoryFilter;
 use Yiisoft\Log\Message\Formatter;
+use Psr\Log\LogLevel;
 
 use function count;
 use function in_array;
@@ -28,6 +29,11 @@ use function sprintf;
  */
 abstract class Target
 {
+    /**
+     * @psalm-suppress MissingClassConstType
+     */
+    public const DEFAULT_EXPORT_INTERVAL = 1000;
+
     private CategoryFilter $categories;
     private Formatter $formatter;
 
@@ -61,14 +67,6 @@ abstract class Target
     private array $commonContext = [];
 
     /**
-     * @var int How many log messages should be accumulated before they are exported.
-     *
-     * Defaults to 1000. Note that messages will always be exported when the application terminates.
-     * Set this property to be 0 if you don't want to export messages until the application terminates.
-     */
-    private int $exportInterval = 1000;
-
-    /**
      * @var bool|callable Enables or disables the current target to export.
      */
     private $enabled = true;
@@ -76,21 +74,37 @@ abstract class Target
     /**
      * When defining a constructor in child classes, you must call `parent::__construct()`.
      *
-     * @param string[] $levels The {@see \Psr\Log\LogLevel log message levels} that this target is interested in.
+     * @param string[] $levels The {@see LogLevel log message levels} that this target is interested in.
+     * @param string[] $categories The log message categories that this target is interested in.
+     * @param string[] $exceptCategories The log message categories that this target is NOT interested in.
+     * @param callable|null $format A PHP callable that returns a string representation of the log message.
+     * @param callable|null $prefix A PHP callable that returns a string to be prefixed to every exported message.
+     * @param string|null $timestampFormat The date format for the log timestamp.
      * @param string|callable|null $contextFormat A context format for the log context output. A template string
      * supports `{trace}`, `{message}` and `{common}` placeholders, or a PHP callable for full control. See
      * {@see Formatter::__construct()}.
      * @param callable|null $stringConverter A PHP callable that converts a context value to a string.
      * See {@see Formatter::__construct()}.
+     * @param int $exportInterval How many messages should be accumulated before they are exported.
+     * @param bool|callable $enabled Whether this target is enabled, or a PHP callable that returns a boolean.
      */
     public function __construct(
         array $levels = [],
+        array $categories = [],
+        array $exceptCategories = [],
+        ?callable $format = null,
+        ?callable $prefix = null,
+        ?string $timestampFormat = null,
         string|callable|null $contextFormat = null,
         ?callable $stringConverter = null,
+        private int $exportInterval = self::DEFAULT_EXPORT_INTERVAL,
+        bool|callable $enabled = true,
     ) {
-        $this->categories = new CategoryFilter();
-        $this->formatter = new Formatter($contextFormat, $stringConverter);
+        $this->categories = new CategoryFilter($categories, $exceptCategories);
+        $this->formatter = new Formatter($format, $prefix, $timestampFormat, $contextFormat, $stringConverter);
+        /** @psalm-suppress DeprecatedMethod */
         $this->setLevels($levels);
+        $this->enabled = $enabled;
     }
 
     /**
@@ -127,6 +141,8 @@ abstract class Target
      * @return self
      *
      * @see CategoryFilter::$include
+     *
+     * @deprecated To be removed in 3.0. Use the `$categories` constructor parameter instead.
      */
     public function setCategories(array $categories): self
     {
@@ -144,6 +160,8 @@ abstract class Target
      * @return self
      *
      * @see CategoryFilter::$exclude
+     *
+     * @deprecated To be removed in 3.0. Use the `$exceptCategories` constructor parameter instead.
      */
     public function setExcept(array $except): self
     {
@@ -152,7 +170,7 @@ abstract class Target
     }
 
     /**
-     * Sets a list of {@see \Psr\Log\LogLevel log message levels} that current target is interested in.
+     * Sets a list of {@see LogLevel log message levels} that current target is interested in.
      *
      * @param string[] $levels The list of log message levels.
      *
@@ -161,12 +179,13 @@ abstract class Target
      * @return self
      *
      * @see Target::$levels
+     *
+     * @deprecated To be removed in 3.0. Use the `$levels` constructor parameter instead.
      */
     public function setLevels(array $levels): self
     {
-        foreach ($levels as $key => $level) {
+        foreach ($levels as $level) {
             Logger::assertLevelIsValid($level);
-            $levels[$key] = $level;
         }
 
         $this->levels = $levels;
@@ -198,6 +217,8 @@ abstract class Target
      * @return self
      *
      * @see Formatter::$format
+     *
+     * @deprecated To be removed in 3.0. Use the `$format` constructor parameter instead.
      */
     public function setFormat(callable $format): self
     {
@@ -213,6 +234,8 @@ abstract class Target
      * @return self
      *
      * @see Formatter::$prefix
+     *
+     * @deprecated To be removed in 3.0. Use the `$prefix` constructor parameter instead.
      */
     public function setPrefix(callable $prefix): self
     {
@@ -228,6 +251,8 @@ abstract class Target
      * @return self
      *
      * @see Target::$exportInterval
+     *
+     * @deprecated To be removed in 3.0. Use the `$exportInterval` constructor parameter instead.
      */
     public function setExportInterval(int $exportInterval): self
     {
@@ -243,6 +268,8 @@ abstract class Target
      * @return self
      *
      * @see Target::$timestampFormat
+     *
+     * @deprecated To be removed in 3.0. Use the `$timestampFormat` constructor parameter instead.
      */
     public function setTimestampFormat(string $format): self
     {
@@ -260,6 +287,8 @@ abstract class Target
      * @return self
      *
      * @see Target::$enabled
+     *
+     * @deprecated To be removed in 3.0. Use the `$enabled` constructor parameter instead.
      */
     public function setEnabled(callable $value): self
     {

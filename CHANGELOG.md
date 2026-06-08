@@ -3,6 +3,7 @@
 ## 2.2.2 under development
 
 - New #140: Add `$contextFormat` and `$stringConverter` constructor parameters to `Target` for customizing context output (@WarLikeLaux)
+- Enh #146: Move `Target` configuration to constructor parameters and deprecate the corresponding setters (@WarLikeLaux)
 
 ## 2.2.1 March 22, 2026
 

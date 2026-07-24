@@ -227,6 +227,67 @@ $logger = new \Yiisoft\Log\Logger(
 );
 ```
 
+### Customizing log format
+
+Each target formats log messages using a built-in `Formatter`. You can customize various aspects of formatting.
+
+To replace the entire message format, use `setFormat()`:
+
+```php
+$target->setFormat(static function (\Yiisoft\Log\Message $message, array $commonContext): string {
+    return "[{$message->level()}][{$message->context('category')}] {$message->message()}";
+});
+```
+
+To add a prefix to every message:
+
+```php
+$target->setPrefix(static fn() => 'MyApp: ');
+```
+
+To change the timestamp format:
+
+```php
+$target->setTimestampFormat('Y-m-d H:i:s');
+```
+
+The context output is customized via constructor parameters.
+
+To replace how context values are converted to strings (default uses VarDumper), pass `stringConverter`:
+
+```php
+$target = new \Yiisoft\Log\StreamTarget(
+    stringConverter: static fn(mixed $value): string => json_encode($value, JSON_THROW_ON_ERROR),
+);
+```
+
+To reorder context sections (trace, message context, common context), pass a `contextFormat` template string
+with `{trace}`, `{message}`, and `{common}` placeholders. Each placeholder expands to its section with
+a header when non-empty, or an empty string when the section has no data:
+
+```php
+$target = new \Yiisoft\Log\StreamTarget(contextFormat: "{common}{message}{trace}\n");
+```
+
+For full control over context rendering, pass a `contextFormat` callable instead:
+
+```php
+$target = new \Yiisoft\Log\StreamTarget(
+    contextFormat: static function (string $trace, string $messageContext, string $commonContext): string {
+        $result = '';
+        if ($commonContext !== '') {
+            $result .= "\n\nCommon:\n" . $commonContext;
+        }
+        if ($messageContext !== '') {
+            $result .= "\n\nMessage:\n" . $messageContext;
+        }
+        return $result;
+    },
+);
+```
+
+`contextFormat` accepts either a template string or a callable.
+
 ### Configuring `LoggerInterface` in Yii3
 
 In a Yii3 application, `Psr\Log\LoggerInterface` is resolved through the DI container.

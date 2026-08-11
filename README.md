@@ -118,6 +118,40 @@ $logger->info('Payment processed', [
 ]);
 ```
 
+### Recommended logging practices
+
+The following recommendations are based on [Proper logging in PHP with PSR-3](https://ocramius.github.io/blog/php-logging-with-psr-3/)
+and help keep logs useful, structured, and reliable:
+
+- Inject `Psr\Log\LoggerInterface` into services instead of using global state or fetching a logger from a container at
+  the call site. This makes logging dependencies explicit and allows a test logger to be supplied in tests.
+- Keep the message template static and pass variable data as context. For example, prefer
+  `$logger->info('User {username} logged in', ['username' => $username])` to concatenating `$username` into the message.
+  The logger interpolates placeholders while preserving the original context for targets that support structured logs.
+- When logging a caught exception or error, pass the `Throwable` itself under the PSR-3 `exception` key:
+
+  ```php
+  try {
+      $service->run();
+  } catch (\Throwable $exception) {
+      $logger->error('Service execution failed', ['exception' => $exception]);
+  }
+  ```
+
+  The default formatter renders the throwable, including its type, message, stack trace, and previous exceptions. Do
+  not copy values such as its message, line, or previous exception into separate context fields. Add only context that
+  cannot be inferred from the throwable.
+- Keep context construction safe and cheap. In particular, avoid database, network, filesystem, or other potentially
+  throwing operations merely to obtain a value for a log call. Prefer identifiers and data already available locally.
+- Choose the lowest useful log level. Use `debug` for verbose diagnostics (especially inside loops), `info` for normal
+  successful operation and occasional heartbeats, `notice` for acceptable irregularities, and `warning` for failures
+  recovered by a fallback. Agree within the team when higher levels should alert an operator. Heartbeat logs complement,
+  but do not replace, external health checks; sample them if their volume would be excessive.
+- Do not use logs as the primary API for measurements or operation durations. Use a metrics API for measurements and a
+  tracing API for timings and nested operations; those systems may still be configured to export their data to logs.
+- Logging and creating throwables both have a cost. Be especially deliberate about either operation in tight loops. The
+  logger and its targets buffer messages by default, so tune the flush and export intervals for long-running processes.
+
 ### Message Flushing and Exporting
 
 Log messages are collected and stored in memory. To limit memory consumption, the logger will flush

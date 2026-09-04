@@ -269,5 +269,5 @@ return [
 
 ## Документация
 
-- [Руководство Yii по логированию](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md)
+- [Руководство Yii по логированию](https://yiisoft.github.io/docs/guide/runtime/logging)
 - [Internals](../../internals.md)

@@ -287,7 +287,7 @@ is emitted and when a console command terminates.
 ## Documentation
 
 - Guide: [Russian - Русский](docs/guide/ru/README.md)
-- [Yii guide to logging](https://github.com/yiisoft/docs/blob/master/guide/en/runtime/logging.md)
+- [Yii guide to logging](https://yiisoft.github.io/docs/guide/runtime/logging)
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is available.

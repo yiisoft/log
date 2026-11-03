@@ -21,11 +21,13 @@ final class DummyTarget extends Target
         ?callable $format = null,
         ?callable $prefix = null,
         ?string $timestampFormat = null,
+        string|callable|null $contextFormat = null,
+        ?callable $stringConverter = null,
         int $exportInterval = self::DEFAULT_EXPORT_INTERVAL,
         bool|callable $enabled = true,
     ) {
-        parent::__construct($levels, $categories, $exceptCategories, $format, $prefix, $timestampFormat, $exportInterval, $enabled);
-        $this->exportFormatter = new Formatter($format, $prefix, $timestampFormat);
+        parent::__construct($levels, $categories, $exceptCategories, $format, $prefix, $timestampFormat, $contextFormat, $stringConverter, $exportInterval, $enabled);
+        $this->exportFormatter = new Formatter($format, $prefix, $timestampFormat, $contextFormat, $stringConverter);
     }
 
     public function export(): void

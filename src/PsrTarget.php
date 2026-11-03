@@ -22,6 +22,8 @@ final class PsrTarget extends Target
      * @param callable|null $format A PHP callable that returns a string representation of the log message.
      * @param callable|null $prefix A PHP callable that returns a string to be prefixed to every exported message.
      * @param string|null $timestampFormat The date format for the log timestamp.
+     * @param string|callable|null $contextFormat A context format for the log context output. See {@see Target::__construct()}.
+     * @param callable|null $stringConverter A PHP callable that converts a context value to a string. See {@see Target::__construct()}.
      * @param int $exportInterval How many messages should be accumulated before they are exported.
      * @param bool|callable $enabled Whether this target is enabled, or a PHP callable that returns a boolean.
      */
@@ -33,10 +35,12 @@ final class PsrTarget extends Target
         ?callable $format = null,
         ?callable $prefix = null,
         ?string $timestampFormat = null,
+        string|callable|null $contextFormat = null,
+        ?callable $stringConverter = null,
         int $exportInterval = self::DEFAULT_EXPORT_INTERVAL,
         bool|callable $enabled = true,
     ) {
-        parent::__construct($levels, $categories, $exceptCategories, $format, $prefix, $timestampFormat, $exportInterval, $enabled);
+        parent::__construct($levels, $categories, $exceptCategories, $format, $prefix, $timestampFormat, $contextFormat, $stringConverter, $exportInterval, $enabled);
     }
 
     /**
